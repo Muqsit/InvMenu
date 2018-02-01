@@ -3,7 +3,7 @@ InvMenu is a PocketMine-MP plugin for developers that helps you create and manag
 
 
 ### Installation
-You can get the compiled .phar file on poggit by clicking here.
+You can get the compiled .phar file on poggit by clicking [here](https://poggit.pmmp.io/ci/Muqsit/InvMenu/~).
 
 ### Usage
 You'll need to import the `muqsit\invmenu\InvMenu.php` class. This is the main class and probably the only class you'll need (for the most part) to create and manage fake inventories.
