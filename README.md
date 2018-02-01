@@ -15,6 +15,7 @@ use muqsit\invmenu\InvMenu;
 InvMenu supports 3 types of menus, but you can always create your own menu type. More on that later. Let's have a look at the 3 main types of menus that InvMenu offers:
 ```php
 class InvMenu {
+    const TYPE_CUSTOM = -1;
     const TYPE_CHEST = 0;
     const TYPE_HOPPER = 1;
     const TYPE_DOUBLE_CHEST = 2;
@@ -48,6 +49,12 @@ Yup, that's it. It's that simple.
 $menu->readonly();
 ```
 
+### Specifying a custom name to the GUI
+You can specify a custom title to the inventory using `InvMenu::setName()`.
+```php
+$menu->setName("Custom GUI Name");
+```
+
 ### Handling item transactions happening in the GUI
 Another thing `InvMenu` offers is simplified inventory transaction handling. Let's see whatever that means!
 There's no way you haven't come across interactive GUIs in Minecraft. You can handle Inventory Transactions by using PHP `callables`.
@@ -63,6 +70,10 @@ Callable parameters:
 - Player `$player` - The player responsible for the inventory transaction.
 - Item `$itemClickedOn` - The item that the player clicked in the GUI.
 - Item `$itemClickedWith` - The item that the player put in the GUI. This can also be the item that the player clicked `$itemClickedOn` with as players are able to put and takeout items from an inventory in one go.
+- SlotChangeAction `$inventoryAction` - The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.
+- SlotChangeAction `$playerAction` - The player-sided SlotChangeAction. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.
+
+It's not mandatory to specify each and every parameter in the `callable`. You are good to go even by specifying only the parameters you'll be using.
 
 The function is called during `InventoryTransactionEvent` that `InvMenu` handles itself. The function **must** return a `bool` value.
 If the function returns `false`, the `InventoryTransactionEvent` gets cancelled.
@@ -101,6 +112,49 @@ $menu->setInventoryCloseListener(function(Player $player, BaseFakeInventory $inv
 });
 ```
 
+### Adding your own custom Inventory instance.
+You can specify your own Inventory instance by creating an Inventory class that extends `BaseFakeInventory`. Here's an example of creating a Brewing stand inventory even though it doesn't exist in the InvMenu code. You'll need to create an InvMenu instance with the type `InvMenu::TYPE_CUSTOM`. This type will NOT create an Inventory instance for the InvMenu so you are forced to specify an inventory using `InvMenu::setInventory()`.
+```php
+<?php
+namespace spacename;
+
+use muqsit\invmenu\inventories\BaseFakeInventory;
+
+use pocketmine\block\BlockIds;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\tile\Tile;
+
+class BrewingInventory extends BaseFakeInventory {
+
+    const FAKE_BLOCK_ID = BlockIds::BREWING_STAND_BLOCK;
+    const FAKE_TILE_ID = Tile::BREWING_STAND;
+
+    public function getName() : string
+    {
+        return "BrewingInventory";
+    }
+
+    public function getDefaultSize() : int
+    {
+        return 4;
+    }
+
+    public function getNetworkType() : int
+    {
+        return WindowTypes::BREWING_STAND;
+    }
+}
+
+$menu = InvMenu::create(InvMenu::TYPE_CUSTOM)
+    ->setInventoryClass(BrewingInventory::class);
+$menu->getInventory()->setContents([
+    Item::get(Item::NETHER_WART),
+    Item::get(Item::POTION),
+    Item::get(Item::POTION),
+    Item::get(Item::POTION)
+]);
+```
+
 ### InvMenu application examples
 Server-selector GUI
 ```php
@@ -112,6 +166,7 @@ class A {
     public function __construct(){
         $this->menu = InvMenu::create(InvMenu::TYPE_CHEST)
             ->readonly()
+            ->setName("Server Selector")
             ->setListener([$this, "onServerSelectorTransaction"])//you can call class functions this way
             ->onInventoryClose(function(Player $player) : void{
                 $player->sendMessage(TextFormat::GREEN."You are being transferred...");
