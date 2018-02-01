@@ -56,6 +56,9 @@ $menu->setName("Custom GUI Name");
 ```
 
 ### Handling item transactions happening in the GUI
+**WARNING!** If you have a plugin that listens to InventoryTransactionEvent at a superior priority than what InvMenu listens to on, it may cause unexpected behaviour. InvMenu listens to InventoryTransactionEvent and simplifies the event's output. Make sure the plugin is letting a way for other plugins to handle the event just as efficiently as without the plugin.
+
+
 Another thing `InvMenu` offers is simplified inventory transaction handling. Let's see whatever that means!
 There's no way you haven't come across interactive GUIs in Minecraft. You can handle Inventory Transactions by using PHP `callables`.
 ```php
@@ -157,5 +160,4 @@ $menu->getInventory()->setContents([
 
 ### InvMenu application examples
 Read the [wiki](https://github.com/Muqsit/InvMenu/wiki/Examples) for examples on the different ways InvMenu can be used on servers.
-```
 
