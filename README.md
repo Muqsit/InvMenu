@@ -3,7 +3,7 @@ InvMenu is a PocketMine-MP plugin for developers that helps you create and manag
 
 
 ### Installation
-You can get the compiled .phar file on poggit by clicking here.
+You can get the compiled .phar file on poggit by clicking [here](https://poggit.pmmp.io/ci/Muqsit/InvMenu/~).
 
 ### Usage
 You'll need to import the `muqsit\invmenu\InvMenu.php` class. This is the main class and probably the only class you'll need (for the most part) to create and manage fake inventories.
@@ -12,7 +12,7 @@ You'll need to import the `muqsit\invmenu\InvMenu.php` class. This is the main c
 use muqsit\invmenu\InvMenu;
 ```
 
-InvMenu supports 3 types of menus, but you can always create your own menu type. More on that later. Let's have a look at the 3 main types of menus that InvMenu offers:
+InvMenu supports 4 types of menus, but you can always create your own menu type. More on that later. Let's have a look at the 3 main types of menus that InvMenu offers:
 ```php
 class InvMenu {
     const TYPE_CUSTOM = -1;
@@ -66,12 +66,12 @@ $menu->setLisener(function(Player $player, Item $itemClickedOn, Item $itemClicke
     return true;
 });
 ```
-Callable parameters:
-- Player `$player` - The player responsible for the inventory transaction.
-- Item `$itemClickedOn` - The item that the player clicked in the GUI.
-- Item `$itemClickedWith` - The item that the player put in the GUI. This can also be the item that the player clicked `$itemClickedOn` with as players are able to put and takeout items from an inventory in one go.
-- SlotChangeAction `$inventoryAction` - The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.
-- SlotChangeAction `$playerAction` - The player-sided SlotChangeAction. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.
+**Callable parameters:**
+- **Player `$player` -** *The player responsible for the inventory transaction.*
+- **Item `$itemClickedOn` -** *The item that the player clicked in the GUI.*
+- **Item `$itemClickedWith` -** *The item that the player put in the GUI. This can also be the item that the player clicked `$itemClickedOn` with as players are able to put and takeout items from an inventory in one go.*
+- **SlotChangeAction `$inventoryAction` -** *The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.*
+- **SlotChangeAction `$playerAction` -** *The player-sided SlotChangeAction. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.*
 
 It's not mandatory to specify each and every parameter in the `callable`. You are good to go even by specifying only the parameters you'll be using.
 
@@ -82,12 +82,12 @@ If the function returns `false`, the `InventoryTransactionEvent` gets cancelled.
 
 ### Sessions
 Now, yeah. InvMenu by default doesn't create a new Inventory instance for every player. In fact, the SAME Inventory is sent to all the players that you `InvMenu::send()` the inventory to.
-You may want to sessionize InvMenu for creating mechanisms like `PlayerVaults` where every player needs their own inventory.
-You can use `InvMenu::sessionize()` to for this.
+You may want to sessionize InvMenu for creating mechanisms like PlayerVaults where every player needs their own inventory.
+You can use `InvMenu::sessionize()` for this.
 ```php
 $menu->sessionize();
 ```
-It is also important to note that the sessionizing InvMenu `clones` the `Inventory` instance that `InvMenu` holds, which means if you create an InvMenu this way:
+It is also important to note that sessionizing InvMenu *clones* the `Inventory` instance that InvMenu holds, which means if you create an InvMenu this way:
 ```php
 $menu = InvMenu::create(InvMenu::TYPE_CHEST);
 $menu->getInventory()->setContents([
@@ -104,7 +104,7 @@ $menu->send($player);//you can move the diamond sword and pickaxe to your invent
 
 $menu->send($player);//the diamond sword and diamond pickaxes are back!
 ```
-InvMenu will delete the inventory instance when the inventory gets closed. You can handle inventory closings too, just like handling inventory transactions.
+InvMenu will delete the inventory instance when the inventory gets closed when InvMenu is sessionized. You can handle inventory closings too, just like handling inventory transactions.
 
 ```php
 $menu->setInventoryCloseListener(function(Player $player, BaseFakeInventory $inventory) : void{
@@ -112,7 +112,7 @@ $menu->setInventoryCloseListener(function(Player $player, BaseFakeInventory $inv
 });
 ```
 
-### Adding your own custom Inventory instance.
+### Adding your own custom Inventory instance
 You can specify your own Inventory instance by creating an Inventory class that extends `BaseFakeInventory`. Here's an example of creating a Brewing stand inventory even though it doesn't exist in the InvMenu code. You'll need to create an InvMenu instance with the type `InvMenu::TYPE_CUSTOM`. This type will NOT create an Inventory instance for the InvMenu so you are forced to specify an inventory using `InvMenu::setInventory()`.
 ```php
 <?php
