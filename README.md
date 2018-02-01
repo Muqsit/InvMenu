@@ -156,36 +156,6 @@ $menu->getInventory()->setContents([
 ```
 
 ### InvMenu application examples
-Server-selector GUI
-```php
-class A {
-
-    /** @var InvMenu */
-    private $menu;
-
-    public function __construct(){
-        $this->menu = InvMenu::create(InvMenu::TYPE_CHEST)
-            ->readonly()
-            ->setName("Server Selector")
-            ->setListener([$this, "onServerSelectorTransaction"])//you can call class functions this way
-            ->onInventoryClose(function(Player $player) : void{
-                $player->sendMessage(TextFormat::GREEN."You are being transferred...");
-            });
-        $server1 = Item::get(Item::DIAMOND_SWORD)->setCustomName("Join Server1");
-        $server1->getNamedTag()->setByte("Server", "server1.invmenu.test:19132");
-        $this->menu->getInventory()->addItem($server1);
-    }
-
-    public function onServerSelectorTransaction(Player $player, Item $itemClickedOn) : bool{
-        [$ip, $port] = explode(":", $itemClickedOn->getNamedTag()->getString("Server", "play.withinvmenu.plugin:19132"));
-        $player->transfer($ip, $port);
-        return true;
-    }
-
-    public function onCommand(CommandSender $issuer, Command $cmd, string $label, array $args) : bool{
-        $this->menu->send($issuer);
-        return true;
-    }
-}
+Read the [wiki](https://github.com/Muqsit/InvMenu/wiki/Examples) for examples on the different ways InvMenu can be used on servers.
 ```
 
