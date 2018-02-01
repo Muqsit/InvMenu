@@ -1,5 +1,7 @@
 # InvMenu
-InvMenu is a PocketMine-MP plugin for developers that helps you create and manage fake inventories with ease!
+**InvMenu is a PocketMine-MP plugin for developers that helps you create and manage fake inventories with ease!**
+[![](https://poggit.pmmp.io/shield.state/InvMenu)](https://poggit.pmmp.io/p/InvMenu)
+<a href="https://poggit.pmmp.io/p/InvMenu"><img src="https://poggit.pmmp.io/shield.state/InvMenu"></a>
 
 
 ### Installation
