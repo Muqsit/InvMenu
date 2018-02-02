@@ -62,7 +62,7 @@ $menu->setName("Custom GUI Name");
 Another thing `InvMenu` offers is simplified inventory transaction handling. Let's see whatever that means!
 There's no way you haven't come across interactive GUIs in Minecraft. You can handle Inventory Transactions by using PHP `callables`.
 ```php
-$menu->setLisener(function(Player $player, Item $itemClickedOn, Item $itemClickedWith) : bool{
+$menu->setListener(function(Player $player, Item $itemClickedOn, Item $itemClickedWith) : bool{
     if($itemClickedOn->getId() === Item::DIAMOND_SWORD){
         $player->sendMessage(TextFormat::GREEN."You clicked on a diamond sword!");
     }
