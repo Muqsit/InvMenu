@@ -1,8 +1,6 @@
 # InvMenu
 **InvMenu is a PocketMine-MP plugin for developers that helps you create and manage fake inventories with ease!**
 [![](https://poggit.pmmp.io/shield.state/InvMenu)](https://poggit.pmmp.io/p/InvMenu)
-<a href="https://poggit.pmmp.io/p/InvMenu"><img src="https://poggit.pmmp.io/shield.state/InvMenu"></a>
-
 
 ### Installation
 You can get the compiled .phar file on poggit by clicking [here](https://poggit.pmmp.io/ci/Muqsit/InvMenu/~).
@@ -134,18 +132,15 @@ class BrewingInventory extends BaseFakeInventory {
     const FAKE_BLOCK_ID = BlockIds::BREWING_STAND_BLOCK;
     const FAKE_TILE_ID = Tile::BREWING_STAND;
 
-    public function getName() : string
-    {
+    public function getName() : string{
         return "BrewingInventory";
     }
 
-    public function getDefaultSize() : int
-    {
+    public function getDefaultSize() : int{
         return 4;
     }
 
-    public function getNetworkType() : int
-    {
+    public function getNetworkType() : int{
         return WindowTypes::BREWING_STAND;
     }
 }
