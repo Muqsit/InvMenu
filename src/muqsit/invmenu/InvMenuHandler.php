@@ -25,8 +25,32 @@ use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\inventory\{PlayerCursorInventory, PlayerInventory};
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\plugin\PluginBase;
 
-class EventListener implements Listener {
+class InvMenuHandler implements Listener {
+
+    /** @var PluginBase */
+    private static $registrant;
+
+    private function __construct()
+    {
+    }
+
+    public static function register(PluginBase $plugin) : void
+    {
+        if (self::isRegistered()) {
+            throw new \Error("EventHandler is already registered by plugin '" . self::$registrant->getName() . "'");
+        }
+
+        self::$registrant = $plugin;
+        $plugin->getServer()->getPluginManager()->registerEvents(new InvMenuHandler(), $plugin);
+        $plugin->getLogger()->info("Registered InvMenuHandler");
+    }
+
+    public static function isRegistered() : bool
+    {
+        return self::$registrant !== null;
+    }
 
     public function onInventoryTransaction(InventoryTransactionEvent $event) : void
     {

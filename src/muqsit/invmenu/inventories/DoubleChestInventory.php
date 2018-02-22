@@ -79,18 +79,17 @@ class DoubleChestInventory extends ChestInventory {
         $pk->z = $holder->z;
 
         $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
-        $nbt = new CompoundTag("", [
+        $tag = new CompoundTag("", [
             new StringTag("id", static::FAKE_TILE_ID),
             new IntTag("pairx", $holder->x + 1),
             new IntTag("pairz", $holder->z)
         ]);
         $customName = $this->menu->getName();
         if ($customName !== null) {
-            $nbt->setString("CustomName", $customName);
+            $tag->setString("CustomName", $customName);
         }
-        $writer->setData($nbt);
 
-        $pk->namedtag = $writer->write();
+        $pk->namedtag = $writer->write($tag);
         $player->dataPacket($pk);
 
         $pk = new BlockEntityDataPacket();
@@ -98,13 +97,11 @@ class DoubleChestInventory extends ChestInventory {
         $pk->y = $holder->y;
         $pk->z = $holder->z;
 
-        $writer->setData(new CompoundTag("", [
+        $pk->namedtag = $writer->write(new CompoundTag("", [
             new StringTag("id", static::FAKE_TILE_ID),
             new IntTag("pairx", $holder->x),
             new IntTag("pairz", $holder->z)
         ]));
-
-        $pk->namedtag = $writer->write();
         $player->dataPacket($pk);
     }
 

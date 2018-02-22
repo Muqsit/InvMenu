@@ -110,6 +110,10 @@ class InvMenu {
 
     public function setListener(callable $listener) : InvMenu
     {
+        if (!InvMenuHandler::isRegistered()) {
+            throw new \Error("Attempted to assign a listener without InvMenuHandler being registered. Use InvMenuHandler::register() if you want to handle inventory transactions.");
+        }
+
         $this->listener = $listener;
         return $this;
     }
@@ -150,7 +154,7 @@ class InvMenu {
 
     public function send(Player $player) : void
     {
-        $player->addWindow($this->inventory);
+        $player->addWindow($this->getInventory($player));
     }
 
     public function onInventoryClose(Player $player) : void

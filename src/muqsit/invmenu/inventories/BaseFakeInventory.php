@@ -62,29 +62,31 @@ abstract class BaseFakeInventory extends BaseInventory {
 
     public function onOpen(Player $player) : void
     {
-        parent::onOpen($player);
+        if (!isset($this->holders[$id = $player->getId()])) {
+            parent::onOpen($player);
 
-        $this->holders[$player->getId()] = $holder = $player->round()->add(0, self::INVENTORY_HEIGHT);
-        $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
+            $this->holders[$id] = $player->round()->add(0, self::INVENTORY_HEIGHT);
+            $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
 
-        $this->sendFakeTile($player);
-
-        $this->sendInventoryInterface($player);
+            $this->sendFakeTile($player);
+            $this->sendInventoryInterface($player);
+        }
     }
 
     public function onClose(Player $player) : void
     {
-        $pk = new ContainerClosePacket();
-        $pk->windowId = $player->getWindowId($this);
-        $player->dataPacket($pk);
+        if (isset($this->holders[$id = $player->getId()])) {
+            parent::onClose($player);
 
-        if (isset($this->holders[$player->getId()])) {
             $this->sendBlocks($player, self::SEND_BLOCKS_REAL);
-            unset($this->holders[$player->getId()]);
-        }
+            $this->menu->onInventoryClose($player);
 
-        parent::onClose($player);
-        $this->menu->onInventoryClose($player);
+            unset($this->holders[$id]);
+
+            $pk = new ContainerClosePacket();
+            $pk->windowId = $player->getWindowId($this);
+            $player->dataPacket($pk);
+        }
     }
 
     public function sendInventoryInterface(Player $player) : void
@@ -112,16 +114,15 @@ abstract class BaseFakeInventory extends BaseInventory {
         $pk->z = $holder->z;
 
         $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
-        $nbt = new CompoundTag("", [
+        $tag = new CompoundTag("", [
             new StringTag("id", static::FAKE_TILE_ID)
         ]);
         $customName = $this->menu->getName();
         if ($customName !== null) {
-            $nbt->setString("CustomName", $customName);
+            $tag->setString("CustomName", $customName);
         }
-        $writer->setData($nbt);
 
-        $pk->namedtag = $writer->write();
+        $pk->namedtag = $writer->write($tag);
         $player->dataPacket($pk);
     }
 
