@@ -19,6 +19,8 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\inventories\tasks\DoubleChestDelayTask;
+
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
@@ -42,27 +44,13 @@ class DoubleChestInventory extends ChestInventory {
     public function sendInventoryInterface(Player $player, bool $force = false) : void
     {
         if (!$force && $player->getPing() < 300) {//if you have > 300 ping, thank your network connection for providing you the delay
-            $player->getServer()->getScheduler()->scheduleDelayedTask(new class($player, $this) extends Task {
-
-                /** @var Player */
-                private $player;
-
-                /** @var DoubleChestInventory */
-                private $inventory;
-
-                public function __construct(Player $player, DoubleChestInventory $inventory)
-                {
-                    $this->player = $player;
-                    $this->inventory = $inventory;
-                }
-
-                public function onRun(int $tick) : void
-                {
-                    if ($this->player->isAlive()) {
-                        $this->inventory->sendInventoryInterface($this->player, true);
-                    }
-                }
-            }, 4);
+            /* For everyone confused what the heck is the reason for the delay's existence.
+             * Calling DoubleChestInventory::sendInventoryInterface() just after sending the client
+             * the chest block and the chest tile packets will send a normal (27 slot) chest to the client.
+             * Delaying it solves the issue with that. The client takes a couple of milliseconds to "merge"
+             * the two chests. Please make a PR if you know how to avoid this delay, because it's an utter mess.
+             */
+            $player->getServer()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
             return;
         }
 
