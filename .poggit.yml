@@ -3,5 +3,6 @@ branches:
 - master
 projects:
   InvMenu:
-    path: ""
+    model: virion
+    type: library
 ...
