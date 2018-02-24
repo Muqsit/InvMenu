@@ -74,8 +74,8 @@ class InvMenu {
             if ($customInvClass === null) {
                 throw new \Error("You need to specify a custom inventory class if you are creating InvMenu with custom type.");
             }
-            if (!($customInvClass instanceof BaseFakeInventory)) {
-                throw new \Error("$customInvClass must be an instance of ".BaseFakeInventory::class.".");
+            if (!is_subclass_of($customInvClass, BaseFakeInventory::class, true)) {
+                throw new \Error("$customInvClass must extend ".BaseFakeInventory::class.".");
             }
             $class = $customInvClass;
         } else {
