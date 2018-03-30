@@ -70,6 +70,7 @@ abstract class BaseFakeInventory extends BaseInventory {
 
             $this->sendFakeTile($player);
             $this->sendInventoryInterface($player);
+            $this->sendContents($player);
         }
     }
 

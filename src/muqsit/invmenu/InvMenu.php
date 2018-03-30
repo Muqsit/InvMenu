@@ -25,6 +25,7 @@ use muqsit\invmenu\inventories\{
 
 use pocketmine\item\Item;
 use pocketmine\Player;
+use pocketmine\utils\MainLogger;
 
 class InvMenu {
 
@@ -79,6 +80,9 @@ class InvMenu {
             }
             $class = $customInvClass;
         } else {
+            if ($customInvClass !== null) {
+                MainLogger::getLogger()->warning("A custom inventory class was specified for an InvMenu. This class will not be used as the inventory class unless you specify the menu type as TYPE_CUSTOM.");
+            }
             $class = self::INVENTORY_CLASSES[$type];
         }
 
@@ -152,9 +156,9 @@ class InvMenu {
         return $this->name;
     }
 
-    public function send(Player $player) : void
+    public function send(Player $player, ?int $forceId = null) : int
     {
-        $player->addWindow($this->getInventory($player));
+        return $player->addWindow($this->getInventory($player), $forceId);
     }
 
     public function onInventoryClose(Player $player) : void
