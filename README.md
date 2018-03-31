@@ -58,8 +58,6 @@ $menu->setName("Custom GUI Name");
 ### Handling item transactions happening in the GUI
 **WARNING!** If you have a plugin that listens to InventoryTransactionEvent at a superior priority than what InvMenu listens to on, it may cause unexpected behaviour. InvMenu listens to InventoryTransactionEvent and simplifies the event's output. Make sure the plugin is letting a way for other plugins to handle the event just as efficiently as without the plugin.
 
-Another thing `InvMenu` offers is simplified inventory transaction handling. Let's see whatever that means!
-
 Before we begin, make sure to register the `InvMenuHandler` class on server startup from your plugin.
 ```php
 /** @var PluginBase $plugin */
@@ -154,8 +152,7 @@ class BrewingInventory extends BaseFakeInventory {
     }
 }
 
-$menu = InvMenu::create(InvMenu::TYPE_CUSTOM)
-    ->setInventoryClass(BrewingInventory::class);
+$menu = InvMenu::create(InvMenu::TYPE_CUSTOM, BrewingInventory::class);
 $menu->getInventory()->setContents([
     Item::get(Item::NETHER_WART),
     Item::get(Item::POTION),
