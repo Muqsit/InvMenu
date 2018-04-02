@@ -165,9 +165,9 @@ class InvMenu {
     {
         if ($this->inventoryCloseListener !== null) {
             ($this->inventoryCloseListener)($player, $this->getInventory($player));
-            if ($this->sessionize) {
-                unset($this->sessions[$player->getId()]);
-            }
+        }
+        if ($this->sessionize) {
+            unset($this->sessions[$player->getId()]);
         }
     }
 }
