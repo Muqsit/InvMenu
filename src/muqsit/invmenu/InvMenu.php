@@ -51,8 +51,11 @@ class InvMenu {
     /** @var string|null */
     private $name;
 
-    /** @var BaseFakeInventory */
+    /** @var BaseFakeInventory|null */
     private $inventory;
+
+    /** @var string */
+    private $inventory_class;
 
     /** @var bool */
     private $readonly = false;
@@ -86,8 +89,18 @@ class InvMenu {
             $class = self::INVENTORY_CLASSES[$type];
         }
 
+        $this->inventory_class = $class;
         $this->type = $type;
-        $this->inventory = new $class($this);
+
+        if (!$this->sessionize) {
+            $this->inventory = $this->createNewInventoryInstance();
+        }
+    }
+
+    public function createNewInventoryInstance() : BaseFakeInventory
+    {
+        $class = $this->inventory_class;
+        return new $class($this);
     }
 
     public function getInventory(?Player $player = null) : BaseFakeInventory
@@ -96,7 +109,8 @@ class InvMenu {
             if ($player === null) {
                 throw new \Error("Could not select the base inventory when InvMenu is sessionized. Please specify a Player instance in the first parameter.");
             }
-            return $this->sessions[$player->getId()] ?? ($this->sessions[$player->getId()] = clone $this->inventory);
+
+            return $this->sessions[$player->getId()] ?? ($this->sessions[$player->getId()] = $this->createNewInventoryInstance());
         }
         return $this->inventory;
     }
