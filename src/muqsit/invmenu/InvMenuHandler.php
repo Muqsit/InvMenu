@@ -36,6 +36,11 @@ class InvMenuHandler implements Listener {
     {
     }
 
+    public static function getRegistrant() : ?PluginBase
+    {
+        return self::$registrant;
+    }
+
     public static function register(PluginBase $plugin) : void
     {
         if (self::isRegistered()) {
