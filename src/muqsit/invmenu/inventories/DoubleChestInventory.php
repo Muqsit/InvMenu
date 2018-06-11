@@ -19,6 +19,7 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\inventories\tasks\DoubleChestDelayTask;
 
 use pocketmine\block\Block;
@@ -50,7 +51,7 @@ class DoubleChestInventory extends ChestInventory {
              * Delaying it solves the issue with that. The client takes a couple of milliseconds to "merge"
              * the two chests. Please make a PR if you know how to avoid this delay, because it's an utter mess.
              */
-            $player->getServer()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
+            InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
             return;
         }
 
