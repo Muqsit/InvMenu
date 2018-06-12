@@ -115,9 +115,9 @@ class InvMenu {
         return $this->inventory;
     }
 
-    public function readonly() : InvMenu
+    public function readonly(bool $value = true) : InvMenu
     {
-        $this->readonly = true;
+        $this->readonly = $value;
         return $this;
     }
 
