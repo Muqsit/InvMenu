@@ -25,7 +25,7 @@ use muqsit\invmenu\inventories\tasks\DoubleChestDelayTask;
 use pocketmine\block\Block;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
-use pocketmine\nbt\tag\{CompoundTag, IntTag, StringTag};
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\scheduler\Task;
 use pocketmine\Player;
@@ -68,11 +68,12 @@ class DoubleChestInventory extends ChestInventory {
         $pk->z = $holder->z;
 
         $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
-        $tag = new CompoundTag("", [
-            new StringTag("id", static::FAKE_TILE_ID),
-            new IntTag("pairx", $holder->x + 1),
-            new IntTag("pairz", $holder->z)
-        ]);
+
+        $tag = new CompoundTag();
+        $tag->setString("id", static::FAKE_TILE_ID);
+        $tag->setInt("pairx", $holder->x + 1);
+        $tag->setInt("pairz", $holder->z);
+
         $customName = $this->menu->getName();
         if ($customName !== null) {
             $tag->setString("CustomName", $customName);
@@ -86,11 +87,9 @@ class DoubleChestInventory extends ChestInventory {
         $pk->y = $holder->y;
         $pk->z = $holder->z;
 
-        $pk->namedtag = $writer->write(new CompoundTag("", [
-            new StringTag("id", static::FAKE_TILE_ID),
-            new IntTag("pairx", $holder->x),
-            new IntTag("pairz", $holder->z)
-        ]));
+        $tag->setInt("pairx", $holder->x);
+
+        $pk->namedtag = $writer->write($tag);
         $player->dataPacket($pk);
     }
 

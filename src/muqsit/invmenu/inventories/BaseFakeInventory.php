@@ -22,14 +22,14 @@ namespace muqsit\invmenu\inventories;
 use muqsit\invmenu\InvMenu;
 
 use pocketmine\block\Block;
-use pocketmine\inventory\BaseInventory;
+use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
-use pocketmine\nbt\tag\{CompoundTag, StringTag};
-use pocketmine\network\mcpe\protocol\{BlockEntityDataPacket, ContainerClosePacket, ContainerOpenPacket};
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\Player;
 
-abstract class BaseFakeInventory extends BaseInventory {
+abstract class BaseFakeInventory extends ContainerInventory {
 
     const SEND_BLOCKS_FAKE = 0;
     const SEND_BLOCKS_REAL = 1;
@@ -52,7 +52,7 @@ abstract class BaseFakeInventory extends BaseInventory {
     public function __construct(InvMenu $menu)
     {
         $this->menu = $menu;
-        parent::__construct();
+        parent::__construct(new Vector3());
     }
 
     public function getMenu() : InvMenu
@@ -63,14 +63,11 @@ abstract class BaseFakeInventory extends BaseInventory {
     public function onOpen(Player $player) : void
     {
         if (!isset($this->holders[$id = $player->getId()])) {
-            parent::onOpen($player);
-
-            $this->holders[$id] = $player->round()->add(0, self::INVENTORY_HEIGHT);
+            $this->holders[$id] = $this->holder = $player->floor()->add(0, static::INVENTORY_HEIGHT, 0);
             $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
 
             $this->sendFakeTile($player);
-            $this->sendInventoryInterface($player);
-            $this->sendContents($player);
+            parent::onOpen($player);
         }
     }
 
@@ -83,26 +80,7 @@ abstract class BaseFakeInventory extends BaseInventory {
             $this->menu->onInventoryClose($player);
 
             unset($this->holders[$id]);
-
-            $pk = new ContainerClosePacket();
-            $pk->windowId = $player->getWindowId($this);
-            $player->dataPacket($pk);
         }
-    }
-
-    public function sendInventoryInterface(Player $player) : void
-    {
-        $holder = $this->holders[$player->getId()];
-
-        $pk = new ContainerOpenPacket();
-        $pk->windowId = $player->getWindowId($this);
-        $pk->type = $this->getNetworkType();
-        $pk->x = $holder->x;
-        $pk->y = $holder->y;
-        $pk->z = $holder->z;
-        $player->dataPacket($pk);
-
-        $this->sendContents($player);
     }
 
     protected function sendFakeTile(Player $player) : void
@@ -114,16 +92,15 @@ abstract class BaseFakeInventory extends BaseInventory {
         $pk->y = $holder->y;
         $pk->z = $holder->z;
 
-        $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
-        $tag = new CompoundTag("", [
-            new StringTag("id", static::FAKE_TILE_ID)
-        ]);
+        $tag = new CompoundTag();
+        $tag->setString("id", static::FAKE_TILE_ID);
+
         $customName = $this->menu->getName();
         if ($customName !== null) {
             $tag->setString("CustomName", $customName);
         }
 
-        $pk->namedtag = $writer->write($tag);
+        $pk->namedtag = (self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream()))->write($tag);
         $player->dataPacket($pk);
     }
 
