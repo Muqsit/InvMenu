@@ -19,12 +19,14 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\inventories\tasks\DoubleChestDelayTask;
 
 use pocketmine\block\Block;
+use pocketmine\inventory\{BaseInventory, ContainerInventory};
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
-use pocketmine\nbt\tag\{CompoundTag, IntTag, StringTag};
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\scheduler\Task;
 use pocketmine\Player;
@@ -41,7 +43,7 @@ class DoubleChestInventory extends ChestInventory {
         return 54;
     }
 
-    public function sendInventoryInterface(Player $player, bool $force = false) : void
+    public function onOpen(Player $player, bool $force = false) : void
     {
         if (!$force && $player->getPing() < 300) {//if you have > 300 ping, thank your network connection for providing you the delay
             /* For everyone confused what the heck is the reason for the delay's existence.
@@ -50,11 +52,18 @@ class DoubleChestInventory extends ChestInventory {
              * Delaying it solves the issue with that. The client takes a couple of milliseconds to "merge"
              * the two chests. Please make a PR if you know how to avoid this delay, because it's an utter mess.
              */
-            $player->getServer()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
+
+            $this->holders[$player->getId()] = $this->holder = $player->floor()->add(0, static::INVENTORY_HEIGHT, 0);
+
+            $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
+            $this->sendFakeTile($player);
+
+            InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
+            BaseInventory::onOpen($player);
             return;
         }
 
-        parent::sendInventoryInterface($player);
+        ContainerInventory::onOpen($player);
     }
 
     protected function sendFakeTile(Player $player) : void
@@ -67,11 +76,12 @@ class DoubleChestInventory extends ChestInventory {
         $pk->z = $holder->z;
 
         $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
-        $tag = new CompoundTag("", [
-            new StringTag("id", static::FAKE_TILE_ID),
-            new IntTag("pairx", $holder->x + 1),
-            new IntTag("pairz", $holder->z)
-        ]);
+
+        $tag = new CompoundTag();
+        $tag->setString("id", static::FAKE_TILE_ID);
+        $tag->setInt("pairx", $holder->x + 1);
+        $tag->setInt("pairz", $holder->z);
+
         $customName = $this->menu->getName();
         if ($customName !== null) {
             $tag->setString("CustomName", $customName);
@@ -85,11 +95,9 @@ class DoubleChestInventory extends ChestInventory {
         $pk->y = $holder->y;
         $pk->z = $holder->z;
 
-        $pk->namedtag = $writer->write(new CompoundTag("", [
-            new StringTag("id", static::FAKE_TILE_ID),
-            new IntTag("pairx", $holder->x),
-            new IntTag("pairz", $holder->z)
-        ]));
+        $tag->setInt("pairx", $holder->x);
+
+        $pk->namedtag = $writer->write($tag);
         $player->dataPacket($pk);
     }
 

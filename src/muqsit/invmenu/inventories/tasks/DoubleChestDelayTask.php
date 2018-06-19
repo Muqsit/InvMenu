@@ -41,7 +41,7 @@ class DoubleChestDelayTask extends Task {
     public function onRun(int $tick) : void
     {
         if ($this->player->isAlive()) {
-            $this->inventory->sendInventoryInterface($this->player, true);
+            $this->inventory->onOpen($this->player, true);
         }
     }
 }
