@@ -80,8 +80,8 @@ $menu->setListener(function(Player $player, Item $itemClickedOn, Item $itemClick
 - **Player `$player` -** *The player responsible for the inventory transaction.*
 - **Item `$itemClickedOn` -** *The item that the player clicked in the GUI.*
 - **Item `$itemClickedWith` -** *The item that the player put in the GUI. This can also be the item that the player clicked `$itemClickedOn` with as players are able to put and takeout items from an inventory in one go.*
-- **SlotChangeAction `$inventoryActions` -** *The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.*
-- **SlotChangeAction[] `$playerActions` -** *The player-sided SlotChangeActions. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.*
+- **SlotChangeAction `$inventoryAction` -** *The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.*
+- **InventoryAction[] `$otherActions` -** *The InventoryActions caused outside the InvMenu inventory which affected the InvMenu inventory.*
 
 It's not mandatory to specify each and every parameter in the `callable`. You are good to go even by specifying only the parameters you'll be using.
 
