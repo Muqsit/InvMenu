@@ -61,15 +61,15 @@ class InvMenuHandler implements Listener {
     {
         $tr = $event->getTransaction();
 
-        $inventoryAction = null;
-        $playerAction = null;
+        $inventoryActions = [];
+        $playerActions = [];
         $menu = null;
 
         foreach ($tr->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 $inventory = $action->getInventory();
                 if ($inventory instanceof BaseFakeInventory) {
-                    $inventoryAction = $action;
+                    $inventoryActions[] = $action;
                     $menu = $inventory->getMenu();
                     if ($menu->isReadonly()) {
                         $event->setCancelled();
@@ -78,20 +78,21 @@ class InvMenuHandler implements Listener {
                         return;
                     }
                 } elseif ($inventory instanceof PlayerInventory || $inventory instanceof PlayerCursorInventory) {
-                    $playerAction = $action;
+                    $playerActions[] = $action;
                 }
             }
         }
 
         if (
-            $inventoryAction !== null &&
-            $playerAction !== null &&
+            $menu !== null &&
+            !empty($inventoryActions) &&
+            !empty($playerActions) &&
             !$menu->getListener()(
                 $tr->getSource(),
                 $inventoryAction->getSourceItem(),
                 $playerAction->getSourceItem(),
-                $inventoryAction,
-                $playerAction
+                $inventoryActions,
+                $playerActions
             )
         ) {
             $event->setCancelled();

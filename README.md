@@ -80,18 +80,20 @@ $menu->setListener(function(Player $player, Item $itemClickedOn, Item $itemClick
 - **Player `$player` -** *The player responsible for the inventory transaction.*
 - **Item `$itemClickedOn` -** *The item that the player clicked in the GUI.*
 - **Item `$itemClickedWith` -** *The item that the player put in the GUI. This can also be the item that the player clicked `$itemClickedOn` with as players are able to put and takeout items from an inventory in one go.*
-- **SlotChangeAction `$inventoryAction` -** *The inventory-sided SlotChangeAction. You can get the Inventory instance and the inventory slot that was clicked using this.*
-- **SlotChangeAction `$playerAction` -** *The player-sided SlotChangeAction. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.*
+- **SlotChangeAction[] `$inventoryActions` -** *The inventory-sided SlotChangeAction array. You can get the Inventory instance and the inventory slot that was clicked using this.*
+- **SlotChangeAction[] `$playerActions` -** *The player-sided SlotChangeAction array. You can get the player's inventory instance and the player's inventory slot (the slot where the `$itemClickedOn` will go if not cancelled) using this.*
 
 It's not mandatory to specify each and every parameter in the `callable`. You are good to go even by specifying only the parameters you'll be using.
 
 The function is called during `InventoryTransactionEvent` that `InvMenu` handles itself. The function **must** return a `bool` value.
 If the function returns `false`, the `InventoryTransactionEvent` gets cancelled.
+
+**NOTE:** If the player is drag-settings items, `$itemClickedOn` and `$itemClickedWith` probably aren't the best options for you to listen to the transaction. You should instead parse the `SlotChangeAction[]` yourself.<br>
 **NOTE:** If you have your menu set to readonly, then the return value of the function does not matter. `InventoryTransactionEvent` gets cancelled any way.
 
 
 ### Sessions
-Now, yeah. InvMenu by default doesn't create a new Inventory instance for every player. In fact, the SAME Inventory is sent to all the players that you `InvMenu::send()` the inventory to.
+InvMenu by default doesn't create a new Inventory instance for every player. In fact, the SAME Inventory is sent to all the players that you `InvMenu::send()` the inventory to.
 You may want to sessionize InvMenu for creating mechanisms like PlayerVaults where every player needs their own inventory.
 You can use `InvMenu::sessionize()` for this.
 ```php
