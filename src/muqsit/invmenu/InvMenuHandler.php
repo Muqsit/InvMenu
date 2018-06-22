@@ -24,7 +24,7 @@ use muqsit\invmenu\inventories\BaseFakeInventory;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\inventory\{PlayerCursorInventory, PlayerInventory};
-use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\action\{DropItemAction, SlotChangeAction};
 use pocketmine\plugin\PluginBase;
 
 class InvMenuHandler implements Listener {
@@ -86,6 +86,8 @@ class InvMenuHandler implements Listener {
                 } else {
                     $hasOtherActions = true;
                 }
+            } elseif ($action instanceof DropItemAction) {
+                $playerActions[] = $action;
             }
         }
 
