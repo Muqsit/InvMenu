@@ -63,39 +63,55 @@ class InvMenuHandler implements Listener {
 
         $inventoryActions = [];
         $playerActions = [];
+
         $menu = null;
+        $hasOtherActions = false;
 
         foreach ($tr->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 $inventory = $action->getInventory();
                 if ($inventory instanceof BaseFakeInventory) {
                     $inventoryActions[] = $action;
+
                     $menu = $inventory->getMenu();
                     if ($menu->isReadonly()) {
                         $event->setCancelled();
                     }
+
                     if (!$menu->isListenable()) {
                         return;
                     }
                 } elseif ($inventory instanceof PlayerInventory || $inventory instanceof PlayerCursorInventory) {
                     $playerActions[] = $action;
+                } else {
+                    $hasOtherActions = true;
                 }
             }
+        }
+
+        if ($menu !== null && $hasOtherActions) { //this probably needs an improvement
+            $event->setCancelled();
+            return;
         }
 
         if (
             $menu !== null &&
             !empty($inventoryActions) &&
-            !empty($playerActions) &&
-            !$menu->getListener()(
-                $tr->getSource(),
-                $inventoryAction->getSourceItem(),
-                $playerAction->getSourceItem(),
-                $inventoryActions,
-                $playerActions
-            )
+            !empty($playerActions)
         ) {
-            $event->setCancelled();
+            $listener = $menu->getListener();
+            foreach ($inventoryActions as $inventoryAction) {
+                if (!$listener(
+                    $tr->getSource(),
+                    $inventoryAction->getSourceItem(),
+                    $inventoryAction->getTargetItem(),
+                    $inventoryAction,
+                    $playerActions
+                )) {
+                    $event->setCancelled();
+                    return;
+                }
+            }
         }
     }
 }
