@@ -23,7 +23,6 @@ use muqsit\invmenu\inventories\BaseFakeInventory;
 
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\inventory\{PlayerCursorInventory, PlayerInventory};
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\plugin\PluginBase;
 
@@ -61,40 +60,51 @@ class InvMenuHandler implements Listener {
     {
         $tr = $event->getTransaction();
 
-        $inventoryAction = null;
-        $playerAction = null;
+        $inventoryActions = [];
+        $otherActions = [];
+
         $menu = null;
 
         foreach ($tr->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
                 $inventory = $action->getInventory();
                 if ($inventory instanceof BaseFakeInventory) {
-                    $inventoryAction = $action;
+                    $inventoryActions[] = $action;
+
                     $menu = $inventory->getMenu();
                     if ($menu->isReadonly()) {
                         $event->setCancelled();
                     }
+
                     if (!$menu->isListenable()) {
                         return;
                     }
-                } elseif ($inventory instanceof PlayerInventory || $inventory instanceof PlayerCursorInventory) {
-                    $playerAction = $action;
+
+                    continue;
                 }
             }
+
+            $otherActions[] = $action;
         }
 
         if (
-            $inventoryAction !== null &&
-            $playerAction !== null &&
-            !$menu->getListener()(
-                $tr->getSource(),
-                $inventoryAction->getSourceItem(),
-                $playerAction->getSourceItem(),
-                $inventoryAction,
-                $playerAction
-            )
+            $menu !== null &&
+            !empty($inventoryActions) &&
+            !empty($otherActions)
         ) {
-            $event->setCancelled();
+            $listener = $menu->getListener();
+            foreach ($inventoryActions as $inventoryAction) {
+                if (!$listener(
+                    $tr->getSource(),
+                    $inventoryAction->getSourceItem(),
+                    $inventoryAction->getTargetItem(),
+                    $inventoryAction,
+                    $otherActions
+                )) {
+                    $event->setCancelled();
+                    return;
+                }
+            }
         }
     }
 }
