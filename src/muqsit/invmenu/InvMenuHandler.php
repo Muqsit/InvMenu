@@ -23,8 +23,7 @@ use muqsit\invmenu\inventories\BaseFakeInventory;
 
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\inventory\{PlayerCursorInventory, PlayerInventory};
-use pocketmine\inventory\transaction\action\{DropItemAction, SlotChangeAction};
+use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\plugin\PluginBase;
 
 class InvMenuHandler implements Listener {
@@ -62,10 +61,9 @@ class InvMenuHandler implements Listener {
         $tr = $event->getTransaction();
 
         $inventoryActions = [];
-        $playerActions = [];
+        $otherActions = [];
 
         $menu = null;
-        $hasOtherActions = false;
 
         foreach ($tr->getActions() as $action) {
             if ($action instanceof SlotChangeAction) {
@@ -81,25 +79,18 @@ class InvMenuHandler implements Listener {
                     if (!$menu->isListenable()) {
                         return;
                     }
-                } elseif ($inventory instanceof PlayerInventory || $inventory instanceof PlayerCursorInventory) {
-                    $playerActions[] = $action;
-                } else {
-                    $hasOtherActions = true;
-                }
-            } elseif ($action instanceof DropItemAction) {
-                $playerActions[] = $action;
-            }
-        }
 
-        if ($menu !== null && $hasOtherActions) { //this probably needs an improvement
-            $event->setCancelled();
-            return;
+                    continue;
+                }
+            }
+
+            $otherActions[] = $action;
         }
 
         if (
             $menu !== null &&
             !empty($inventoryActions) &&
-            !empty($playerActions)
+            !empty($otherActions)
         ) {
             $listener = $menu->getListener();
             foreach ($inventoryActions as $inventoryAction) {
@@ -108,7 +99,7 @@ class InvMenuHandler implements Listener {
                     $inventoryAction->getSourceItem(),
                     $inventoryAction->getTargetItem(),
                     $inventoryAction,
-                    $playerActions
+                    $otherActions
                 )) {
                     $event->setCancelled();
                     return;
