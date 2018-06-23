@@ -89,8 +89,7 @@ class InvMenuHandler implements Listener {
 
         if (
             $menu !== null &&
-            !empty($inventoryActions) &&
-            !empty($otherActions)
+            !empty($inventoryActions)
         ) {
             $listener = $menu->getListener();
             foreach ($inventoryActions as $inventoryAction) {
