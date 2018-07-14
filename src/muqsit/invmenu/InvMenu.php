@@ -184,4 +184,11 @@ class InvMenu {
             unset($this->sessions[$player->getId()]);
         }
     }
+
+    public function __clone()
+    {
+        $contents = $this->inventory->getContents();
+        $this->inventory = $this->createNewInventoryInstance();
+        $this->inventory->setContents($contents);
+    }
 }
