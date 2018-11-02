@@ -15,7 +15,7 @@ use muqsit\invmenu\InvMenu;
 InvMenu supports creating a GUI out of any king of inventory that can be created by extending it's `BaseFakeInventory` class.
 
 ### Creating an InvMenu instance
-`InvMenu::create($inventory_class)` creates a new instance of InvMenu. `$inventory_class` should be a path to an inventory class extending InvMenu's `BaseFakeInventory` class. InvMenu ships with 3 inventory classes by default: `ChestInventory`, `DoubleChestInventory` and `HopperInventory`. The path to these inventory classes can either be accessed by specifying the path to the inventory class or by the constants `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
+`InvMenu::create($inventory_class)` creates a new instance of InvMenu. `$inventory_class` should be a path to an inventory class extending InvMenu's `BaseFakeInventory` class. InvMenu comes with 3 inventory classes by default: `ChestInventory`, `DoubleChestInventory` and `HopperInventory`. The path to these inventory classes can either be accessed by specifying the path to the inventory class or by the constants `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
 
 ```php
 $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -128,6 +128,46 @@ What this does is it creates a different inventory instance for each player. You
 $inventory = $menu->getInventory($player);
 ```
 **NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If your plugin likes to make the inventory persist, you can listen to inventory close triggers and store the inventory contents somewhere and then set the inventory contents while sending the inventory to the player.
+
+### Writing a custom inventory class
+So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER` or `DispenserInventory::class`. BUT that won't stop you from doing what you want to do! You can write your own DispenserInventory class and it should be valid as long as you specified the correct identifiers and it extends the `BaseFakeInventory` class. InvMenu consists of a `SingleBlockInventory` class which is a simplified version of the `BaseFakeInventory` class.
+```
+<?php
+namespace spacename;
+
+use muqsit\invmenu\inventories\SingleBlockInventory;
+
+use pocketmine\block\Block;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\tile\Tile;
+
+class DispenserInventory extends SingleBlockInventory{
+
+	public function getBlock() : Block{
+		return Block::get(Block::DISPENSER);
+	}
+
+	public function getNetworkType() : int{
+		return WindowTypes::DISPENSER;
+	}
+
+	public function getTileId() : string{
+		return "Dispenser";
+	}
+
+	public function getName() : string{
+		return "Dispenser";
+	}
+
+	public function getDefaultSize() : int{
+		return 9;
+	}
+}
+```
+Sweet! Now you can create a dispenser menu using
+```php
+$menu = InvMenu::create(\spacename\DispenserInventory::class);
+```
 
 ### InvMenu applications / examples
 Read the [wiki](https://github.com/Muqsit/InvMenu/wiki/Examples) for examples on the different ways InvMenu can be used on servers.
