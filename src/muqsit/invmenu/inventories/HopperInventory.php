@@ -19,31 +19,13 @@
 
 namespace muqsit\invmenu\inventories;
 
-use muqsit\invmenu\utils\HolderData;
-
 use pocketmine\block\Block;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
 
-class HopperInventory extends BaseFakeInventory{
+class HopperInventory extends SingleBlockInventory{
 
-	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
-		$block = Block::get(Block::HOPPER_BLOCK)->setComponents($data->position->x, $data->position->y, $data->position->z);
-		$player->getLevel()->sendBlocks([$player], [$block]);
-
-		$tag = new CompoundTag();
-		if($data->custom_name !== null){
-			$tag->setString("CustomName", $data->custom_name);
-		}
-
-		$this->sendTile($player, $block, $tag);
-
-		$this->onFakeBlockDataSend($player);
-	}
-
-	protected function sendRealBlockData(Player $player, HolderData $data) : void{
-		$player->getLevel()->sendBlocks([$player], [$data->position]);
+	public function getBlock() : Block{
+		return Block::get(Block::HOPPER_BLOCK);
 	}
 
 	public function getNetworkType() : int{
@@ -55,7 +37,7 @@ class HopperInventory extends BaseFakeInventory{
 	}
 
 	public function getName() : string{
-		return "Chest";
+		return "Hopper";
 	}
 
 	public function getDefaultSize() : int{
