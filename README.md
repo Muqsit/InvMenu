@@ -29,7 +29,7 @@ $inventory = $menu->getInventory();
 The inventory instance extends pocketmine's `Inventory` class, so you can use all the fancy pocketmine inventory methods.
 ```php
 $menu->getInventory()->setContents([
-Item::get(Item::DIAMOND_SWORD),
+	Item::get(Item::DIAMOND_SWORD),
 	Item::get(Item::DIAMOND_PICKAXE)
 ]);
 $menu->getInventory()->addItem(Item::get(Item::DIAMOND_AXE));
