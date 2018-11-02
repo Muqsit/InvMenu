@@ -19,27 +19,47 @@
 
 namespace muqsit\invmenu\inventories;
 
-use pocketmine\block\BlockIds;
+use muqsit\invmenu\utils\HolderData;
+
+use pocketmine\block\Block;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\Player;
 use pocketmine\tile\Tile;
 
-class ChestInventory extends BaseFakeInventory {
+class ChestInventory extends BaseFakeInventory{
 
-    const FAKE_BLOCK_ID = BlockIds::CHEST;
-    const FAKE_TILE_ID = Tile::CHEST;
+	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
+		$block = Block::get(Block::CHEST)->setComponents($data->position->x, $data->position->y, $data->position->z);
+		$player->getLevel()->sendBlocks([$player], [$block]);
 
-    public function getName() : string
-    {
-        return "ChestInventory";
-    }
+		$tag = new CompoundTag();
+		if($data->custom_name !== null){
+			$tag->setString("CustomName", $data->custom_name);
+		}
 
-    public function getDefaultSize() : int
-    {
-        return 27;
-    }
+		$this->sendTile($player, $block, $tag);
 
-    public function getNetworkType() : int
-    {
-        return WindowTypes::CONTAINER;
-    }
+		$this->onFakeBlockDataSend($player);
+	}
+
+	protected function sendRealBlockData(Player $player, HolderData $data) : void{
+		$player->getLevel()->sendBlocks([$player], [$data->position]);
+	}
+
+	public function getNetworkType() : int{
+		return WindowTypes::CONTAINER;
+	}
+
+	public function getTileId() : string{
+		return Tile::CHEST;
+	}
+
+	public function getName() : string{
+		return "Chest";
+	}
+
+	public function getDefaultSize() : int{
+		return 27;
+	}
 }

@@ -19,27 +19,46 @@
 
 namespace muqsit\invmenu\inventories;
 
-use pocketmine\block\BlockIds;
+use muqsit\invmenu\utils\HolderData;
+
+use pocketmine\block\Block;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\tile\Tile;
+use pocketmine\Player;
 
-class HopperInventory extends BaseFakeInventory {
+class HopperInventory extends BaseFakeInventory{
 
-    const FAKE_BLOCK_ID = BlockIds::HOPPER_BLOCK;
-    const FAKE_TILE_ID = "Hopper";//Tile::HOPPER;
+	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
+		$block = Block::get(Block::HOPPER_BLOCK)->setComponents($data->position->x, $data->position->y, $data->position->z);
+		$player->getLevel()->sendBlocks([$player], [$block]);
 
-    public function getName() : string
-    {
-        return "HopperInventory";
-    }
+		$tag = new CompoundTag();
+		if($data->custom_name !== null){
+			$tag->setString("CustomName", $data->custom_name);
+		}
 
-    public function getDefaultSize() : int
-    {
-        return 5;
-    }
+		$this->sendTile($player, $block, $tag);
 
-    public function getNetworkType() : int
-    {
-        return WindowTypes::HOPPER;
-    }
+		$this->onFakeBlockDataSend($player);
+	}
+
+	protected function sendRealBlockData(Player $player, HolderData $data) : void{
+		$player->getLevel()->sendBlocks([$player], [$data->position]);
+	}
+
+	public function getNetworkType() : int{
+		return WindowTypes::HOPPER;
+	}
+
+	public function getTileId() : string{
+		return "Hopper";
+	}
+
+	public function getName() : string{
+		return "Chest";
+	}
+
+	public function getDefaultSize() : int{
+		return 5;
+	}
 }

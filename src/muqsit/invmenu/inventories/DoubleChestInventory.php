@@ -19,99 +19,66 @@
 
 namespace muqsit\invmenu\inventories;
 
-use muqsit\invmenu\InvMenuHandler;
-use muqsit\invmenu\inventories\tasks\DoubleChestDelayTask;
+use muqsit\invmenu\utils\HolderData;
 
 use pocketmine\block\Block;
-use pocketmine\inventory\{BaseInventory, ContainerInventory};
-use pocketmine\math\Vector3;
-use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
-use pocketmine\scheduler\Task;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
+use pocketmine\tile\Tile;
 
-class DoubleChestInventory extends ChestInventory {
+class DoubleChestInventory extends BaseFakeInventory{
 
-    public function getName() : string
-    {
-        return "DoubleChestInventory";
-    }
+	public function getSendDelay(Player $player) : int{
+		/**
+		 * For those who are confused as to why this even exists...
+		 *   The client takes time to render the two chests "pairing" into a double chest.
+		 *   If the inventory is directly sent without a delay, the client either gets sent
+		 *   a single chest inventory or the client closes the inventory as soon as it renders
+		 *   the pair.
+		 */
+		return $player->getPing() < 300 ? 5 : 0;
+	}
 
-    public function getDefaultSize() : int
-    {
-        return 54;
-    }
+	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
+		$block = Block::get(Block::CHEST)->setComponents($data->position->x, $data->position->y, $data->position->z);
+		$block2 = Block::get(Block::CHEST)->setComponents($data->position->x + 1, $data->position->y, $data->position->z);
 
-    public function onOpen(Player $player, bool $force = false) : void
-    {
-        if (!$force && $player->getPing() < 300) {//if you have > 300 ping, thank your network connection for providing you the delay
-            /* For everyone confused what the heck is the reason for the delay's existence.
-             * Calling DoubleChestInventory::sendInventoryInterface() just after sending the client
-             * the chest block and the chest tile packets will send a normal (27 slot) chest to the client.
-             * Delaying it solves the issue with that. The client takes a couple of milliseconds to "merge"
-             * the two chests. Please make a PR if you know how to avoid this delay, because it's an utter mess.
-             */
+		$player->getLevel()->sendBlocks([$player], [$block, $block2]);
 
-            $this->holders[$player->getId()] = $this->holder = $player->floor()->add(0, static::INVENTORY_HEIGHT, 0);
+		$tag = new CompoundTag();
+		if($data->custom_name !== null){
+			$tag->setString("CustomName", $data->custom_name);
+		}
 
-            $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
-            $this->sendFakeTile($player);
+		$tag->setInt("pairz", $block->z);
 
-            InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DoubleChestDelayTask($player, $this), 4);
-            BaseInventory::onOpen($player);
-            return;
-        }
+		$tag->setInt("pairx", $block->x + 1);
+		$this->sendTile($player, $block, $tag);
 
-        ContainerInventory::onOpen($player);
-    }
+		$tag->setInt("pairx", $block->x);
+		$this->sendTile($player, $block2, $tag);
 
-    protected function sendFakeTile(Player $player) : void
-    {
-        $holder = $this->holders[$player->getId()];
+		$this->onFakeBlockDataSend($player);
+	}
 
-        $pk = new BlockEntityDataPacket();
-        $pk->x = $holder->x;
-        $pk->y = $holder->y;
-        $pk->z = $holder->z;
+	protected function sendRealBlockData(Player $player, HolderData $data) : void{
+		$player->getLevel()->sendBlocks([$player], [$data->position, $data->position->add(1, 0, 0)]);
+	}
 
-        $writer = self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream());
+	public function getNetworkType() : int{
+		return WindowTypes::CONTAINER;
+	}
 
-        $tag = new CompoundTag();
-        $tag->setString("id", static::FAKE_TILE_ID);
-        $tag->setInt("pairx", $holder->x + 1);
-        $tag->setInt("pairz", $holder->z);
+	public function getTileId() : string{
+		return Tile::CHEST;
+	}
 
-        $customName = $this->menu->getName();
-        if ($customName !== null) {
-            $tag->setString("CustomName", $customName);
-        }
+	public function getName() : string{
+		return "Chest";
+	}
 
-        $pk->namedtag = $writer->write($tag);
-        $player->dataPacket($pk);
-
-        $pk = new BlockEntityDataPacket();
-        $pk->x = $holder->x + 1;
-        $pk->y = $holder->y;
-        $pk->z = $holder->z;
-
-        $tag->setInt("pairx", $holder->x);
-
-        $pk->namedtag = $writer->write($tag);
-        $player->dataPacket($pk);
-    }
-
-    protected function getFakeBlocks(Vector3 $holder) : array
-    {
-        return array_merge(parent::getFakeBlocks($holder), [
-            Block::get(static::FAKE_BLOCK_ID, static::FAKE_BLOCK_DATA)->setComponents($holder->x + 1, $holder->y, $holder->z),
-        ]);
-    }
-
-    protected function getRealBlocks(Player $player, Vector3 $holder) : array
-    {
-        return array_merge(parent::getRealBlocks($player, $holder), [
-            $player->getLevel()->getBlockAt($holder->x + 1, $holder->y, $holder->z)
-        ]);
-    }
+	public function getDefaultSize() : int{
+		return 54;
+	}
 }

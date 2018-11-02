@@ -20,8 +20,12 @@
 namespace muqsit\invmenu\inventories;
 
 use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\InvMenuHandler;
+use muqsit\invmenu\tasks\DelayedFakeBlockDataNotifyTask;
+use muqsit\invmenu\utils\HolderData;
 
 use pocketmine\block\Block;
+use pocketmine\inventory\BaseInventory;
 use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
@@ -29,106 +33,98 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\Player;
 
-abstract class BaseFakeInventory extends ContainerInventory {
-
-    const SEND_BLOCKS_FAKE = 0;
-    const SEND_BLOCKS_REAL = 1;
-
-    const FAKE_BLOCK_ID = 0;
-    const FAKE_BLOCK_DATA = 0;
-    const FAKE_TILE_ID = "";
+abstract class BaseFakeInventory extends ContainerInventory{
 
     const INVENTORY_HEIGHT = 3;
 
-    /** @var Vector3[] */
-    protected $holders = [];
+	/** @var InvMenu */
+	protected $menu;
 
-    /** @var InvMenu */
-    protected $menu;
+    /** @var HolderData[] */
+    private $holder_data = [];
 
-    /** @var BigEndianNBTStream|null */
-    protected static $nbtWriter;
+	public function __construct(InvMenu $menu, array $items = [], int $size = null, string $title = null){
+		$this->menu = $menu;
+		BaseInventory::__construct($items, $size, $title);
+	}
 
-    public function __construct(InvMenu $menu)
-    {
-        $this->menu = $menu;
-        parent::__construct(new Vector3());
-    }
+	public function getMenu() : InvMenu{
+		return $this->menu;
+	}
 
-    public function getMenu() : InvMenu
-    {
-        return $this->menu;
-    }
+	public function createNewInstance() : BaseFakeInventory{
+		return new static($this->menu, $this->getContents());
+	}
 
-    public function onOpen(Player $player) : void
-    {
-        if (!isset($this->holders[$id = $player->getId()])) {
-            $this->holders[$id] = $this->holder = $player->floor()->add(0, static::INVENTORY_HEIGHT, 0);
-            $this->sendBlocks($player, self::SEND_BLOCKS_FAKE);
+	final public function send(Player $player, ?string $custom_name) : void{
+		$this->sendFakeBlockData($player, $this->holder_data[$player->getId()] = new HolderData($player->floor()->add(0, static::INVENTORY_HEIGHT, 0), $custom_name));
+	}
 
-            $this->sendFakeTile($player);
-            parent::onOpen($player);
-        }
-    }
+	final public function open(Player $player) : bool{
+		if(!isset($this->holder_data[$player->getId()])){
+			return false;
+		}
 
-    public function onClose(Player $player) : void
-    {
-        if (isset($this->holders[$id = $player->getId()])) {
-            parent::onClose($player);
+		return parent::open($player);
+	}
 
-            $this->sendBlocks($player, self::SEND_BLOCKS_REAL);
-            $this->menu->onInventoryClose($player);
+	final public function onOpen(Player $player) : void{
+		$this->holder = $this->holder_data[$player->getId()]->position;
+		parent::onOpen($player);
+		$this->holder = null;
+	}
 
-            unset($this->holders[$id]);
-        }
-    }
+	final public function onClose(Player $player) : void{
+		if(isset($this->holder_data[$id = $player->getId()])){
+			$this->sendRealBlockData($player, $this->holder_data[$id]);
+			unset($this->holder_data[$id]);
 
-    protected function sendFakeTile(Player $player) : void
-    {
-        $holder = $this->holders[$player->getId()];
+			parent::onClose($player);
 
-        $pk = new BlockEntityDataPacket();
-        $pk->x = $holder->x;
-        $pk->y = $holder->y;
-        $pk->z = $holder->z;
+			$this->menu->onInventoryClose($player);
 
-        $tag = new CompoundTag();
-        $tag->setString("id", static::FAKE_TILE_ID);
+			$listener = $this->menu->getInventoryCloseListener();
+			if($listener !== null){
+				$listener($player, $this);
+			}
+		}
+	}
 
-        $customName = $this->menu->getName();
-        if ($customName !== null) {
-            $tag->setString("CustomName", $customName);
-        }
+	abstract protected function sendFakeBlockData(Player $player, HolderData $data) : void;
 
-        $pk->namedtag = (self::$nbtWriter ?? (self::$nbtWriter = new NetworkLittleEndianNBTStream()))->write($tag);
-        $player->dataPacket($pk);
-    }
+	abstract protected function sendRealBlockData(Player $player, HolderData $data) : void;
 
-    protected function sendBlocks(Player $player, int $type) : void
-    {
-        switch ($type) {
-            case self::SEND_BLOCKS_FAKE:
-                $player->getLevel()->sendBlocks([$player], $this->getFakeBlocks($this->holders[$player->getId()]));
-                return;
-            case self::SEND_BLOCKS_REAL:
-                $player->getLevel()->sendBlocks([$player], $this->getRealBlocks($player, $this->holders[$player->getId()]));
-                return;
-        }
+	abstract public function getTileId() : string;
 
-        throw new \Error("Unhandled type $type provided.");
-    }
+	public function getSendDelay(Player $player) : int{
+		return 0;
+	}
 
-    protected function getFakeBlocks(Vector3 $holder) : array
-    {
-        return [
-            Block::get(static::FAKE_BLOCK_ID, static::FAKE_BLOCK_DATA)->setComponents($holder->x, $holder->y, $holder->z)
-        ];
-    }
+	public function onFakeBlockDataSend(Player $player) : void{
+		$delay = $this->getSendDelay($player);
+		if($delay > 0){
+			InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DelayedFakeBlockDataNotifyTask($player, $this), $delay);
+		}else{
+			$this->onFakeBlockDataSendSuccess($player);
+		}
+	}
 
-    protected function getRealBlocks(Player $player, Vector3 $holder) : array
-    {
-        return [
-            $player->getLevel()->getBlockAt($holder->x, $holder->y, $holder->z)
-        ];
-    }
+	public function onFakeBlockDataSendSuccess(Player $player) : void{
+		$player->addWindow($this);
+	}
+
+	public function onFakeBlockDataSendFailed(Player $player) : void{
+		unset($this->holder_data[$player->getId()]);
+	}
+
+	protected function sendTile(Player $player, Vector3 $pos, CompoundTag $nbt) : void{
+		$nbt->setString("id", $this->getTileId());
+
+		$pk = new BlockEntityDataPacket();
+		$pk->x = $pos->x;
+		$pk->y = $pos->y;
+		$pk->z = $pos->z;
+		$pk->namedtag = (new NetworkLittleEndianNBTStream())->write($nbt);
+		$player->sendDataPacket($pk);
+	}
 }
