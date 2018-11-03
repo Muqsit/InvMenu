@@ -48,7 +48,7 @@ $menu->readonly();
 ```
 That's all you have to do to completely stop players from moving items in and out of your menu.
 
-### Custom inventory naming
+### Specifying a custom name to the menu
 To set a custom name to a menu, use
 ```php
 $menu->setName("Custom Name");
