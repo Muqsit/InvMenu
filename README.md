@@ -68,7 +68,6 @@ $menu->setListener($listener);
 ```
 What's **`$listener`**?
 ```php
-bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
 /**
  * @param Player $player the player who tried modifying the inventory.
  *
@@ -89,11 +88,12 @@ bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChan
  * NOTE: If the menu is set to readonly, the transaction will be
  * forcefully cancelled irrespective of this callable's return value.
  */
+bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
 ```
 
 ### Inventory closing — Listening to inventory close triggers & How to!
 To forcefully close or remove the menu from a player, you can use
-```
+```php
 /** @var Player $player */
 $player->removeWindow($menu->getInventory($player));
 ```
@@ -111,12 +111,12 @@ $menu->setInventoryCloseListener($listener);
 ```
 What's **`$listener`**?
 ```php
-void callback(Player $player, BaseFakeInventory $inventory);
 /**
  * @param Player $player the player who closed the inventory.
  *
  * @param BaseFakeInventory $inventory the inventory instance closed by the player.
  */
+void callback(Player $player, BaseFakeInventory $inventory);
 ```
 
 ### Sessionizing menu — "per player inventory"
@@ -125,7 +125,7 @@ InvMenu supports having a different inventory instance for each player. By defau
 $menu->sessionize();
 ```
 What this does is it creates a different inventory instance for each player. You can access a player's inventory using:
-```
+```php
 /** @var Player $player */
 $inventory = $menu->getInventory($player);
 ```
@@ -133,7 +133,7 @@ $inventory = $menu->getInventory($player);
 
 ### Writing a custom inventory class
 So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER` or `DispenserInventory::class`. BUT that won't stop you from doing what you want to do! You can write your own DispenserInventory class and it should be valid as long as you specified the correct identifiers and it extends the `BaseFakeInventory` class. InvMenu consists of a `SingleBlockInventory` class which is a simplified version of the `BaseFakeInventory` class.
-```
+```php
 <?php
 namespace spacename;
 
