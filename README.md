@@ -19,6 +19,7 @@ InvMenu supports creating a GUI out of any king of inventory that can be created
 
 ```php
 $menu = InvMenu::create(InvMenu::TYPE_CHEST);
+//This is the same as InvMenu::create(\muqsit\invmenu\inventories\ChestInventory::class);
 ```
 
 To access this menu's inventory, you can use:
