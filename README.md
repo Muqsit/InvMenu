@@ -70,21 +70,22 @@ What's **`$listener`**?
 ```php
 bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
 /**
- * $player => The player who tried modifying the inventory.
+ * @param Player $player the player who tried modifying the inventory.
  *
- * $itemClicked => The item that the player clicked / took out of the
+ * @param Item $itemClicked the item that the player clicked / took out of the
  * menu.
  *
- * $itemClickedWith => The item that the player clicked $itemClicked
+ * @param Item $itemClickedWith the item that the player clicked $itemClicked
  * using / put in the menu.
  *
- * $action => The SlotChangeAction instance created during the
+ * @param SlotChangeAction $action the SlotChangeAction instance created during the
  * transaction. You can use this to fetch the inventory instance by
  * using $action->getInventory().
  *
  * @return bool whether to not cancel the item movement. If it returns
  * true, then the transaction is not cancelled. If it returns false,
  * the transaction is cancelled.
+ *
  * NOTE: If the menu is set to readonly, the transaction will be
  * forcefully cancelled irrespective of this callable's return value.
  */
@@ -112,9 +113,9 @@ What's **`$listener`**?
 ```php
 void callback(Player $player, BaseFakeInventory $inventory);
 /**
- * $player => The player who closed the inventory.
+ * @param Player $player the player who closed the inventory.
  *
- * $inventory => The inventory instance closed by the player.
+ * @param BaseFakeInventory $inventory the inventory instance closed by the player.
  */
 ```
 
