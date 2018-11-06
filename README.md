@@ -91,7 +91,7 @@ What's **`$listener`**?
 bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
 ```
 
-### Inventory closing â€” Listening to inventory close triggers & How to!
+### Inventory closing — Listening to inventory close triggers & How to!
 To listen to inventory close triggers, you can specify the inventory close callable using
 ```php
 /** @var callable $listener */
@@ -118,7 +118,7 @@ $menu->setListener(function(Player $player, Item $itemClicked, Item $itemClicked
 	return false;
 });
 ```
-### Sessionizing menu â€” "per player inventory"
+### Sessionizing menu — "per player inventory"
 InvMenu supports having a different inventory instance for each player. By default menu instances aren't sesionized, so all players whom you `$menu->send($player)` the menu to are accessing the same inventory. Either you can create a different InvMenu instance for each player or use the `sessionize` feature of InvMenu by calling
 ```php
 $menu->sessionize();
