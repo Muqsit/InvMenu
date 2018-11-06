@@ -17,30 +17,20 @@
  *
 */
 
-namespace muqsit\invmenu\inventories;
+namespace muqsit\invmenu\utils;
 
-use pocketmine\block\Block;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\math\Vector3;
 
-class HopperInventory extends SingleBlockInventory{
+class HolderData{
 
-	public function getBlock() : Block{
-		return Block::get(Block::HOPPER_BLOCK);
-	}
+	/** @var Vector3 */
+	public $position;
 
-	public function getNetworkType() : int{
-		return WindowTypes::HOPPER;
-	}
+	/** @var string|null */
+	public $custom_name;
 
-	public function getTileId() : string{
-		return "Hopper";
-	}
-
-	public function getName() : string{
-		return "Hopper";
-	}
-
-	public function getDefaultSize() : int{
-		return 5;
+	public function __construct(Vector3 $position, ?string $custom_name){
+		$this->position = $position;
+		$this->custom_name = $custom_name;
 	}
 }

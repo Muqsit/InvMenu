@@ -17,31 +17,17 @@
  *
 */
 
-namespace muqsit\invmenu\inventories\tasks;
+namespace muqsit\invmenu;
 
+use muqsit\invmenu\inventories\ChestInventory;
 use muqsit\invmenu\inventories\DoubleChestInventory;
+use muqsit\invmenu\inventories\HopperInventory;
 
-use pocketmine\Player;
-use pocketmine\scheduler\Task;
+interface MenuIds{
 
-class DoubleChestDelayTask extends Task {
+	// This interface exists for backwards compatibility.
 
-    /** @var Player */
-    private $player;
-
-    /** @var DoubleChestInventory */
-    private $inventory;
-
-    public function __construct(Player $player, DoubleChestInventory $inventory)
-    {
-        $this->player = $player;
-        $this->inventory = $inventory;
-    }
-
-    public function onRun(int $tick) : void
-    {
-        if ($this->player->isAlive()) {
-            $this->inventory->onOpen($this->player, true);
-        }
-    }
+	const TYPE_CHEST = ChestInventory::class;
+	const TYPE_DOUBLE_CHEST = DoubleChestInventory::class;
+	const TYPE_HOPPER = HopperInventory::class;
 }

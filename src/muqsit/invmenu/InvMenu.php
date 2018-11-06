@@ -19,176 +19,127 @@
 
 namespace muqsit\invmenu;
 
-use muqsit\invmenu\inventories\{
-    BaseFakeInventory, ChestInventory, DoubleChestInventory, HopperInventory
-};
+use muqsit\invmenu\inventories\BaseFakeInventory;
 
-use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\utils\MainLogger;
 
-class InvMenu {
+class InvMenu implements MenuIds{
 
-    const TYPE_CUSTOM = -1;
-    const TYPE_CHEST = 0;
-    const TYPE_HOPPER = 1;
-    const TYPE_DOUBLE_CHEST = 2;
+	public static function create(string $inventory_class) : InvMenu{
+		return new InvMenu($inventory_class);
+	}
 
-    const INVENTORY_CLASSES = [
-        self::TYPE_CHEST => ChestInventory::class,
-        self::TYPE_HOPPER => HopperInventory::class,
-        self::TYPE_DOUBLE_CHEST => DoubleChestInventory::class
-    ];
+	/** @var bool */
+	private $readonly = false;
 
-    public static function create(int $windowId, ?string $customInvClass = null) : InvMenu
-    {
-        return new InvMenu($windowId, $customInvClass);
-    }
+	/** @var string|null */
+	private $name;
 
-    /** @var int */
-    private $type;
+	/** @var callable|null */
+	private $listener;
 
-    /** @var string|null */
-    private $name;
+	/** @var callable|null */
+	private $inventory_close_listener;
 
-    /** @var BaseFakeInventory|null */
-    private $inventory;
+	/** @var bool */
+	private $sessionized = false;
 
-    /** @var string */
-    private $inventory_class;
+	/** @var BaseFakeInventory[]|null */
+	private $sessions;
 
-    /** @var bool */
-    private $readonly = false;
+	/** @var BaseFakeInventory|null */
+	private $inventory;
 
-    /** @var bool */
-    private $sessionize = false;
+	public function __construct(string $inventory_class){
+		if(!is_subclass_of($inventory_class, BaseFakeInventory::class, true)){
+			throw new \InvalidArgumentException($inventory_class . " must extend " . BaseFakeInventory::class . ".");
+		}
 
-    /** @var BaseFakeInventory[]|null */
-    private $sessions;
+		$this->inventory = new $inventory_class($this);
+	}
 
-    /** @var callable|null */
-    private $listener;
+	public function getInventory(?Player $player = null, ?string $custom_name = null) : BaseFakeInventory{
+		if($this->sessionized){
+			if($player === null){
+				throw new \InvalidArgumentException("You need to specify a " . Player::class . " instance as the first parameter of getInventory() while fetching an inventory from a sessionized InvMenu instance.");
+			}
 
-    /** @var callable|null */
-    private $inventoryCloseListener;
+			return $this->sessions[$uuid = $player->getId()] ?? ($this->sessions[$uuid] = $this->inventory->createNewInstance($player));
+		}
 
-    private function __construct(int $type, ?string $customInvClass = null)
-    {
-        if ($type === self::TYPE_CUSTOM) {
-            if ($customInvClass === null) {
-                throw new \Error("You need to specify a custom inventory class if you are creating InvMenu with custom type.");
-            }
-            if (!is_subclass_of($customInvClass, BaseFakeInventory::class, true)) {
-                throw new \Error("$customInvClass must extend ".BaseFakeInventory::class.".");
-            }
-            $class = $customInvClass;
-        } else {
-            if ($customInvClass !== null) {
-                MainLogger::getLogger()->warning("A custom inventory class was specified for an InvMenu. This class will not be used as the inventory class unless you specify the menu type as TYPE_CUSTOM.");
-            }
-            $class = self::INVENTORY_CLASSES[$type];
-        }
+		return $this->inventory;
+	}
 
-        $this->inventory_class = $class;
-        $this->type = $type;
+	public function readonly(bool $value = true) : InvMenu{
+		$this->readonly = $value;
+		return $this;
+	}
 
-        if (!$this->sessionize) {
-            $this->inventory = $this->createNewInventoryInstance();
-        }
-    }
+	public function isReadonly() : bool{
+		return $this->readonly;
+	}
 
-    public function createNewInventoryInstance() : BaseFakeInventory
-    {
-        $class = $this->inventory_class;
-        return new $class($this);
-    }
+	public function setName(?string $name) : InvMenu{
+		$this->name = $name;
+		return $this;
+	}
 
-    public function getInventory(?Player $player = null) : BaseFakeInventory
-    {
-        if ($this->sessionize) {
-            if ($player === null) {
-                throw new \Error("Could not select the base inventory when InvMenu is sessionized. Please specify a Player instance in the first parameter.");
-            }
+	public function sessionize(bool $value = true) : InvMenu{
+		if($this->sessionized !== $value){
+			$this->clearSessions();
+			$this->sessionized = $value;
+		}
 
-            return $this->sessions[$player->getId()] ?? ($this->sessions[$player->getId()] = $this->createNewInventoryInstance());
-        }
-        return $this->inventory;
-    }
+		return $this;
+	}
 
-    public function readonly(bool $value = true) : InvMenu
-    {
-        $this->readonly = $value;
-        return $this;
-    }
+	public function getListener() : ?callable{
+		return $this->listener;
+	}
 
-    public function isReadonly() : bool
-    {
-        return $this->readonly;
-    }
+	public function setListener(?callable $listener) : InvMenu{
+		$this->listener = $listener;
+		return $this;
+	}
 
-    public function setListener(callable $listener) : InvMenu
-    {
-        if (!InvMenuHandler::isRegistered()) {
-            throw new \Error("Attempted to assign a listener without InvMenuHandler being registered. Use InvMenuHandler::register() if you want to handle inventory transactions.");
-        }
+	public function getInventoryCloseListener() : ?callable{
+		return $this->inventory_close_listener;
+	}
 
-        $this->listener = $listener;
-        return $this;
-    }
+	public function setInventoryCloseListener(?callable $inventory_close_listener) : InvMenu{
+		$this->inventory_close_listener = $inventory_close_listener;
+		return $this;
+	}
 
-    public function isListenable() : bool
-    {
-        return $this->listener !== null;
-    }
+	public function send(Player $player, ?string $custom_name = null) : bool{
+		return $this->getInventory($player)->send($player, $custom_name ?? $this->name);
+	}
 
-    public function getListener() : ?callable
-    {
-        return $this->listener;
-    }
+	public function clearSessions(bool $remove_windows = true) : void{
+		if($this->sessionized){
+			$inventories = $this->sessions;
+			$this->sessions = [];
+		}else{
+			$inventories = [$this->getInventory()];
+		}
 
-    public function setInventoryCloseListener(callable $listener) : InvMenu
-    {
-        $this->inventoryCloseListener = $listener;
-        return $this;
-    }
+		if($remove_windows){
+			foreach($inventories as $inventory){
+				foreach($inventory->getViewers() as $player){
+					$player->removeWindow($inventory);
+				}
+			}
+		}
+	}
 
-    public function sessionize() : InvMenu
-    {
-        $this->sessionize = true;
-        $this->sessions = [];
-        return $this;
-    }
+	public function onInventoryClose(Player $player) : void{
+		if($this->sessionized){
+			unset($this->sessions[$player->getId()]);
+		}
+	}
 
-    public function setName(?string $name = null) : InvMenu
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function getName() : ?string
-    {
-        return $this->name;
-    }
-
-    public function send(Player $player, ?int $forceId = null) : int
-    {
-        return $player->addWindow($this->getInventory($player), $forceId);
-    }
-
-    public function onInventoryClose(Player $player) : void
-    {
-        if ($this->inventoryCloseListener !== null) {
-            ($this->inventoryCloseListener)($player, $this->getInventory($player));
-        }
-        if ($this->sessionize) {
-            unset($this->sessions[$player->getId()]);
-        }
-    }
-
-    public function __clone()
-    {
-        $contents = $this->inventory->getContents();
-        $this->inventory = $this->createNewInventoryInstance();
-        $this->inventory->setContents($contents);
-    }
+	public function __clone(){
+		$this->inventory = $this->inventory->createNewInstance();
+		$this->clearSessions(false);
+	}
 }
