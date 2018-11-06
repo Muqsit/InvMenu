@@ -92,18 +92,6 @@ bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChan
 ```
 
 ### Inventory closing — Listening to inventory close triggers & How to!
-To forcefully close or remove the menu from a player, you can use
-```php
-/** @var Player $player */
-$player->removeWindow($menu->getInventory($player));
-```
-To forcefully close or remove the menu when a player modifies the inventory, you can use
-```php
-$menu->setListener(function(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) : bool{
-	$player->removeWindow($action->getInventory());
-	return false;
-});
-```
 To listen to inventory close triggers, you can specify the inventory close callable using
 ```php
 /** @var callable $listener */
@@ -118,7 +106,18 @@ What's **`$listener`**?
  */
 void callback(Player $player, BaseFakeInventory $inventory);
 ```
-
+To forcefully close or remove the menu from a player, you can use
+```php
+/** @var Player $player */
+$player->removeWindow($menu->getInventory($player));
+```
+To forcefully close or remove the menu when a player modifies the inventory, you can use
+```php
+$menu->setListener(function(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) : bool{
+	$player->removeWindow($action->getInventory());
+	return false;
+});
+```
 ### Sessionizing menu — "per player inventory"
 InvMenu supports having a different inventory instance for each player. By default menu instances aren't sesionized, so all players whom you `$menu->send($player)` the menu to are accessing the same inventory. Either you can create a different InvMenu instance for each player or use the `sessionize` feature of InvMenu by calling
 ```php
