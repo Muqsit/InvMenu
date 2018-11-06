@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  ___            __  __
+ *  ___	           __  __
  * |_ _|_ ____   _|  \/  | ___ _ __  _   _
  *  | || '_ \ \ / / |\/| |/ _ \ '_ \| | | |
  *  | || | | \ V /| |  | |  __/ | | | |_| |
@@ -35,13 +35,16 @@ use pocketmine\Player;
 
 abstract class BaseFakeInventory extends ContainerInventory{
 
-    const INVENTORY_HEIGHT = 3;
+	const INVENTORY_HEIGHT = 3;
 
 	/** @var InvMenu */
 	protected $menu;
 
-    /** @var HolderData[] */
-    private $holder_data = [];
+	/** @var int */
+	protected $default_send_delay = 0;
+
+	/** @var HolderData[] */
+	private $holder_data = [];
 
 	public function __construct(InvMenu $menu, array $items = [], int $size = null, string $title = null){
 		$this->menu = $menu;
@@ -97,7 +100,11 @@ abstract class BaseFakeInventory extends ContainerInventory{
 	abstract public function getTileId() : string;
 
 	public function getSendDelay(Player $player) : int{
-		return 0;
+		return $this->default_send_delay;
+	}
+
+	public function setDefaultSendDelay(int $delay) : void{
+		$this->default_send_delay = $delay;
 	}
 
 	public function onFakeBlockDataSend(Player $player) : void{
