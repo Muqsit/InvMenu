@@ -111,8 +111,8 @@ class InvMenu implements MenuIds{
 		return $this;
 	}
 
-	public function send(Player $player, ?string $custom_name = null) : void{
-		$this->getInventory($player)->send($player, $custom_name ?? $this->name);
+	public function send(Player $player, ?string $custom_name = null) : bool{
+		return $this->getInventory($player)->send($player, $custom_name ?? $this->name);
 	}
 
 	public function clearSessions(bool $remove_windows = true) : void{
