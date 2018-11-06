@@ -27,7 +27,7 @@ use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
 use pocketmine\tile\Tile;
 
-abstract class SingleInventory extends BaseFakeInventory{
+abstract class SingleBlockInventory extends BaseFakeInventory{
 
 	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
 		$block = $this->getBlock()->setComponents($data->position->x, $data->position->y, $data->position->z);
