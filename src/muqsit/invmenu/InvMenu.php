@@ -25,8 +25,8 @@ use pocketmine\Player;
 
 class InvMenu implements MenuIds{
 
-	public static function create(string $inventory_class) : InvMenu{
-		return new InvMenu($inventory_class);
+	public static function create(string $inventory_class, ...$args) : InvMenu{
+		return new InvMenu($inventory_class, ...$args);
 	}
 
 	/** @var bool */
@@ -50,12 +50,12 @@ class InvMenu implements MenuIds{
 	/** @var BaseFakeInventory|null */
 	private $inventory;
 
-	public function __construct(string $inventory_class){
+	public function __construct(string $inventory_class, ...$args){
 		if(!is_subclass_of($inventory_class, BaseFakeInventory::class, true)){
 			throw new \InvalidArgumentException($inventory_class . " must extend " . BaseFakeInventory::class . ".");
 		}
 
-		$this->inventory = new $inventory_class($this);
+		$this->inventory = new $inventory_class($this, ...$args);
 	}
 
 	public function getInventory(?Player $player = null, ?string $custom_name = null) : BaseFakeInventory{
