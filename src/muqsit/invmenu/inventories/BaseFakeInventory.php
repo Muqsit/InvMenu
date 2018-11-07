@@ -59,8 +59,14 @@ abstract class BaseFakeInventory extends ContainerInventory{
 		return new static($this->menu, $this->getContents());
 	}
 
-	final public function send(Player $player, ?string $custom_name) : void{
-		$this->sendFakeBlockData($player, $this->holder_data[$player->getId()] = new HolderData($player->floor()->add(0, static::INVENTORY_HEIGHT, 0), $custom_name));
+	final public function send(Player $player, ?string $custom_name) : bool{
+		$position = $player->floor()->add(0, static::INVENTORY_HEIGHT, 0);
+		if($player->getLevel()->isInWorld($position->x, $position->y, $position->z)){
+			$this->sendFakeBlockData($player, $this->holder_data[$player->getId()] = new HolderData($position, $custom_name));
+			return true;
+		}
+
+		return false;
 	}
 
 	final public function open(Player $player) : bool{
