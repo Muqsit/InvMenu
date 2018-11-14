@@ -55,8 +55,8 @@ abstract class BaseFakeInventory extends ContainerInventory{
 		return $this->menu;
 	}
 
-	public function createNewInstance() : BaseFakeInventory{
-		return new static($this->menu, $this->getContents());
+	public function createNewInstance(InvMenu $menu) : BaseFakeInventory{
+		return new static($menu, $this->getContents());
 	}
 
 	final public function send(Player $player, ?string $custom_name) : bool{

@@ -64,7 +64,7 @@ class InvMenu implements MenuIds{
 				throw new \InvalidArgumentException("You need to specify a " . Player::class . " instance as the first parameter of getInventory() while fetching an inventory from a sessionized InvMenu instance.");
 			}
 
-			return $this->sessions[$uuid = $player->getId()] ?? ($this->sessions[$uuid] = $this->inventory->createNewInstance($player));
+			return $this->sessions[$uuid = $player->getId()] ?? ($this->sessions[$uuid] = $this->inventory->createNewInstance($this));
 		}
 
 		return $this->inventory;
@@ -139,7 +139,7 @@ class InvMenu implements MenuIds{
 	}
 
 	public function __clone(){
-		$this->inventory = $this->inventory->createNewInstance();
+		$this->inventory = $this->inventory->createNewInstance($this);
 		$this->clearSessions(false);
 	}
 }
