@@ -64,11 +64,8 @@ class InvMenuHandler implements Listener{
 				if($inventory instanceof BaseFakeInventory){
 					$menu = $inventory->getMenu();
 					$listener = $menu->getListener();
-					if($listener === null){
-						continue;
-					}
 
-					if(!$listener($transaction->getSource(), $action->getSourceItem(), $action->getTargetItem(), $action) || $menu->isReadonly()){
+					if(($listener !== null && !$listener($transaction->getSource(), $action->getSourceItem(), $action->getTargetItem(), $action)) || $menu->isReadonly()){
 						$event->setCancelled();
 						return;
 					}
