@@ -12,7 +12,7 @@ You'll need to import the `muqsit\invmenu\InvMenu.php` class. This is the main c
 use muqsit\invmenu\InvMenu;
 ```
 
-InvMenu supports creating a GUI out of any king of inventory that can be created by extending it's `BaseFakeInventory` class.
+InvMenu supports creating a GUI out of any kind of inventory that can be created by extending it's `BaseFakeInventory` class.
 
 ### Creating an InvMenu instance
 `InvMenu::create($inventory_class)` creates a new instance of InvMenu. `$inventory_class` should be a path to an inventory class extending InvMenu's `BaseFakeInventory` class. InvMenu comes with 3 inventory classes by default: `ChestInventory`, `DoubleChestInventory` and `HopperInventory`. The path to these inventory classes can either be accessed by specifying the path to the inventory class or by the constants `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
