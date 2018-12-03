@@ -85,7 +85,10 @@ abstract class BaseFakeInventory extends ContainerInventory{
 
 	final public function onClose(Player $player) : void{
 		if(isset($this->holder_data[$id = $player->getId()])){
-			$this->sendRealBlockData($player, $this->holder_data[$id]);
+			$pos = $this->holder_data[$id]->position;
+			if($player->getLevel()->isChunkLoaded($pos->x >> 4, $pos->z >> 4)){
+				$this->sendRealBlockData($player, $this->holder_data[$id]);
+			}
 			unset($this->holder_data[$id]);
 
 			parent::onClose($player);
