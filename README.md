@@ -14,6 +14,13 @@ use muqsit\invmenu\InvMenu;
 
 InvMenu supports creating a GUI out of any kind of inventory that can be created by extending it's `BaseFakeInventory` class.
 
+**NOTE:** You'll need to allow InvMenu to handle inventory events (such as InventoryTransactionEvent) if you'd like `InvMenu::readonly()` and InvMenu listeners to work. For this, you can do the following when your plugin enables...
+```php
+if(!InvMenuHandler::isRegistered()){
+	InvMenuHandler::register($this);
+}
+```
+
 ### Creating an InvMenu instance
 `InvMenu::create($inventory_class)` creates a new instance of InvMenu. `$inventory_class` should be a path to an inventory class extending InvMenu's `BaseFakeInventory` class. InvMenu comes with 3 inventory classes by default: `ChestInventory`, `DoubleChestInventory` and `HopperInventory`. The path to these inventory classes can either be accessed by specifying the path to the inventory class or by the constants `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
 
