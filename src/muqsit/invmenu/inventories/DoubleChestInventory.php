@@ -25,7 +25,8 @@ use pocketmine\block\Block;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
-use pocketmine\tile\Tile;
+use pocketmine\tile\Chest;
+use pocketmine\tile\TileFactory;
 
 class DoubleChestInventory extends BaseFakeInventory{
 
@@ -71,7 +72,7 @@ class DoubleChestInventory extends BaseFakeInventory{
 	}
 
 	public function getTileId() : string{
-		return Tile::CHEST;
+		return TileFactory::getSaveId(Chest::class);
 	}
 
 	public function getName() : string{

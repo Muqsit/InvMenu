@@ -28,7 +28,7 @@ use pocketmine\block\Block;
 use pocketmine\inventory\BaseInventory;
 use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\NetworkLittleEndianNBTStream;
+use pocketmine\network\mcpe\NetworkNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\Player;
@@ -140,7 +140,7 @@ abstract class BaseFakeInventory extends ContainerInventory{
 		$pk->x = $pos->x;
 		$pk->y = $pos->y;
 		$pk->z = $pos->z;
-		$pk->namedtag = (new NetworkLittleEndianNBTStream())->write($nbt);
+		$pk->namedtag = (new NetworkNbtSerializer())->write($nbt);
 		$player->sendDataPacket($pk);
 	}
 }

@@ -21,7 +21,8 @@ namespace muqsit\invmenu\inventories;
 
 use pocketmine\block\Block;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\tile\Tile;
+use pocketmine\tile\Chest;
+use pocketmine\tile\TileFactory;
 
 class ChestInventory extends SingleBlockInventory{
 
@@ -34,7 +35,7 @@ class ChestInventory extends SingleBlockInventory{
 	}
 
 	public function getTileId() : string{
-		return Tile::CHEST;
+		return TileFactory::getSaveId(Chest::class);
 	}
 
 	public function getName() : string{
