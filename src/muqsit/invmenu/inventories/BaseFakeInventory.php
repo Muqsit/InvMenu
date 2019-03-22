@@ -30,6 +30,7 @@ use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\Player;
 
@@ -140,7 +141,7 @@ abstract class BaseFakeInventory extends ContainerInventory{
 		$pk->x = $pos->x;
 		$pk->y = $pos->y;
 		$pk->z = $pos->z;
-		$pk->namedtag = (new NetworkNbtSerializer())->write($nbt);
+		$pk->namedtag = (new NetworkNbtSerializer())->write(new TreeRoot($nbt));
 		$player->sendDataPacket($pk);
 	}
 }

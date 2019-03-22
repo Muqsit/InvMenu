@@ -33,7 +33,7 @@ abstract class SingleBlockInventory extends BaseFakeInventory{
 		$block = $this->getBlock()->setComponents($data->position->x, $data->position->y, $data->position->z);
 		$player->getLevel()->sendBlocks([$player], [$block]);
 
-		$tag = new CompoundTag("", []);
+		$tag = CompoundTag::create();
 		if($data->custom_name !== null){
 			$tag->setString("CustomName", $data->custom_name);
 		}

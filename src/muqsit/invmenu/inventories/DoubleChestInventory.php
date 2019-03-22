@@ -47,7 +47,7 @@ class DoubleChestInventory extends BaseFakeInventory{
 
 		$player->getLevel()->sendBlocks([$player], [$block, $block2]);
 
-		$tag = new CompoundTag("", []);
+		$tag = CompoundTag::create();
 		if($data->custom_name !== null){
 			$tag->setString("CustomName", $data->custom_name);
 		}
