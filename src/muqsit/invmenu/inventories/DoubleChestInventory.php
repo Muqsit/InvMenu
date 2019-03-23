@@ -19,6 +19,7 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\utils\HolderData;
 
 use pocketmine\block\Block;
@@ -29,6 +30,10 @@ use pocketmine\tile\Chest;
 use pocketmine\tile\TileFactory;
 
 class DoubleChestInventory extends BaseFakeInventory{
+
+	public function __construct(InvMenu $menu, array $items = []){
+		parent::__construct($menu, 54, $items);
+	}
 
 	public function getSendDelay(Player $player) : int{
 		/**
@@ -77,9 +82,5 @@ class DoubleChestInventory extends BaseFakeInventory{
 
 	public function getName() : string{
 		return "Chest";
-	}
-
-	public function getDefaultSize() : int{
-		return 54;
 	}
 }

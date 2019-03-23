@@ -19,10 +19,16 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\InvMenu;
+
 use pocketmine\block\Block;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 
 class HopperInventory extends SingleBlockInventory{
+
+	public function __construct(InvMenu $menu, array $items = []){
+		parent::__construct($menu, 5, $items);
+	}
 
 	public function getBlock() : Block{
 		return Block::get(Block::HOPPER_BLOCK);
@@ -38,9 +44,5 @@ class HopperInventory extends SingleBlockInventory{
 
 	public function getName() : string{
 		return "Hopper";
-	}
-
-	public function getDefaultSize() : int{
-		return 5;
 	}
 }

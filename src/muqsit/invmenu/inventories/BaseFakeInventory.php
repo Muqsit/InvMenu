@@ -47,9 +47,9 @@ abstract class BaseFakeInventory extends ContainerInventory{
 	/** @var HolderData[] */
 	private $holder_data = [];
 
-	public function __construct(InvMenu $menu, array $items = [], int $size = null, string $title = null){
+	public function __construct(InvMenu $menu, int $size, array $items = []){
 		$this->menu = $menu;
-		BaseInventory::__construct($items, $size, $title);
+		BaseInventory::__construct($size, $items);
 	}
 
 	public function getMenu() : InvMenu{

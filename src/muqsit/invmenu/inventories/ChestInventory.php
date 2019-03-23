@@ -19,12 +19,18 @@
 
 namespace muqsit\invmenu\inventories;
 
+use muqsit\invmenu\InvMenu;
+
 use pocketmine\block\Block;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\tile\Chest;
 use pocketmine\tile\TileFactory;
 
 class ChestInventory extends SingleBlockInventory{
+
+	public function __construct(InvMenu $menu, array $items = []){
+		parent::__construct($menu, 27, $items);
+	}
 
 	public function getBlock() : Block{
 		return Block::get(Block::CHEST);
@@ -40,9 +46,5 @@ class ChestInventory extends SingleBlockInventory{
 
 	public function getName() : string{
 		return "Chest";
-	}
-
-	public function getDefaultSize() : int{
-		return 27;
 	}
 }
