@@ -31,7 +31,7 @@ abstract class SingleBlockInventory extends BaseFakeInventory{
 
 	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
 		$block = $this->getBlock()->setComponents($data->position->x, $data->position->y, $data->position->z);
-		$player->getLevel()->sendBlocks([$player], [$block]);
+		$player->getWorld()->sendBlocks([$player], [$block]);
 
 		$tag = CompoundTag::create();
 		if($data->custom_name !== null){
@@ -44,7 +44,7 @@ abstract class SingleBlockInventory extends BaseFakeInventory{
 	}
 
 	protected function sendRealBlockData(Player $player, HolderData $data) : void{
-		$player->getLevel()->sendBlocks([$player], [$data->position]);
+		$player->getWorld()->sendBlocks([$player], [$data->position]);
 	}
 
 	abstract public function getBlock() : Block;

@@ -50,7 +50,7 @@ class DoubleChestInventory extends BaseFakeInventory{
 		$block = Block::get(Block::CHEST)->setComponents($data->position->x, $data->position->y, $data->position->z);
 		$block2 = Block::get(Block::CHEST)->setComponents($data->position->x + 1, $data->position->y, $data->position->z);
 
-		$player->getLevel()->sendBlocks([$player], [$block, $block2]);
+		$player->getWorld()->sendBlocks([$player], [$block, $block2]);
 
 		$tag = CompoundTag::create();
 		if($data->custom_name !== null){
@@ -69,7 +69,7 @@ class DoubleChestInventory extends BaseFakeInventory{
 	}
 
 	protected function sendRealBlockData(Player $player, HolderData $data) : void{
-		$player->getLevel()->sendBlocks([$player], [$data->position, $data->position->add(1, 0, 0)]);
+		$player->getWorld()->sendBlocks([$player], [$data->position, $data->position->add(1, 0, 0)]);
 	}
 
 	public function getNetworkType() : int{
