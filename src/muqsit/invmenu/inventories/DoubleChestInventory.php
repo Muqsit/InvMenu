@@ -43,7 +43,7 @@ class DoubleChestInventory extends BaseFakeInventory{
 		 *   a single chest inventory or the client closes the inventory as soon as it renders
 		 *   the pair.
 		 */
-		return $player->getPing() < 300 ? 5 : 0;
+		return $player->getNetworkSession()->getPing() < 300 ? 5 : 0;
 	}
 
 	protected function sendFakeBlockData(Player $player, HolderData $data) : void{
