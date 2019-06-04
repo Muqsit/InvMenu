@@ -25,7 +25,7 @@ use pocketmine\block\Block;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
-use pocketmine\tile\Tile;
+use pocketmine\block\tile\Tile;
 
 abstract class SingleBlockInventory extends BaseFakeInventory{
 

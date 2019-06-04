@@ -26,8 +26,8 @@ use pocketmine\block\Block;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\Player;
-use pocketmine\tile\Chest;
-use pocketmine\tile\TileFactory;
+use pocketmine\block\tile\Chest;
+use pocketmine\block\tile\TileFactory;
 
 class DoubleChestInventory extends BaseFakeInventory{
 

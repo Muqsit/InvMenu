@@ -54,7 +54,6 @@ class InvMenuHandler implements Listener{
 	/**
 	 * @param InventoryTransactionEvent $event
 	 * @priority NORMAL
-	 * @ignoreCancelled true
 	 */
 	public function onInventoryTransaction(InventoryTransactionEvent $event) : void{
 		$transaction = $event->getTransaction();

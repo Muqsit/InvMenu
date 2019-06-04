@@ -23,8 +23,8 @@ use muqsit\invmenu\InvMenu;
 
 use pocketmine\block\Block;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\tile\Chest;
-use pocketmine\tile\TileFactory;
+use pocketmine\block\tile\Chest;
+use pocketmine\block\tile\TileFactory;
 
 class ChestInventory extends SingleBlockInventory{
 
