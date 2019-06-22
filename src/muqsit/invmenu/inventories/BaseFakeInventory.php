@@ -32,7 +32,7 @@ use pocketmine\network\mcpe\NetworkNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 abstract class BaseFakeInventory extends ContainerInventory{
 
@@ -70,21 +70,17 @@ abstract class BaseFakeInventory extends ContainerInventory{
 		return false;
 	}
 
-	final public function open(Player $player) : bool{
+	public function onOpen(Player $player) : void{
 		if(!isset($this->holder_data[$player->getId()])){
-			return false;
+			return;
 		}
 
-		return parent::open($player);
-	}
-
-	final public function onOpen(Player $player) : void{
 		$this->holder = $this->holder_data[$player->getId()]->position;
 		parent::onOpen($player);
 		$this->holder = null;
 	}
 
-	final public function onClose(Player $player) : void{
+	public function onClose(Player $player) : void{
 		if(isset($this->holder_data[$id = $player->getId()])){
 			$pos = $this->holder_data[$id]->position;
 			if($player->getWorld()->isChunkLoaded($pos->x >> 4, $pos->z >> 4)){
@@ -127,7 +123,7 @@ abstract class BaseFakeInventory extends ContainerInventory{
 	}
 
 	public function onFakeBlockDataSendSuccess(Player $player) : void{
-		$player->addWindow($this);
+		$player->setCurrentWindow($this);
 	}
 
 	public function onFakeBlockDataSendFailed(Player $player) : void{

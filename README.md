@@ -116,12 +116,12 @@ void callback(Player $player, BaseFakeInventory $inventory);
 To forcefully close or remove the menu from a player, you can use
 ```php
 /** @var Player $player */
-$player->removeWindow($menu->getInventory($player));
+$player->removeCurrentWindow();
 ```
 To forcefully close or remove the menu when a player modifies the inventory, you can use
 ```php
 $menu->setListener(function(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) : bool{
-	$player->removeWindow($action->getInventory());
+	$player->removeCurrentWindow();
 	return false;
 });
 ```

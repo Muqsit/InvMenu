@@ -25,7 +25,7 @@ use muqsit\invmenu\utils\HolderData;
 use pocketmine\block\Block;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\block\tile\Chest;
 use pocketmine\block\tile\TileFactory;
 

@@ -21,7 +21,7 @@ namespace muqsit\invmenu;
 
 use muqsit\invmenu\inventories\BaseFakeInventory;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class InvMenu implements MenuIds{
 
@@ -126,7 +126,7 @@ class InvMenu implements MenuIds{
 		if($remove_windows){
 			foreach($inventories as $inventory){
 				foreach($inventory->getViewers() as $player){
-					$player->removeWindow($inventory);
+					$player->removeCurrentWindow();
 				}
 			}
 		}
