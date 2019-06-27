@@ -26,7 +26,7 @@ use muqsit\invmenu\utils\HolderData;
 
 use pocketmine\block\Block;
 use pocketmine\inventory\BaseInventory;
-use pocketmine\inventory\ContainerInventory;
+use pocketmine\inventory\BlockInventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\NetworkNbtSerializer;
 use pocketmine\nbt\tag\CompoundTag;
@@ -34,7 +34,7 @@ use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\player\Player;
 
-abstract class BaseFakeInventory extends ContainerInventory{
+abstract class BaseFakeInventory extends BlockInventory{
 
 	const INVENTORY_HEIGHT = 3;
 
