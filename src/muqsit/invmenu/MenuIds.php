@@ -19,15 +19,9 @@
 
 namespace muqsit\invmenu;
 
-use muqsit\invmenu\inventories\ChestInventory;
-use muqsit\invmenu\inventories\DoubleChestInventory;
-use muqsit\invmenu\inventories\HopperInventory;
-
 interface MenuIds{
 
-	// This interface exists for backwards compatibility.
-
-	const TYPE_CHEST = ChestInventory::class;
-	const TYPE_DOUBLE_CHEST = DoubleChestInventory::class;
-	const TYPE_HOPPER = HopperInventory::class;
+	public const TYPE_CHEST = "invmenu:chest";
+	public const TYPE_DOUBLE_CHEST = "invmenu:double_chest";
+	public const TYPE_HOPPER = "invmenu:hopper";
 }

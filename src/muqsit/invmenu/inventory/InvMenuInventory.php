@@ -17,20 +17,20 @@
  *
 */
 
-namespace muqsit\invmenu\utils;
+declare(strict_types=1);
 
+namespace muqsit\invmenu\inventory;
+
+use pocketmine\inventory\BlockInventory;
 use pocketmine\math\Vector3;
 
-class HolderData{
+class InvMenuInventory extends BlockInventory{
 
-	/** @var Vector3 */
-	public $position;
+	public function __construct(int $size){
+		parent::__construct(new Vector3(), $size);
+	}
 
-	/** @var string|null */
-	public $custom_name;
-
-	public function __construct(Vector3 $position, ?string $custom_name){
-		$this->position = $position;
-		$this->custom_name = $custom_name;
+	public function moveHolderTo(Vector3 $pos) : void{
+		$this->holder = $pos;
 	}
 }

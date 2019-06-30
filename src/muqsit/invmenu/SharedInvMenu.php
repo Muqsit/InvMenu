@@ -1,0 +1,55 @@
+<?php
+
+/*
+ *  ___            __  __
+ * |_ _|_ ____   _|  \/  | ___ _ __  _   _
+ *  | || '_ \ \ / / |\/| |/ _ \ '_ \| | | |
+ *  | || | | \ V /| |  | |  __/ | | | |_| |
+ * |___|_| |_|\_/ |_|  |_|\___|_| |_|\__,_|
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * @author Muqsit
+ * @link http://github.com/Muqsit
+ *
+*/
+
+declare(strict_types=1);
+
+namespace muqsit\invmenu;
+
+use muqsit\invmenu\inventory\InvMenuInventory;
+use muqsit\invmenu\inventory\SharedInventorySynchronizer;
+use muqsit\invmenu\metadata\MenuMetadata;
+use pocketmine\inventory\Inventory;
+use pocketmine\player\Player;
+
+class SharedInvMenu extends InvMenu{
+
+	/** @var InvMenuInventory */
+	private $inventory;
+
+	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
+		parent::__construct($type);
+		$this->setInventory($custom_inventory);
+	}
+
+	public function getInventory() : InvMenuInventory{
+		return $this->inventory;
+	}
+
+	protected function setInventory(?Inventory $custom_inventory) : void{
+		$this->inventory = $this->type->createInventory();
+		if($custom_inventory !== null){
+			$this->inventory->setContents($custom_inventory->getContents());
+			$custom_inventory->addChangeListeners(new SharedInventorySynchronizer($this));
+		}
+	}
+
+	public function getInventoryForPlayer(Player $player) : InvMenuInventory{
+		return $this->getInventory();
+	}
+}
