@@ -41,15 +41,11 @@ final class InvMenuHandler{
 	/** @var MenuMetadata[] */
 	private static $menu_types = [];
 
-	public static function isRegistered() : bool{
-		return self::$registrant instanceof Plugin;
-	}
-
-	public static function getRegistrant() : Plugin{
+	public static function getRegistrant(): Plugin{
 		return self::$registrant;
 	}
 
-	public static function register(Plugin $plugin) : void{
+	public static function register(Plugin $plugin): void{
 		if(self::isRegistered()){
 			throw new InvalidArgumentException($plugin->getName() . " attempted to register " . self::class . " twice.");
 		}
@@ -59,13 +55,17 @@ final class InvMenuHandler{
 		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
 	}
 
-	private static function registerDefaultMenuTypes() : void{
+	public static function isRegistered(): bool{
+		return self::$registrant instanceof Plugin;
+	}
+
+	private static function registerDefaultMenuTypes(): void{
 		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
 		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
 		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockLegacyIds::HOPPER_BLOCK), TileFactory::getSaveId(Hopper::class)));
 	}
 
-	public static function registerMenuType(MenuMetadata $type) : void{
+	public static function registerMenuType(MenuMetadata $type): void{
 		if(isset(self::$menu_types[$identifier = $type->getIdentifier()])){
 			throw new InvalidArgumentException("A menu type with the identifier \"" . $identifier . "\" is already registered as " . get_class(self::$menu_types[$identifier]));
 		}
@@ -73,7 +73,7 @@ final class InvMenuHandler{
 		self::$menu_types[$identifier] = $type;
 	}
 
-	public static function getMenuType(string $identifier) : ?MenuMetadata{
+	public static function getMenuType(string $identifier): ?MenuMetadata{
 		return self::$menu_types[$identifier] ?? null;
 	}
 }

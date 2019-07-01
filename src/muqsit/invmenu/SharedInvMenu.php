@@ -40,18 +40,18 @@ class SharedInvMenu extends InvMenu{
 		$this->setInventory($custom_inventory);
 	}
 
-	public function getInventory() : InvMenuInventory{
+	public function getInventory(): InvMenuInventory{
 		return $this->inventory;
 	}
 
-	protected function setInventory(?Inventory $custom_inventory) : void{
+	protected function setInventory(?Inventory $custom_inventory): void{
 		$this->inventory = $this->type->createInventory();
 		if($custom_inventory !== null){
 			$this->synchronizer = new SharedInvMenuSynchronizer($this, $custom_inventory);
 		}
 	}
 
-	public function getInventoryForPlayer(Player $player) : InvMenuInventory{
+	public function getInventoryForPlayer(Player $player): InvMenuInventory{
 		return $this->getInventory();
 	}
 }

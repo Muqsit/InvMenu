@@ -37,13 +37,13 @@ class SharedInventoryNotifier implements InventoryChangeListener{
 		$this->synchronizer = $synchronizer;
 	}
 
-	public function onContentChange(Inventory $inventory) : void{
+	public function onContentChange(Inventory $inventory): void{
 		$this->inventory->removeChangeListeners($this->synchronizer);
 		$this->inventory->setContents($inventory->getContents());
 		$this->inventory->addChangeListeners($this->synchronizer);
 	}
 
-	public function onSlotChange(Inventory $inventory, int $slot) : void{
+	public function onSlotChange(Inventory $inventory, int $slot): void{
 		if($slot < $inventory->getSize()){
 			$this->inventory->removeChangeListeners($this->synchronizer);
 			$this->inventory->setItem($slot, $inventory->getItem($slot));

@@ -61,7 +61,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$this->tile_id = $tile_id;
 	}
 
-	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
+	public function sendGraphic(Player $player, MenuExtradata $metadata): void{
 		$positions = $this->getBlockPositions($metadata);
 
 		$blocks = [];
@@ -80,7 +80,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		}
 	}
 
-	protected function sendBlockEntityGraphicAt(Player $player, Vector3 $pos, ?string $name) : void{
+	protected function sendBlockEntityGraphicAt(Player $player, Vector3 $pos, ?string $name): void{
 		$player->sendDataPacket(BlockEntityDataPacket::create(
 			$pos->x,
 			$pos->y,
@@ -91,19 +91,19 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		));
 	}
 
-	protected function getBlockEntityDataAt(Vector3 $pos, ?string $name) : CompoundTag{
+	protected function getBlockEntityDataAt(Vector3 $pos, ?string $name): CompoundTag{
 		$tag = CompoundTag::create()->setString(Tile::TAG_ID, $this->tile_id);
-		if($name !== null) {
+		if($name !== null){
 			$tag->setString(Nameable::TAG_CUSTOM_NAME, $name);
 		}
 		return $tag;
 	}
 
-	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{
+	public function removeGraphic(Player $player, MenuExtradata $extradata): void{
 		$player->getWorld()->sendBlocks([$player], $this->getBlockPositions($extradata));
 	}
 
-	protected function getBlockPositions(MenuExtradata $metadata) : array{
+	protected function getBlockPositions(MenuExtradata $metadata): array{
 		return [$metadata->getPosition()];
 	}
 }

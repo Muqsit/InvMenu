@@ -28,15 +28,15 @@ final class PlayerManager{
 	/** @var PlayerSession[] */
 	private static $sessions = [];
 
-	public static function create(Player $player) : void{
+	public static function create(Player $player): void{
 		self::$sessions[$player->getRawUniqueId()] = new PlayerSession($player);
 	}
 
-	public static function destroy(Player $player) : void{
+	public static function destroy(Player $player): void{
 		unset(self::$sessions[$player->getRawUniqueId()]);
 	}
 
-	public static function get(Player $player) : PlayerSession{
+	public static function get(Player $player): PlayerSession{
 		return self::$sessions[$player->getRawUniqueId()];
 	}
 }

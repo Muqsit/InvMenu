@@ -33,15 +33,15 @@ class SharedInventorySynchronizer implements InventoryChangeListener{
 		$this->inventory = $inventory;
 	}
 
-	public function getSynchronizingInventory() : InvMenuInventory{
+	public function getSynchronizingInventory(): InvMenuInventory{
 		return $this->inventory;
 	}
 
-	public function onContentChange(Inventory $inventory) : void{
+	public function onContentChange(Inventory $inventory): void{
 		$this->inventory->setContents($inventory->getContents());
 	}
 
-	public function onSlotChange(Inventory $inventory, int $slot) : void{
+	public function onSlotChange(Inventory $inventory, int $slot): void{
 		$this->inventory->setItem($slot, $inventory->getItem($slot));
 	}
 }
