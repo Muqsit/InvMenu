@@ -21,7 +21,6 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\inventory;
 
-use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\SharedInvMenu;
 use pocketmine\inventory\Inventory;
 
@@ -51,6 +50,5 @@ class SharedInvMenuSynchronizer{
 	public function __destruct(){
 		$this->synchronizer->getSynchronizingInventory()->removeChangeListeners($this->notifier);
 		$this->inventory->removeChangeListeners($this->synchronizer);
-		InvMenuHandler::getRegistrant()->getLogger()->debug("Destroyed: " . get_class($this));
 	}
 }
