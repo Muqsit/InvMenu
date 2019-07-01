@@ -22,11 +22,10 @@ if(!InvMenuHandler::isRegistered()){
 ```
 
 ### Creating an InvMenu instance
-`InvMenu::create($inventory_class)` creates a new instance of InvMenu. `$inventory_class` should be a path to an inventory class extending InvMenu's `BaseFakeInventory` class. InvMenu comes with 3 inventory classes by default: `ChestInventory`, `DoubleChestInventory` and `HopperInventory`. The path to these inventory classes can either be accessed by specifying the path to the inventory class or by the constants `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
+`InvMenu::create($identifier)` creates a new instance of InvMenu. `$identifier` should be an identifier of a registered `MenuMedata` object. InvMenu comes with 3 pre-registered `MenuMetadata` identifiers by default: `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
 
 ```php
 $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-//This is the same as InvMenu::create(\muqsit\invmenu\inventories\ChestInventory::class);
 ```
 
 To access this menu's inventory, you can use:
@@ -34,13 +33,14 @@ To access this menu's inventory, you can use:
 $inventory = $menu->getInventory();
 ```
 
-The inventory instance extends pocketmine's `Inventory` class, so you can use all the fancy pocketmine inventory methods.
+The `$inventory` extends pocketmine's `Inventory` class, so you can use all the fancy pocketmine inventory methods.
 ```php
 $menu->getInventory()->setContents([
 	Item::get(Item::DIAMOND_SWORD),
 	Item::get(Item::DIAMOND_PICKAXE)
 ]);
 $menu->getInventory()->addItem(Item::get(Item::DIAMOND_AXE));
+$menu->getInventory()->setItem(3, Item::get(Item::GOLD_INGOT));
 ```
 To send the menu to a player, use:
 ```php
@@ -50,25 +50,24 @@ $menu->send($player);
 Yup, that's it. It's that simple.
 
 ### Disallowing players from modifying the menu's contents
-This can be an essential in cases where you'd want to use a menu as a UI. InvMenu comes with a method that disallows players to move items in and out of the menu. It's as simple as calling:
+This is useful in cases where you'd want to use an inventory as a UI. You can disallows players from modifying the inventory by setting the `InvMenu` instance as read-only. This only disallows players. The inventory contents can still be modified thru code.
 ```php
 $menu->readonly();
 ```
-That's all you have to do to completely stop players from moving items in and out of your menu.
 
 ### Specifying a custom name to the menu
 To set a custom name to a menu, use
 ```php
 $menu->setName("Custom Name");
 ```
-You can also specify a different inventory name for each player separately during `InvMenu::send()`.
+You can also specify a different menu name for each player separately during `InvMenu::send()`.
 ```php
 /** @var Player $player */
 $menu->send($player, "Greetings, " . $player->getName());
 ```
 
 ### Handling menu item transactions
-Inventory transactions are menu-based. To handle inventory transactions happening in a menu, you will need to specify a callable which will get called every time an item is either put in or taken out of the menu's inventory. You can do this using
+To handle inventory transactions happening in a menu, you will need to specify a callable which will get called every time an item is either put in or taken out of the menu's inventory. You can do this using
 ```php
 /** @var callable $listener */
 $menu->setListener($listener);
@@ -88,14 +87,11 @@ What's **`$listener`**?
  * transaction. You can use this to fetch the inventory instance by
  * using $action->getInventory().
  *
- * @return bool whether to not cancel the item movement. If it returns
- * true, then the transaction is not cancelled. If it returns false,
- * the transaction is cancelled.
- *
- * NOTE: If the menu is set to readonly, the transaction will be
- * forcefully cancelled irrespective of this callable's return value.
+ * Should return void if InvMenu is readonly, bool otherwise. Return false if you
+ * want to cancel the inventory change from occuring.
+ * @return bool|void
  */
-bool callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
+bool|void callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
 ```
 
 ### Inventory closing — Listening to inventory close triggers & How to!
@@ -109,72 +105,48 @@ What's **`$listener`**?
 /**
  * @param Player $player the player who closed the inventory.
  *
- * @param BaseFakeInventory $inventory the inventory instance closed by the player.
+ * @param InvMenuInventory $inventory the inventory instance closed by the player.
  */
-void callback(Player $player, BaseFakeInventory $inventory);
+void callback(Player $player, InvMenuInventory $inventory);
 ```
 To forcefully close or remove the menu from a player, you can use
 ```php
 /** @var Player $player */
 $player->removeCurrentWindow();
 ```
-To forcefully close or remove the menu when a player modifies the inventory, you can use
-```php
-$menu->setListener(function(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action) : bool{
-	$player->removeCurrentWindow();
-	return false;
-});
-```
 ### Sessionizing menu — "per player inventory"
-InvMenu supports having a different inventory instance for each player. By default menu instances aren't sesionized, so all players whom you `$menu->send($player)` the menu to are accessing the same inventory. Either you can create a different InvMenu instance for each player or use the `sessionize` feature of InvMenu by calling
+The "sessionize" feature allows you to create one `InvMenu` instance but send a different inventory instance to each player. You can create a sessionized InvMenu instance using
 ```php
-$menu->sessionize();
+$menu = InvMenu::createSessionized(InvMenu::TYPE_CHEST);
 ```
-What this does is it creates a different inventory instance for each player. You can access a player's inventory using:
+The difference between `InvMenu::create()` and `InvMenu::createSessionized()` is that sessionized InvMenu instances create a separate inventory for each player while unsessionized InvMenu instances send the same inventory to each player. In sessionized InvMenu instances, each player has their own separate inventory which is undisturbed by others who are viewing the same InvMenu.
+To access a player's inventory in a sessionized InvMenu, use:
 ```php
 /** @var Player $player */
 $inventory = $menu->getInventory($player);
 ```
-**NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If your plugin likes to make the inventory persist, you can listen to inventory close triggers and store the inventory contents somewhere and then set the inventory contents while sending the inventory to the player.
+**NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If you want inventory contents to persist, you may listen to inventory close triggers and store the inventory contents.
 
 ### Writing a custom inventory class
-So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER` or `DispenserInventory::class`. BUT that won't stop you from doing what you want to do! You can write your own DispenserInventory class and it should be valid as long as you specified the correct identifiers and it extends the `BaseFakeInventory` class. InvMenu consists of a `SingleBlockInventory` class which is a simplified version of the `BaseFakeInventory` class.
+So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER`. You can still create a dispenser InvMenu by registering a `MenuMetadata` object with the information about what a dispenser inventory looks like.
 ```php
-<?php
-namespace spacename;
+public const TYPE_DISPENSER = "myplugin:dispenser";
 
-use muqsit\invmenu\inventories\SingleBlockInventory;
-
-use pocketmine\block\Block;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
-use pocketmine\tile\Tile;
-
-class DispenserInventory extends SingleBlockInventory{
-
-	public function getBlock() : Block{
-		return Block::get(Block::DISPENSER);
-	}
-
-	public function getNetworkType() : int{
-		return WindowTypes::DISPENSER;
-	}
-
-	public function getTileId() : string{
-		return "Dispenser";
-	}
-
-	public function getName() : string{
-		return "Dispenser";
-	}
-
-	public function getDefaultSize() : int{
-		return 9;
-	}
+public function registerCustomMenuTypes() : void{
+	$type = new SingleBlockMenuMetadata(
+		self::TYPE_DISPENSER, // identifier
+		9, // number of slots
+		BlockFactory::get(Block::DISPENSER), // Block
+		"Dispenser" // block entity identifier
+	);
+	InvMenuHandler::registerMenuType($menu);
 }
+
+$this->registerCustomMenuTypes();
 ```
 Sweet! Now you can create a dispenser menu using
 ```php
-$menu = InvMenu::create(\spacename\DispenserInventory::class);
+$menu = InvMenu::create(self::TYPE_DISPENSER);
 ```
 
 ### InvMenu applications / examples
