@@ -30,6 +30,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Chest;
 use pocketmine\block\tile\Hopper;
 use pocketmine\block\tile\TileFactory;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\plugin\Plugin;
 
 final class InvMenuHandler{
@@ -59,9 +60,9 @@ final class InvMenuHandler{
 	}
 
 	private static function registerDefaultMenuTypes() : void{
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
-		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, BlockFactory::get(BlockLegacyIds::HOPPER_BLOCK), TileFactory::getSaveId(Hopper::class)));
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
+		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, BlockFactory::get(BlockLegacyIds::CHEST), TileFactory::getSaveId(Chest::class)));
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockLegacyIds::HOPPER_BLOCK), TileFactory::getSaveId(Hopper::class)));
 	}
 
 	public static function registerMenuType(MenuMetadata $type) : void{

@@ -22,6 +22,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use muqsit\invmenu\InvMenu;
+use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 use pocketmine\player\Player;
 
@@ -50,22 +51,46 @@ class PlayerSession{
 
 	/**
 	 * @internal use InvMenu::send() instead.
+	 *
 	 * @param InvMenu|null $menu
+	 * @return bool
 	 */
-	public function setCurrentMenu(?InvMenu $menu) : void{
-		$this->current_menu = $menu;
-		$this->notification_id = time() * 1000; // TODO: remove the x1000 hack when fixed
+	public function setCurrentMenu(?InvMenu $menu) : bool{
+		if($menu !== null && !$this->waitForNotification(mt_rand() * 1000)){ // TODO: remove the x1000 hack when fixed
+			return false;
+		}
 
+		$this->current_menu = $menu;
+		return true;
+	}
+
+	protected function waitForNotification(int $notification_id) : bool{
 		$pk = new NetworkStackLatencyPacket();
-		$pk->timestamp = $this->notification_id;
+		$pk->timestamp = $notification_id;
 		$pk->needResponse = true;
-		$this->player->sendDataPacket($pk);
+
+		if($this->player->sendDataPacket($pk)){
+			$this->notification_id = $notification_id;
+			return true;
+		}
+
+		return false;
 	}
 
 	public function notify(int $notification_id) : void{
 		if($notification_id === $this->notification_id){
 			$this->notification_id = null;
-			$this->current_menu->sendInventory($this->player, $this->menu_extradata);
+			if($this->current_menu !== null){
+				if($this->current_menu->sendInventory($this->player, $this->menu_extradata)) {
+					$this->player->sendDataPacket(ContainerOpenPacket::blockInvVec3(
+						$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
+						$this->current_menu->getType()->getWindowType(),
+						$this->menu_extradata->getPosition()
+					));
+				}else{
+					$this->setCurrentMenu(null);
+				}
+			}
 		}
 	}
 
@@ -75,10 +100,9 @@ class PlayerSession{
 
 	/**
 	 * @internal use Player::removeCurrentWindow() instead
-	 * @return void
+	 * @return bool
 	 */
-	public function removeCurrentMenu() : void{
-		$this->current_menu = null;
-		$this->notification_id = null;
+	public function removeCurrentMenu() : bool{
+		return $this->setCurrentMenu(null);
 	}
 }

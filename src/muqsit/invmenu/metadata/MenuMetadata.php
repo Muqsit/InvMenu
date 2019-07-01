@@ -33,9 +33,13 @@ abstract class MenuMetadata{
 	/** @var int */
 	protected $size;
 
-	public function __construct(string $identifier, int $size){
+	/** @var int */
+	protected $window_type;
+
+	public function __construct(string $identifier, int $size, int $window_type){
 		$this->identifier = $identifier;
 		$this->size = $size;
+		$this->window_type = $window_type;
 	}
 
 	public function getIdentifier() : string{
@@ -44,6 +48,10 @@ abstract class MenuMetadata{
 
 	public function getSize() : int{
 		return $this->size;
+	}
+
+	public function getWindowType() : int{
+		return $this->window_type;
 	}
 
 	public function createInventory() : InvMenuInventory{

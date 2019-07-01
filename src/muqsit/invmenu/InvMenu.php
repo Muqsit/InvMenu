@@ -99,24 +99,26 @@ abstract class InvMenu implements MenuIds{
 			->setInventoryCloseListener($menu->inventory_close_listener);
 	}
 
-	final public function send(Player $player, ?string $name = null) : void{
+	final public function send(Player $player, ?string $name = null) : bool{
 		$extradata = PlayerManager::get($player)->getMenuExtradata();
 		$extradata->setName($name ?? $this->getName());
 		$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
 
 		$this->type->sendGraphic($player, $extradata);
-		PlayerManager::get($player)->setCurrentMenu($this);
+		return PlayerManager::get($player)->setCurrentMenu($this);
 	}
 
 	/**
+	 * @internal use InvMenu::send() instead.
+	 *
 	 * @param Player $player
 	 * @param MenuExtradata $extradata
-	 * @internal use InvMenu::send() instead.
+	 * @return bool
 	 */
-	public function sendInventory(Player $player, MenuExtradata $extradata) : void{
+	public function sendInventory(Player $player, MenuExtradata $extradata) : bool{
 		$inventory = $this->getInventoryForPlayer($player);
 		$inventory->moveHolderTo($extradata->getPosition());
-		$player->setCurrentWindow($inventory);
+		return $player->setCurrentWindow($inventory);
 	}
 
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;

@@ -136,6 +136,7 @@ public function registerCustomMenuTypes() : void{
 	$type = new SingleBlockMenuMetadata(
 		self::TYPE_DISPENSER, // identifier
 		9, // number of slots
+		WindowTypes::DISPENSER, // mcpe window type id
 		BlockFactory::get(Block::DISPENSER), // Block
 		"Dispenser" // block entity identifier
 	);

@@ -50,8 +50,8 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	/** @var string */
 	protected $tile_id;
 
-	public function __construct(string $identifier, int $size, Block $block, string $tile_id){
-		parent::__construct($identifier, $size);
+	public function __construct(string $identifier, int $size, int $window_type, Block $block, string $tile_id){
+		parent::__construct($identifier, $size, $window_type);
 
 		if(self::$serializer === null){
 			self::$serializer = new NetworkNbtSerializer();
