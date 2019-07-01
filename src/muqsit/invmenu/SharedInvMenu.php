@@ -22,7 +22,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use muqsit\invmenu\inventory\InvMenuInventory;
-use muqsit\invmenu\inventory\SharedInventorySynchronizer;
+use muqsit\invmenu\inventory\SharedInvMenuSynchronizer;
 use muqsit\invmenu\metadata\MenuMetadata;
 use pocketmine\inventory\Inventory;
 use pocketmine\player\Player;
@@ -30,7 +30,10 @@ use pocketmine\player\Player;
 class SharedInvMenu extends InvMenu{
 
 	/** @var InvMenuInventory */
-	private $inventory;
+	protected $inventory;
+
+	/** @var SharedInvMenuSynchronizer|null */
+	protected $synchronizer;
 
 	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
 		parent::__construct($type);
@@ -44,8 +47,7 @@ class SharedInvMenu extends InvMenu{
 	protected function setInventory(?Inventory $custom_inventory) : void{
 		$this->inventory = $this->type->createInventory();
 		if($custom_inventory !== null){
-			$this->inventory->setContents($custom_inventory->getContents());
-			$custom_inventory->addChangeListeners(new SharedInventorySynchronizer($this));
+			$this->synchronizer = new SharedInvMenuSynchronizer($this, $custom_inventory);
 		}
 	}
 

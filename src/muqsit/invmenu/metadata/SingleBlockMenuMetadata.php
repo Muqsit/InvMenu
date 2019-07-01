@@ -32,7 +32,6 @@ use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
 use pocketmine\network\mcpe\serializer\NetworkNbtSerializer;
 use pocketmine\player\Player;
-use pocketmine\world\Position;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
 
