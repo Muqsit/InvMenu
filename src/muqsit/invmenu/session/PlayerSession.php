@@ -45,7 +45,7 @@ class PlayerSession{
 		$this->menu_extradata = new MenuExtradata();
 	}
 
-	public function getMenuExtradata(): MenuExtradata{
+	public function getMenuExtradata() : MenuExtradata{
 		return $this->menu_extradata;
 	}
 
@@ -55,7 +55,7 @@ class PlayerSession{
 	 * @param InvMenu|null $menu
 	 * @return bool
 	 */
-	public function setCurrentMenu(?InvMenu $menu): bool{
+	public function setCurrentMenu(?InvMenu $menu) : bool{
 		if($menu !== null && !$this->waitForNotification(mt_rand() * 1000)){ // TODO: remove the x1000 hack when fixed
 			return false;
 		}
@@ -64,7 +64,7 @@ class PlayerSession{
 		return true;
 	}
 
-	protected function waitForNotification(int $notification_id): bool{
+	protected function waitForNotification(int $notification_id) : bool{
 		$pk = new NetworkStackLatencyPacket();
 		$pk->timestamp = $notification_id;
 		$pk->needResponse = true;
@@ -77,7 +77,7 @@ class PlayerSession{
 		return false;
 	}
 
-	public function notify(int $notification_id): void{
+	public function notify(int $notification_id) : void{
 		if($notification_id === $this->notification_id){
 			$this->notification_id = null;
 			if($this->current_menu !== null){
@@ -94,7 +94,7 @@ class PlayerSession{
 		}
 	}
 
-	public function getCurrentMenu(): ?InvMenu{
+	public function getCurrentMenu() : ?InvMenu{
 		return $this->current_menu;
 	}
 
@@ -102,7 +102,7 @@ class PlayerSession{
 	 * @internal use Player::removeCurrentWindow() instead
 	 * @return bool
 	 */
-	public function removeCurrentMenu(): bool{
+	public function removeCurrentMenu() : bool{
 		return $this->setCurrentMenu(null);
 	}
 }

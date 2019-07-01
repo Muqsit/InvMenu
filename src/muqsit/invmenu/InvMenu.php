@@ -33,11 +33,11 @@ abstract class InvMenu implements MenuIds{
 
 	public const INVENTORY_HEIGHT = 3;
 
-	public static function create(string $identifier, ...$args): SharedInvMenu{
+	public static function create(string $identifier, ...$args) : SharedInvMenu{
 		return new SharedInvMenu(InvMenuHandler::getMenuType($identifier), ...$args);
 	}
 
-	public static function createSessionized(string $identifier): SessionizedInvMenu{
+	public static function createSessionized(string $identifier) : SessionizedInvMenu{
 		return new SessionizedInvMenu(InvMenuHandler::getMenuType($identifier));
 	}
 
@@ -60,46 +60,46 @@ abstract class InvMenu implements MenuIds{
 		$this->type = $type;
 	}
 
-	public function getType(): MenuMetadata{
+	public function getType() : MenuMetadata{
 		return $this->type;
 	}
 
-	public function getName(): ?string{
+	public function getName() : ?string{
 		return $this->name;
 	}
 
-	public function setName(?string $name): InvMenu{
+	public function setName(?string $name) : InvMenu{
 		$this->name = $name;
 		return $this;
 	}
 
-	public function isReadonly(): bool{
+	public function isReadonly() : bool{
 		return $this->readonly;
 	}
 
-	public function readonly(bool $value = true): InvMenu{
+	public function readonly(bool $value = true) : InvMenu{
 		$this->readonly = $value;
 		return $this;
 	}
 
-	public function setListener(?callable $listener): InvMenu{
+	public function setListener(?callable $listener) : InvMenu{
 		$this->listener = $listener;
 		return $this;
 	}
 
-	public function setInventoryCloseListener(?callable $listener): InvMenu{
+	public function setInventoryCloseListener(?callable $listener) : InvMenu{
 		$this->inventory_close_listener = $listener;
 		return $this;
 	}
 
-	public function copyProperties(InvMenu $menu): void{
+	public function copyProperties(InvMenu $menu) : void{
 		$this->setName($menu->getName())
 			->readonly($menu->isReadonly())
 			->setListener($menu->listener)
 			->setInventoryCloseListener($menu->inventory_close_listener);
 	}
 
-	final public function send(Player $player, ?string $name = null): bool{
+	final public function send(Player $player, ?string $name = null) : bool{
 		$extradata = PlayerManager::get($player)->getMenuExtradata();
 		$extradata->setName($name ?? $this->getName());
 		$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
@@ -115,15 +115,15 @@ abstract class InvMenu implements MenuIds{
 	 * @param Player $player
 	 * @return bool
 	 */
-	public function sendInventory(Player $player, MenuExtradata $extradata): bool{
+	public function sendInventory(Player $player, MenuExtradata $extradata) : bool{
 		$inventory = $this->getInventoryForPlayer($player);
 		$inventory->moveHolderTo($extradata->getPosition());
 		return $player->setCurrentWindow($inventory);
 	}
 
-	abstract public function getInventoryForPlayer(Player $player): InvMenuInventory;
+	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;
 
-	public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action): bool{
+	public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action) : bool{
 		if($this->listener !== null){
 			if($this->readonly){
 				($this->listener)($player, $in, $out, $action);
@@ -136,7 +136,7 @@ abstract class InvMenu implements MenuIds{
 		return true;
 	}
 
-	public function onClose(Player $player): void{
+	public function onClose(Player $player) : void{
 		if($this->inventory_close_listener !== null){
 			($this->inventory_close_listener)($player, $this->getInventoryForPlayer($player));
 		}

@@ -37,7 +37,7 @@ class InvMenuEventHandler implements Listener{
 	 * @param PlayerLoginEvent $event
 	 * @priority MONITOR
 	 */
-	public function onPlayerLogin(PlayerLoginEvent $event): void{
+	public function onPlayerLogin(PlayerLoginEvent $event) : void{
 		PlayerManager::create($event->getPlayer());
 	}
 
@@ -45,7 +45,7 @@ class InvMenuEventHandler implements Listener{
 	 * @param PlayerQuitEvent $event
 	 * @priority MONITOR
 	 */
-	public function onPlayerQuit(PlayerQuitEvent $event): void{
+	public function onPlayerQuit(PlayerQuitEvent $event) : void{
 		PlayerManager::destroy($event->getPlayer());
 	}
 
@@ -53,7 +53,7 @@ class InvMenuEventHandler implements Listener{
 	 * @param DataPacketReceiveEvent $event
 	 * @priority NORMAL
 	 */
-	public function onDataPacketReceive(DataPacketReceiveEvent $event): void{
+	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
 		$packet = $event->getPacket();
 		if($packet instanceof NetworkStackLatencyPacket){
 			PlayerManager::get($event->getOrigin()->getPlayer())->notify($packet->timestamp);
@@ -64,7 +64,7 @@ class InvMenuEventHandler implements Listener{
 	 * @param InventoryCloseEvent $event
 	 * @priority MONITOR
 	 */
-	public function onInventoryClose(InventoryCloseEvent $event): void{
+	public function onInventoryClose(InventoryCloseEvent $event) : void{
 		$player = $event->getPlayer();
 		$menu = PlayerManager::get($player)->getCurrentMenu();
 		if($menu !== null){
@@ -79,7 +79,7 @@ class InvMenuEventHandler implements Listener{
 	 * @param InventoryTransactionEvent $event
 	 * @priority NORMAL
 	 */
-	public function onInventoryTransaction(InventoryTransactionEvent $event): void{
+	public function onInventoryTransaction(InventoryTransactionEvent $event) : void{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 

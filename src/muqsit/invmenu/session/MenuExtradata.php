@@ -31,23 +31,23 @@ class MenuExtradata{
 	/** @var string|null */
 	protected $name;
 
-	public function getPosition(): ?Vector3{
+	public function getPosition() : ?Vector3{
 		return $this->position;
 	}
 
-	public function getName(): ?string{
+	public function getName() : ?string{
 		return $this->name;
 	}
 
-	public function setPosition(?Vector3 $pos): void{
+	public function setPosition(?Vector3 $pos) : void{
 		$this->position = $pos;
 	}
 
-	public function setName(?string $name): void{
+	public function setName(?string $name) : void{
 		$this->name = $name;
 	}
 
-	public function reset(): void{
+	public function reset() : void{
 		$this->position = null;
 		$this->name = null;
 	}

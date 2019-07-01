@@ -42,23 +42,23 @@ abstract class MenuMetadata{
 		$this->window_type = $window_type;
 	}
 
-	public function getIdentifier(): string{
+	public function getIdentifier() : string{
 		return $this->identifier;
 	}
 
-	public function getSize(): int{
+	public function getSize() : int{
 		return $this->size;
 	}
 
-	public function getWindowType(): int{
+	public function getWindowType() : int{
 		return $this->window_type;
 	}
 
-	public function createInventory(): InvMenuInventory{
+	public function createInventory() : InvMenuInventory{
 		return new InvMenuInventory($this->getSize());
 	}
 
-	abstract public function sendGraphic(Player $player, MenuExtradata $metadata): void;
+	abstract public function sendGraphic(Player $player, MenuExtradata $metadata) : void;
 
-	abstract public function removeGraphic(Player $player, MenuExtradata $extradata): void;
+	abstract public function removeGraphic(Player $player, MenuExtradata $extradata) : void;
 }

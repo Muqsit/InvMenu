@@ -29,7 +29,7 @@ class SessionizedInvMenu extends InvMenu{
 	/** @var SharedInvMenu[] */
 	protected $menus = [];
 
-	public function getMenu(Player $player): SharedInvMenu{
+	public function getMenu(Player $player) : SharedInvMenu{
 		if(isset($this->menus[$uuid = $player->getRawUniqueId()])){
 			return $this->menus[$uuid];
 		}
@@ -39,15 +39,15 @@ class SessionizedInvMenu extends InvMenu{
 		return $menu;
 	}
 
-	public function getInventory(Player $player): InvMenuInventory{
+	public function getInventory(Player $player) : InvMenuInventory{
 		return $this->getMenu($player)->getInventory();
 	}
 
-	public function getInventoryForPlayer(Player $player): InvMenuInventory{
+	public function getInventoryForPlayer(Player $player) : InvMenuInventory{
 		return $this->getInventory($player);
 	}
 
-	public function onClose(Player $player): void{
+	public function onClose(Player $player) : void{
 		parent::onClose($player);
 		unset($this->menus[$player->getRawUniqueId()]);
 	}
