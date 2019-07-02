@@ -81,7 +81,7 @@ class PlayerSession{
 		if($notification_id === $this->notification_id){
 			$this->notification_id = null;
 			if($this->current_menu !== null){
-				if($this->current_menu->sendInventory($this->player, $this->menu_extradata)){
+				if($this->current_menu->sendInventory($this->player)){
 					$this->player->sendDataPacket(ContainerOpenPacket::blockInvVec3(
 						$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
 						$this->current_menu->getType()->getWindowType(),

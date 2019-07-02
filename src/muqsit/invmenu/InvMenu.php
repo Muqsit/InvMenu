@@ -111,14 +111,11 @@ abstract class InvMenu implements MenuIds{
 	/**
 	 * @internal use InvMenu::send() instead.
 	 *
-	 * @param MenuExtradata $extradata
 	 * @param Player $player
 	 * @return bool
 	 */
-	public function sendInventory(Player $player, MenuExtradata $extradata) : bool{
-		$inventory = $this->getInventoryForPlayer($player);
-		$inventory->moveHolderTo($extradata->getPosition());
-		return $player->setCurrentWindow($inventory);
+	public function sendInventory(Player $player) : bool{
+		return $player->setCurrentWindow($this->getInventoryForPlayer($player));
 	}
 
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;

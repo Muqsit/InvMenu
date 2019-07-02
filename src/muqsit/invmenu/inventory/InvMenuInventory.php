@@ -29,8 +29,4 @@ class InvMenuInventory extends BlockInventory{
 	public function __construct(int $size){
 		parent::__construct(new Vector3(), $size);
 	}
-
-	public function moveHolderTo(Vector3 $pos) : void{
-		$this->holder = $pos;
-	}
 }
