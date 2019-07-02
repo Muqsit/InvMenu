@@ -45,6 +45,15 @@ class PlayerSession{
 		$this->menu_extradata = new MenuExtradata();
 	}
 
+	/**
+	 * @internal
+	 */
+	public function finalize() : void{
+		if($this->current_menu !== null){
+			$this->player->removeCurrentWindow();
+		}
+	}
+
 	public function getMenuExtradata() : MenuExtradata{
 		return $this->menu_extradata;
 	}
@@ -82,11 +91,14 @@ class PlayerSession{
 			$this->notification_id = null;
 			if($this->current_menu !== null){
 				if($this->current_menu->sendInventory($this->player)){
+					// TODO: Revert this to the Inventory->moveTo() method when it's possible
+					// for plugins to specify network type for inventories
 					$this->player->sendDataPacket(ContainerOpenPacket::blockInvVec3(
 						$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
 						$this->current_menu->getType()->getWindowType(),
 						$this->menu_extradata->getPosition()
 					));
+					$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventoryForPlayer($this->player));
 				}else{
 					$this->setCurrentMenu(null);
 				}
