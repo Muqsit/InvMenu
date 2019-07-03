@@ -66,11 +66,14 @@ class InvMenuEventHandler implements Listener{
 	 */
 	public function onInventoryClose(InventoryCloseEvent $event) : void{
 		$player = $event->getPlayer();
-		$menu = PlayerManager::get($player)->getCurrentMenu();
-		if($menu !== null){
-			$inventory = $menu->getInventoryForPlayer($player);
-			if($inventory === $menu->getInventoryForPlayer($player)){
-				$menu->onClose($player);
+		$session = PlayerManager::get($player);
+		if($session !== null){
+			$menu = $session->getCurrentMenu();
+			if($menu !== null){
+				$inventory = $menu->getInventoryForPlayer($player);
+				if($inventory === $menu->getInventoryForPlayer($player)){
+					$menu->onClose($player);
+				}
 			}
 		}
 	}

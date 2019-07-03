@@ -37,7 +37,7 @@ final class PlayerManager{
 		unset(self::$sessions[$uuid]);
 	}
 
-	public static function get(Player $player) : PlayerSession{
+	public static function get(Player $player) : ?PlayerSession{
 		return self::$sessions[$player->getRawUniqueId()];
 	}
 }
