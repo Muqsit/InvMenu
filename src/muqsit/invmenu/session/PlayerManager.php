@@ -29,15 +29,15 @@ final class PlayerManager{
 	private static $sessions = [];
 
 	public static function create(Player $player) : void{
-		self::$sessions[$player->getRawUniqueId()] = new PlayerSession($player);
+		self::$sessions[$player->getUniqueId()->toBinary()] = new PlayerSession($player);
 	}
 
 	public static function destroy(Player $player) : void{
-		self::$sessions[$uuid = $player->getRawUniqueId()]->finalize();
+		self::$sessions[$uuid = $player->getUniqueId()->toBinary()]->finalize();
 		unset(self::$sessions[$uuid]);
 	}
 
 	public static function get(Player $player) : ?PlayerSession{
-		return self::$sessions[$player->getRawUniqueId()] ?? null;
+		return self::$sessions[$player->getUniqueId()->toBinary()] ?? null;
 	}
 }

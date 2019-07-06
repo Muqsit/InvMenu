@@ -30,7 +30,7 @@ class SessionizedInvMenu extends InvMenu{
 	protected $menus = [];
 
 	public function getMenu(Player $player) : SharedInvMenu{
-		if(isset($this->menus[$uuid = $player->getRawUniqueId()])){
+		if(isset($this->menus[$uuid = $player->getUniqueId()->toBinary()])){
 			return $this->menus[$uuid];
 		}
 
@@ -49,6 +49,6 @@ class SessionizedInvMenu extends InvMenu{
 
 	public function onClose(Player $player) : void{
 		parent::onClose($player);
-		unset($this->menus[$player->getRawUniqueId()]);
+		unset($this->menus[$player->getUniqueId()->toBinary()]);
 	}
 }
