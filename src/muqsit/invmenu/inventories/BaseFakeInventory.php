@@ -30,7 +30,7 @@ use pocketmine\inventory\ContainerInventory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
+use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\Player;
 
 abstract class BaseFakeInventory extends ContainerInventory{
@@ -136,7 +136,7 @@ abstract class BaseFakeInventory extends ContainerInventory{
 	protected function sendTile(Player $player, Vector3 $pos, CompoundTag $nbt) : void{
 		$nbt->setString("id", $this->getTileId());
 
-		$pk = new BlockEntityDataPacket();
+		$pk = new BlockActorDataPacket();
 		$pk->x = $pos->x;
 		$pk->y = $pos->y;
 		$pk->z = $pos->z;
