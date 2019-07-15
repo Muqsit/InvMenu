@@ -27,8 +27,8 @@ use pocketmine\nbt\tag\CompoundTag;
 
 class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
 
-	protected function getBlockEntityDataAt(Vector3 $pos, ?string $name) : CompoundTag{
-		return parent::getBlockEntityDataAt($pos, $name)
+	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
+		return parent::getBlockActorDataAt($pos, $name)
 			->setInt("pairx", $pos->x + (($pos->x & 1) ? 1 : -1))
 			->setInt("pairz", $pos->z);
 	}

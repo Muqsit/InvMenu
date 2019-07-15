@@ -29,7 +29,7 @@ use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
-use pocketmine\network\mcpe\protocol\BlockEntityDataPacket;
+use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\serializer\NetworkNbtSerializer;
 use pocketmine\player\Player;
 
@@ -81,17 +81,17 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	}
 
 	protected function sendBlockEntityGraphicAt(Player $player, Vector3 $pos, ?string $name) : void{
-		$player->sendDataPacket(BlockEntityDataPacket::create(
+		$player->sendDataPacket(BlockActorDataPacket::create(
 			$pos->x,
 			$pos->y,
 			$pos->z,
 			self::$serializer->write(
-				new TreeRoot($this->getBlockEntityDataAt($pos, $name))
+				new TreeRoot($this->getBlockActorDataAt($pos, $name))
 			)
 		));
 	}
 
-	protected function getBlockEntityDataAt(Vector3 $pos, ?string $name) : CompoundTag{
+	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
 		$tag = CompoundTag::create()->setString(Tile::TAG_ID, $this->tile_id);
 		if($name !== null){
 			$tag->setString(Nameable::TAG_CUSTOM_NAME, $name);
