@@ -30,7 +30,7 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Chest;
 use pocketmine\block\tile\Hopper;
 use pocketmine\block\tile\TileFactory;
-use pocketmine\network\mcpe\protocol\types\WindowTypes;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\plugin\Plugin;
 
 final class InvMenuHandler{

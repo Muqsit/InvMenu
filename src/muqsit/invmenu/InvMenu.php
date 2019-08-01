@@ -23,7 +23,6 @@ namespace muqsit\invmenu;
 
 use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\metadata\MenuMetadata;
-use muqsit\invmenu\session\MenuExtradata;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
