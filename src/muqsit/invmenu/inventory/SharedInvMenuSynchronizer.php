@@ -47,7 +47,7 @@ class SharedInvMenuSynchronizer{
 		$menu_inventory->addChangeListeners($this->notifier);
 	}
 
-	public function __destruct(){
+	public function destroy() : void{
 		$this->synchronizer->getSynchronizingInventory()->removeChangeListeners($this->notifier);
 		$this->inventory->removeChangeListeners($this->synchronizer);
 	}

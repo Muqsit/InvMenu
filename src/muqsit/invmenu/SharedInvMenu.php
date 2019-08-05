@@ -37,6 +37,7 @@ class SharedInvMenu extends InvMenu{
 
 	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
 		parent::__construct($type);
+		$this->inventory = $this->type->createInventory();
 		$this->setInventory($custom_inventory);
 	}
 
@@ -44,8 +45,12 @@ class SharedInvMenu extends InvMenu{
 		return $this->inventory;
 	}
 
-	protected function setInventory(?Inventory $custom_inventory) : void{
-		$this->inventory = $this->type->createInventory();
+	public function setInventory(?Inventory $custom_inventory) : void{
+		if($this->synchronizer !== null){
+			$this->synchronizer->destroy();
+			$this->synchronizer = null;
+		}
+
 		if($custom_inventory !== null){
 			$this->synchronizer = new SharedInvMenuSynchronizer($this, $custom_inventory);
 		}
