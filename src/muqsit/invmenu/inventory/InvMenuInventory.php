@@ -22,11 +22,11 @@ declare(strict_types=1);
 namespace muqsit\invmenu\inventory;
 
 use pocketmine\inventory\BlockInventory;
-use pocketmine\math\Vector3;
+use pocketmine\world\Position;
 
 class InvMenuInventory extends BlockInventory{
 
 	public function __construct(int $size){
-		parent::__construct(new Vector3(), $size);
+		parent::__construct(new Position(), $size);
 	}
 }

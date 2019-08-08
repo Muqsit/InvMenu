@@ -23,13 +23,13 @@ namespace muqsit\invmenu\metadata;
 
 use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
 use pocketmine\block\tile\Nameable;
 use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
+use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\network\mcpe\serializer\NetworkNbtSerializer;
 use pocketmine\player\Player;
 
@@ -64,31 +64,27 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
 		$positions = $this->getBlockPositions($metadata);
 
-		$blocks = [];
-		foreach($positions as $pos){
-			$block = BlockFactory::get($this->block->getId(), $this->block->getMeta());
-			$block->x = $pos->x;
-			$block->y = $pos->y;
-			$block->z = $pos->z;
-			$blocks[] = $block;
-		}
-		$player->getWorld()->sendBlocks([$player], $blocks);
-
 		$name = $metadata->getName();
+		$packets = [];
 		foreach($positions as $pos){
-			$this->sendBlockEntityGraphicAt($player, $pos, $name);
+			array_push($packets,
+				UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $this->block->getRuntimeId()),
+				$this->getBlockActorDataPacketAt($player, $pos, $name)
+			);
 		}
+
+		$player->getServer()->broadcastPackets([$player], $packets);
 	}
 
-	protected function sendBlockEntityGraphicAt(Player $player, Vector3 $pos, ?string $name) : void{
-		$player->sendDataPacket(BlockActorDataPacket::create(
+	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
+		return BlockActorDataPacket::create(
 			$pos->x,
 			$pos->y,
 			$pos->z,
 			self::$serializer->write(
 				new TreeRoot($this->getBlockActorDataAt($pos, $name))
 			)
-		));
+		);
 	}
 
 	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
