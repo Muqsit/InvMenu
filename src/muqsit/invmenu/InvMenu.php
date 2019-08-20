@@ -99,9 +99,11 @@ abstract class InvMenu implements MenuIds{
 	}
 
 	final public function send(Player $player, ?string $name = null) : bool{
+		$player->removeCurrentWindow();
+
 		$extradata = PlayerManager::get($player)->getMenuExtradata();
 		$extradata->setName($name ?? $this->getName());
-		$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
+		$extradata->setPosition($player->getLocation()->floor()->add(0, static::INVENTORY_HEIGHT, 0));
 
 		$this->type->sendGraphic($player, $extradata);
 		return PlayerManager::get($player)->setCurrentMenu($this);
@@ -120,16 +122,14 @@ abstract class InvMenu implements MenuIds{
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;
 
 	public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action) : bool{
-		if($this->listener !== null){
-			if($this->readonly){
+		if($this->readonly){
+			if($this->listener !== null){
 				($this->listener)($player, $in, $out, $action);
-				return false;
 			}
-
-			return ($this->listener)($player, $in, $out, $action);
+			return false;
 		}
 
-		return true;
+		return $this->listener === null || ($this->listener)($player, $in, $out, $action);
 	}
 
 	public function onClose(Player $player) : void{
