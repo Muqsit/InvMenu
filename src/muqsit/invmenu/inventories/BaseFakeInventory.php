@@ -32,6 +32,7 @@ use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\Player;
+use pocketmine\Server;
 
 abstract class BaseFakeInventory extends ContainerInventory{
 
@@ -119,7 +120,12 @@ abstract class BaseFakeInventory extends ContainerInventory{
 	public function onFakeBlockDataSend(Player $player) : void{
 		$delay = $this->getSendDelay($player);
 		if($delay > 0){
-			InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DelayedFakeBlockDataNotifyTask($player, $this), $delay);
+			try{
+				InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new DelayedFakeBlockDataNotifyTask($player, $this), $delay);
+			}catch(\InvalidStateException $e){
+				Server::getInstance()->getLogger()->error("[InvMenu] Failed to send inventory due to disabled plugin " . InvMenuHandler::getRegistrant()->getName());
+				throw $e;
+			}
 		}else{
 			$this->onFakeBlockDataSendSuccess($player);
 		}
