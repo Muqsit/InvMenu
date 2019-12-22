@@ -21,9 +21,9 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\session;
 
+use Closure;
 use muqsit\invmenu\InvMenu;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
-use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 use pocketmine\player\Player;
 
 class PlayerSession{
@@ -31,17 +31,18 @@ class PlayerSession{
 	/** @var Player */
 	protected $player;
 
+	/** @var PlayerNetwork */
+	protected $network;
+
 	/** @var MenuExtradata */
 	protected $menu_extradata;
 
 	/** @var InvMenu|null */
 	protected $current_menu;
 
-	/** @var int|null */
-	protected $notification_id;
-
 	public function __construct(Player $player){
 		$this->player = $player;
+		$this->network = new PlayerNetwork($player->getNetworkSession());
 		$this->menu_extradata = new MenuExtradata();
 	}
 
@@ -62,48 +63,43 @@ class PlayerSession{
 	 * @internal use InvMenu::send() instead.
 	 *
 	 * @param InvMenu|null $menu
+	 * @param Closure|null $callback
 	 * @return bool
 	 */
-	public function setCurrentMenu(?InvMenu $menu) : bool{
-		if($menu !== null && !$this->waitForNotification(mt_rand() * 1000)){ // TODO: remove the x1000 hack when fixed
-			return false;
+	public function setCurrentMenu(?InvMenu $menu, ?Closure $callback = null) : bool{
+		if($menu !== null){
+			$this->network->wait(function(bool $success) use($callback) : void{
+				if($success && $this->current_menu !== null){
+					if($this->current_menu->sendInventory($this->player)){
+						// TODO: Revert this to the Inventory->moveTo() method when it's possible
+						// for plugins to specify network type for inventories
+						if($this->player->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInvVec3(
+							$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
+							$this->current_menu->getType()->getWindowType(),
+							$this->menu_extradata->getPosition()
+						))){
+							$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventoryForPlayer($this->player));
+							if($callback !== null){
+								$callback(true);
+							}
+							return;
+						}
+					}else{
+						$this->setCurrentMenu(null);
+					}
+				}
+				if($callback !== null){
+					$callback(true);
+				}
+			});
 		}
 
 		$this->current_menu = $menu;
 		return true;
 	}
 
-	protected function waitForNotification(int $notification_id) : bool{
-		$pk = new NetworkStackLatencyPacket();
-		$pk->timestamp = $notification_id;
-		$pk->needResponse = true;
-
-		if($this->player->sendDataPacket($pk)){
-			$this->notification_id = $notification_id;
-			return true;
-		}
-
-		return false;
-	}
-
-	public function notify(int $notification_id) : void{
-		if($notification_id === $this->notification_id){
-			$this->notification_id = null;
-			if($this->current_menu !== null){
-				if($this->current_menu->sendInventory($this->player)){
-					// TODO: Revert this to the Inventory->moveTo() method when it's possible
-					// for plugins to specify network type for inventories
-					$this->player->sendDataPacket(ContainerOpenPacket::blockInvVec3(
-						$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
-						$this->current_menu->getType()->getWindowType(),
-						$this->menu_extradata->getPosition()
-					));
-					$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventoryForPlayer($this->player));
-				}else{
-					$this->setCurrentMenu(null);
-				}
-			}
-		}
+	public function getNetwork() : PlayerNetwork{
+		return $this->network;
 	}
 
 	public function getCurrentMenu() : ?InvMenu{

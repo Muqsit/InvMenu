@@ -21,9 +21,11 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu;
 
+use Closure;
 use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\session\PlayerManager;
+use muqsit\invmenu\session\PlayerSession;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
@@ -98,15 +100,24 @@ abstract class InvMenu implements MenuIds{
 			->setInventoryCloseListener($menu->inventory_close_listener);
 	}
 
-	final public function send(Player $player, ?string $name = null) : bool{
+	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
 		$player->removeCurrentWindow();
 
-		$extradata = PlayerManager::get($player)->getMenuExtradata();
-		$extradata->setName($name ?? $this->getName());
-		$extradata->setPosition($player->getLocation()->floor()->add(0, static::INVENTORY_HEIGHT, 0));
-
-		$this->type->sendGraphic($player, $extradata);
-		return PlayerManager::get($player)->setCurrentMenu($this);
+		/** @var PlayerSession $session */
+		$session = PlayerManager::get($player);
+		$network = $session->getNetwork();
+		$network->dropPending();
+		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
+			if($success){
+				$extradata = $session->getMenuExtradata();
+				$extradata->setName($name ?? $this->getName());
+				$extradata->setPosition($player->getLocation()->floor()->add(0, static::INVENTORY_HEIGHT, 0));
+				$this->type->sendGraphic($player, $extradata);
+				$session->setCurrentMenu($this, $callback);
+			}elseif($callback !== null){
+				$callback(false);
+			}
+		});
 	}
 
 	/**

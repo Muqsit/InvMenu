@@ -56,7 +56,10 @@ class InvMenuEventHandler implements Listener{
 	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
 		$packet = $event->getPacket();
 		if($packet instanceof NetworkStackLatencyPacket){
-			PlayerManager::get($event->getOrigin()->getPlayer())->notify($packet->timestamp);
+			$session = PlayerManager::get($event->getOrigin()->getPlayer());
+			if($session !== null){
+				$session->getNetwork()->notify($packet->timestamp);
+			}
 		}
 	}
 
@@ -83,6 +86,7 @@ class InvMenuEventHandler implements Listener{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
+		/** @noinspection NullPointerExceptionInspection */
 		$menu = PlayerManager::get($player)->getCurrentMenu();
 		if($menu !== null){
 			$inventory = $menu->getInventoryForPlayer($player);

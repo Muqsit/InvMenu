@@ -66,6 +66,18 @@ You can also specify a different menu name for each player separately during `In
 $menu->send($player, "Greetings, " . $player->getName());
 ```
 
+### Verifying whether the menu was sent to the player
+Not a common occurrence but it's possible for plugins to disallow players from opening inventories.
+This can also occur as an attempt to drop garbage `InvMenu::send()` requests (if you send two menus simultaneously without any delay in betweeen, the first menu request may be regarded as garbage).
+```php
+/** @var string|null $name */
+$menu->send($player, $name, function(bool $sent) : void{
+	if($sent){
+		// do something
+	}
+});
+```
+
 ### Handling menu item transactions
 To handle inventory transactions happening in a menu, you will need to specify a callable which will get called every time an item is either put in or taken out of the menu's inventory. You can do this using
 ```php
