@@ -89,7 +89,7 @@ class PlayerSession{
 					}
 				}
 				if($callback !== null){
-					$callback(true);
+					$callback(false);
 				}
 			});
 		}
