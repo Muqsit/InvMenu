@@ -17,11 +17,29 @@
  *
 */
 
+declare(strict_types=1);
+
 namespace muqsit\invmenu;
 
-interface MenuIds{
+use muqsit\invmenu\inventory\InvMenuInventory;
+use muqsit\invmenu\metadata\MenuMetadata;
+use pocketmine\Player;
 
-	public const TYPE_CHEST = "invmenu:chest";
-	public const TYPE_DOUBLE_CHEST = "invmenu:double_chest";
-	public const TYPE_HOPPER = "invmenu:hopper";
+class SharedInvMenu extends InvMenu{
+
+	/** @var InvMenuInventory */
+	protected $inventory;
+
+	public function __construct(MenuMetadata $type){
+		parent::__construct($type);
+		$this->inventory = $this->type->createInventory();
+	}
+
+	public function getInventory() : InvMenuInventory{
+		return $this->inventory;
+	}
+
+	public function getInventoryForPlayer(Player $player) : InvMenuInventory{
+		return $this->getInventory();
+	}
 }

@@ -17,23 +17,27 @@
  *
 */
 
+declare(strict_types=1);
+
 namespace muqsit\invmenu;
 
-use muqsit\invmenu\inventories\BaseFakeInventory;
-
-use pocketmine\event\inventory\InventoryTransactionEvent;
-use pocketmine\event\Listener;
-use pocketmine\inventory\transaction\action\SlotChangeAction;
+use InvalidArgumentException;
+use muqsit\invmenu\metadata\DoubleBlockMenuMetadata;
+use muqsit\invmenu\metadata\MenuMetadata;
+use muqsit\invmenu\metadata\SingleBlockMenuMetadata;
+use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockIds;
+use pocketmine\network\mcpe\protocol\types\WindowTypes;
 use pocketmine\plugin\Plugin;
+use pocketmine\tile\Tile;
 
-class InvMenuHandler implements Listener{
+final class InvMenuHandler{
 
 	/** @var Plugin|null */
 	private static $registrant;
 
-	public static function isRegistered() : bool{
-		return self::$registrant instanceof Plugin;
-	}
+	/** @var MenuMetadata[] */
+	private static $menu_types = [];
 
 	public static function getRegistrant() : Plugin{
 		return self::$registrant;
@@ -41,36 +45,33 @@ class InvMenuHandler implements Listener{
 
 	public static function register(Plugin $plugin) : void{
 		if(self::isRegistered()){
-			throw new \Error($plugin->getName() . "attempted to register " . self::class . " twice.");
+			throw new InvalidArgumentException($plugin->getName() . " attempted to register " . self::class . " twice.");
 		}
 
 		self::$registrant = $plugin;
-		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuHandler(), $plugin);
+		self::registerDefaultMenuTypes();
+		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
 	}
 
-	private function __construct(){
+	public static function isRegistered() : bool{
+		return self::$registrant instanceof Plugin;
 	}
 
-	/**
-	 * @param InventoryTransactionEvent $event
-	 * @priority NORMAL
-	 * @ignoreCancelled true
-	 */
-	public function onInventoryTransaction(InventoryTransactionEvent $event) : void{
-		$transaction = $event->getTransaction();
-		foreach($transaction->getActions() as $action){
-			if($action instanceof SlotChangeAction){
-				$inventory = $action->getInventory();
-				if($inventory instanceof BaseFakeInventory){
-					$menu = $inventory->getMenu();
-					$listener = $menu->getListener();
+	private static function registerDefaultMenuTypes() : void{
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
+		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockIds::HOPPER_BLOCK), "Hopper"));
+	}
 
-					if(($listener !== null && !$listener($transaction->getSource(), $action->getSourceItem(), $action->getTargetItem(), $action)) || $menu->isReadonly()){
-						$event->setCancelled();
-						return;
-					}
-				}
-			}
+	public static function registerMenuType(MenuMetadata $type) : void{
+		if(isset(self::$menu_types[$identifier = $type->getIdentifier()])){
+			throw new InvalidArgumentException("A menu type with the identifier \"" . $identifier . "\" is already registered as " . get_class(self::$menu_types[$identifier]));
 		}
+
+		self::$menu_types[$identifier] = $type;
+	}
+
+	public static function getMenuType(string $identifier) : ?MenuMetadata{
+		return self::$menu_types[$identifier] ?? null;
 	}
 }
