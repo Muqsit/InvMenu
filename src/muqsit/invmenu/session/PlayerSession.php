@@ -24,14 +24,13 @@ namespace muqsit\invmenu\session;
 use Closure;
 use InvalidArgumentException;
 use InvalidStateException;
+use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
+use pocketmine\network\mcpe\protocol\types\ContainerIds;
 use pocketmine\Player;
 
 class PlayerSession{
-
-	private const INVMENU_FORCE_ID_MIN = 83;
-	private const INVMENU_FORCE_ID_MAX = 84;
 
 	/** @var Player */
 	protected $player;
@@ -46,7 +45,7 @@ class PlayerSession{
 	protected $current_menu;
 
 	/** @var int */
-	protected $last_force_id = self::INVMENU_FORCE_ID_MIN;
+	protected $current_window_id = ContainerIds::NONE;
 
 	public function __construct(Player $player){
 		$this->player = $player;
@@ -64,33 +63,27 @@ class PlayerSession{
 	}
 
 	public function removeWindow() : void{
-		for($i = self::INVMENU_FORCE_ID_MIN; $i <= self::INVMENU_FORCE_ID_MAX; ++$i){
-			$window = $this->player->getWindow($i);
-			if($window !== null){
-				$this->player->removeWindow($window);
-			}
+		$window = $this->player->getWindow($this->current_window_id);
+		if($window instanceof InvMenuInventory){
+			$this->player->removeWindow($window);
+			$this->current_window_id = ContainerIds::NONE;
 		}
-	}
-
-	private function getForceId() : int{
-		if($this->last_force_id > self::INVMENU_FORCE_ID_MAX){
-			$this->last_force_id = self::INVMENU_FORCE_ID_MIN;
-		}
-		return $this->last_force_id++;
 	}
 
 	private function sendWindow() : bool{
-		$windowId = null;
+		$this->current_window_id = ContainerIds::NONE;
+
 		try{
 			$position = $this->menu_extradata->getPosition();
 			$inventory = $this->current_menu->getInventoryForPlayer($this->player);
 			/** @noinspection NullPointerExceptionInspection */
 			$inventory->moveTo($position->x, $position->y, $position->z);
-			$windowId = $this->player->addWindow($inventory, $this->getForceId());
+			$this->current_window_id = $this->player->addWindow($inventory);
 		}catch(InvalidStateException | InvalidArgumentException $e){
 			InvMenuHandler::getRegistrant()->getLogger()->debug("InvMenu failed to send inventory to " . $this->player->getName() . " due to: " . $e->getMessage());
 		}
-		return $windowId >= self::INVMENU_FORCE_ID_MIN && $windowId <= self::INVMENU_FORCE_ID_MAX;
+
+		return $this->current_window_id !== ContainerIds::NONE;
 	}
 
 	public function getMenuExtradata() : MenuExtradata{
