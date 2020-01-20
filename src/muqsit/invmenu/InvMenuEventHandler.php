@@ -24,7 +24,7 @@ namespace muqsit\invmenu;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -33,10 +33,10 @@ use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 class InvMenuEventHandler implements Listener{
 
 	/**
-	 * @param PlayerLoginEvent $event
-	 * @priority MONITOR
+	 * @param PlayerJoinEvent $event
+	 * @priority LOW
 	 */
-	public function onPlayerLogin(PlayerLoginEvent $event) : void{
+	public function onPlayerJoin(PlayerJoinEvent $event) : void{
 		PlayerManager::create($event->getPlayer());
 	}
 
@@ -51,6 +51,7 @@ class InvMenuEventHandler implements Listener{
 	/**
 	 * @param DataPacketReceiveEvent $event
 	 * @priority NORMAL
+	 * @ignoreCancelled true
 	 */
 	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
 		$packet = $event->getPacket();
@@ -65,23 +66,26 @@ class InvMenuEventHandler implements Listener{
 	/**
 	 * @param InventoryTransactionEvent $event
 	 * @priority NORMAL
+	 * @ignoreCancelled true
 	 */
 	public function onInventoryTransaction(InventoryTransactionEvent $event) : void{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
-		/** @noinspection NullPointerExceptionInspection */
-		$menu = PlayerManager::get($player)->getCurrentMenu();
-		if($menu !== null){
-			$inventory = $menu->getInventoryForPlayer($player);
-			foreach($transaction->getActions() as $action){
-				if(
-					$action instanceof SlotChangeAction &&
-					$action->getInventory() === $inventory &&
-					!$menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action)
-				){
-					$event->setCancelled();
-					break;
+		$session = PlayerManager::get($player);
+		if($session !== null){
+			$menu = $session->getCurrentMenu();
+			if($menu !== null){
+				$inventory = $menu->getInventoryForPlayer($player);
+				foreach($transaction->getActions() as $action){
+					if(
+						$action instanceof SlotChangeAction &&
+						$action->getInventory() === $inventory &&
+						!$menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action)
+					){
+						$event->setCancelled();
+						break;
+					}
 				}
 			}
 		}

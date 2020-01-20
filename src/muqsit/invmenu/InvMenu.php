@@ -103,20 +103,24 @@ abstract class InvMenu implements MenuIds{
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
 		/** @var PlayerSession $session */
 		$session = PlayerManager::get($player);
-		$network = $session->getNetwork();
-		$network->dropPending();
-		$session->removeWindow();
-		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
-			if($success){
-				$extradata = $session->getMenuExtradata();
-				$extradata->setName($name ?? $this->getName());
-				$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
-				$this->type->sendGraphic($player, $extradata);
-				$session->setCurrentMenu($this, $callback);
-			}elseif($callback !== null){
-				$callback(false);
-			}
-		});
+		if($session === null){
+			$callback(false);
+		}else{
+			$network = $session->getNetwork();
+			$network->dropPending();
+			$session->removeWindow();
+			$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
+				if($success){
+					$extradata = $session->getMenuExtradata();
+					$extradata->setName($name ?? $this->getName());
+					$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
+					$this->type->sendGraphic($player, $extradata);
+					$session->setCurrentMenu($this, $callback);
+				}elseif($callback !== null){
+					$callback(false);
+				}
+			});
+		}
 	}
 
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;
