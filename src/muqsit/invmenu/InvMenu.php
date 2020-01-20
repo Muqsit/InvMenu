@@ -103,9 +103,9 @@ abstract class InvMenu implements MenuIds{
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
 		/** @var PlayerSession $session */
 		$session = PlayerManager::get($player);
-		$session->removeWindow();
 		$network = $session->getNetwork();
 		$network->dropPending();
+		$session->removeWindow();
 		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
 			if($success){
 				$extradata = $session->getMenuExtradata();

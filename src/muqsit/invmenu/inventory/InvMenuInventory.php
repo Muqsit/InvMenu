@@ -61,7 +61,10 @@ class InvMenuInventory extends ContainerInventory{
 	}
 
 	public function onClose(Player $who) : void{
-		$this->menu_metadata->removeGraphic($who, PlayerManager::get($who)->getMenuExtradata());
-		parent::onClose($who);
+		if(isset($this->viewers[spl_object_hash($who)])){
+			parent::onClose($who);
+			/** @noinspection NullPointerExceptionInspection */
+			$this->menu_metadata->removeGraphic($who, PlayerManager::get($who)->getMenuExtradata());
+		}
 	}
 }
