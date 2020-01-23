@@ -17,20 +17,38 @@
  *
 */
 
-namespace muqsit\invmenu\utils;
+declare(strict_types=1);
+
+namespace muqsit\invmenu\session;
 
 use pocketmine\math\Vector3;
 
-class HolderData{
+class MenuExtradata{
 
-	/** @var Vector3 */
-	public $position;
+	/** @var Vector3|null */
+	protected $position;
 
 	/** @var string|null */
-	public $custom_name;
+	protected $name;
 
-	public function __construct(Vector3 $position, ?string $custom_name){
-		$this->position = $position;
-		$this->custom_name = $custom_name;
+	public function getPosition() : ?Vector3{
+		return $this->position;
+	}
+
+	public function getName() : ?string{
+		return $this->name;
+	}
+
+	public function setPosition(?Vector3 $pos) : void{
+		$this->position = $pos;
+	}
+
+	public function setName(?string $name) : void{
+		$this->name = $name;
+	}
+
+	public function reset() : void{
+		$this->position = null;
+		$this->name = null;
 	}
 }
