@@ -23,6 +23,7 @@ namespace muqsit\invmenu\inventory;
 
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\session\PlayerManager;
+use muqsit\invmenu\session\PlayerSession;
 use pocketmine\inventory\ContainerInventory;
 use pocketmine\level\Position;
 use pocketmine\Player;
@@ -63,8 +64,11 @@ class InvMenuInventory extends ContainerInventory{
 	public function onClose(Player $who) : void{
 		if(isset($this->viewers[spl_object_hash($who)])){
 			parent::onClose($who);
+			/** @var PlayerSession $session */
+			$session = PlayerManager::get($who);
 			/** @noinspection NullPointerExceptionInspection */
-			$this->menu_metadata->removeGraphic($who, PlayerManager::get($who)->getMenuExtradata());
+			$session->getCurrentMenu()->onClose($who);
+			$this->menu_metadata->removeGraphic($who, $session->getMenuExtradata());
 		}
 	}
 }
