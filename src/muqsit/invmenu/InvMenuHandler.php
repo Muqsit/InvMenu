@@ -63,8 +63,8 @@ final class InvMenuHandler{
 		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockIds::HOPPER_BLOCK), "Hopper"));
 	}
 
-	public static function registerMenuType(MenuMetadata $type) : void{
-		if(isset(self::$menu_types[$identifier = $type->getIdentifier()])){
+	public static function registerMenuType(MenuMetadata $type, bool $override = false) : void{
+		if(isset(self::$menu_types[$identifier = $type->getIdentifier()]) && !$override){
 			throw new InvalidArgumentException("A menu type with the identifier \"" . $identifier . "\" is already registered as " . get_class(self::$menu_types[$identifier]));
 		}
 

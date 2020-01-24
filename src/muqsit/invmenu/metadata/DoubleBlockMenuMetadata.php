@@ -24,6 +24,7 @@ namespace muqsit\invmenu\metadata;
 use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\Player;
 
 class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
 
@@ -37,5 +38,12 @@ class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
 		$pos = $metadata->getPosition();
 		return [$pos, ($pos->x & 1) ? $pos->east() : $pos->west()];
+	}
+
+	protected function calculateGraphicOffset(Player $player) : Vector3{
+		$offset = parent::calculateGraphicOffset($player);
+		$offset->x *= 2;
+		$offset->z *= 2;
+		return $offset;
 	}
 }

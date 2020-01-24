@@ -32,8 +32,6 @@ use pocketmine\Player;
 
 abstract class InvMenu implements MenuIds{
 
-	public const INVENTORY_HEIGHT = 3;
-
 	public static function create(string $identifier) : SharedInvMenu{
 		return new SharedInvMenu(InvMenuHandler::getMenuType($identifier));
 	}
@@ -69,7 +67,7 @@ abstract class InvMenu implements MenuIds{
 		return $this->name;
 	}
 
-	public function setName(?string $name) : InvMenu{
+	public function setName(?string $name) : self{
 		$this->name = $name;
 		return $this;
 	}
@@ -78,17 +76,17 @@ abstract class InvMenu implements MenuIds{
 		return $this->readonly;
 	}
 
-	public function readonly(bool $value = true) : InvMenu{
+	public function readonly(bool $value = true) : self{
 		$this->readonly = $value;
 		return $this;
 	}
 
-	public function setListener(?callable $listener) : InvMenu{
+	public function setListener(?callable $listener) : self{
 		$this->listener = $listener;
 		return $this;
 	}
 
-	public function setInventoryCloseListener(?callable $listener) : InvMenu{
+	public function setInventoryCloseListener(?callable $listener) : self{
 		$this->inventory_close_listener = $listener;
 		return $this;
 	}
@@ -113,7 +111,7 @@ abstract class InvMenu implements MenuIds{
 				if($success){
 					$extradata = $session->getMenuExtradata();
 					$extradata->setName($name ?? $this->getName());
-					$extradata->setPosition($player->floor()->add(0, static::INVENTORY_HEIGHT, 0));
+					$extradata->setPosition($this->type->calculateGraphicPosition($player));
 					$this->type->sendGraphic($player, $extradata);
 					$session->setCurrentMenu($this, $callback);
 				}elseif($callback !== null){
