@@ -32,8 +32,6 @@ use pocketmine\player\Player;
 
 abstract class InvMenu implements MenuIds{
 
-	public const INVENTORY_HEIGHT = 3;
-
 	public static function create(string $identifier, ...$args) : SharedInvMenu{
 		return new SharedInvMenu(InvMenuHandler::getMenuType($identifier), ...$args);
 	}
@@ -111,7 +109,7 @@ abstract class InvMenu implements MenuIds{
 			if($success){
 				$extradata = $session->getMenuExtradata();
 				$extradata->setName($name ?? $this->getName());
-				$extradata->setPosition($player->getLocation()->floor()->add(0, static::INVENTORY_HEIGHT, 0));
+				$extradata->setPosition($this->type->calculateGraphicPosition($player));
 				$this->type->sendGraphic($player, $extradata);
 				$session->setCurrentMenu($this, $callback);
 			}elseif($callback !== null){

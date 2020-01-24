@@ -23,6 +23,7 @@ namespace muqsit\invmenu\metadata;
 
 use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\session\MenuExtradata;
+use pocketmine\math\Vector3;
 use pocketmine\player\Player;
 
 abstract class MenuMetadata{
@@ -56,6 +57,18 @@ abstract class MenuMetadata{
 
 	public function createInventory() : InvMenuInventory{
 		return new InvMenuInventory($this->getSize());
+	}
+
+	protected function calculateGraphicOffset(Player $player) : Vector3{
+		$offset = $player->getDirectionVector();
+		$offset->x *= -(1 + $player->width);
+		$offset->y *= -(1 + $player->height);
+		$offset->z *= -(1 + $player->width);
+		return $offset;
+	}
+
+	public function calculateGraphicPosition(Player $player) : Vector3{
+		return $player->getPosition()->add($this->calculateGraphicOffset($player))->floor();
 	}
 
 	abstract public function sendGraphic(Player $player, MenuExtradata $metadata) : void;
