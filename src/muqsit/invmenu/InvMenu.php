@@ -67,7 +67,7 @@ abstract class InvMenu implements MenuIds{
 		return $this->name;
 	}
 
-	public function setName(?string $name) : InvMenu{
+	public function setName(?string $name) : self{
 		$this->name = $name;
 		return $this;
 	}
@@ -76,17 +76,17 @@ abstract class InvMenu implements MenuIds{
 		return $this->readonly;
 	}
 
-	public function readonly(bool $value = true) : InvMenu{
+	public function readonly(bool $value = true) : self{
 		$this->readonly = $value;
 		return $this;
 	}
 
-	public function setListener(?callable $listener) : InvMenu{
+	public function setListener(?callable $listener) : self{
 		$this->listener = $listener;
 		return $this;
 	}
 
-	public function setInventoryCloseListener(?callable $listener) : InvMenu{
+	public function setInventoryCloseListener(?callable $listener) : self{
 		$this->inventory_close_listener = $listener;
 		return $this;
 	}
