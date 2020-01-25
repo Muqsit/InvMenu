@@ -46,22 +46,26 @@ final class PlayerNetwork{
 
 	public function wait(Closure $then) : void{
 		$timestamp = mt_rand() * 1000; // TODO: remove this hack when fixed
-
-		$pk = new NetworkStackLatencyPacket();
-		$pk->timestamp = $timestamp;
-		$pk->needResponse = true;
-
-		if($this->player->sendDataPacket($pk)){
-			$this->awaiting[$timestamp] = $then;
-		}else{
-			$then(false);
+		$this->awaiting[$timestamp] = $then;
+		if(count($this->awaiting) === 1 && !$this->sendTimestamp($timestamp)){
+			$this->notify($timestamp, false);
 		}
 	}
 
-	public function notify(int $timestamp) : void{
+	public function notify(int $timestamp, bool $success = true) : void{
 		if(isset($this->awaiting[$timestamp])){
-			$this->awaiting[$timestamp](true);
+			$this->awaiting[$timestamp]($success);
 			unset($this->awaiting[$timestamp]);
+			if(count($this->awaiting) > 0){
+				$this->sendTimestamp(array_keys($this->awaiting)[0]);
+			}
 		}
+	}
+
+	private function sendTimestamp(int $timestamp) : bool{
+		$pk = new NetworkStackLatencyPacket();
+		$pk->timestamp = $timestamp;
+		$pk->needResponse = true;
+		return $this->player->sendDataPacket($pk);
 	}
 }

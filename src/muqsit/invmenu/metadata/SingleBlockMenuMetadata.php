@@ -62,9 +62,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
 		$positions = $this->getBlockPositions($metadata);
-
 		$name = $metadata->getName();
-		$packets = [];
 		foreach($positions as $pos){
 			$packet = new UpdateBlockPacket();
 			$packet->x = $pos->x;
@@ -72,13 +70,9 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 			$packet->z = $pos->z;
 			$packet->blockRuntimeId = $this->block->getRuntimeId();
 			$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
-			array_push($packets,
-				$packet,
-				$this->getBlockActorDataPacketAt($player, $pos, $name)
-			);
+			$player->sendDataPacket($packet);
+			$player->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
 		}
-
-		$player->getServer()->batchPackets([$player], $packets);
 	}
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
@@ -100,7 +94,16 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	}
 
 	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{
-		$player->getLevel()->sendBlocks([$player], $this->getBlockPositions($extradata));
+		$level = $player->getLevel();
+		foreach($this->getBlockPositions($extradata) as $pos){
+			$packet = new UpdateBlockPacket();
+			$packet->x = $pos->x;
+			$packet->y = $pos->y;
+			$packet->z = $pos->z;
+			$packet->blockRuntimeId = $level->getBlockAt($pos->x, $pos->y, $pos->z)->getRuntimeId();
+			$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
+			$player->sendDataPacket($packet);
+		}
 	}
 
 	protected function getBlockPositions(MenuExtradata $metadata) : array{

@@ -66,12 +66,13 @@ class PlayerSession{
 		$window = $this->player->getWindow($this->current_window_id);
 		if($window instanceof InvMenuInventory){
 			$this->player->removeWindow($window);
-			$this->current_window_id = ContainerIds::NONE;
+			$this->network->wait(static function(bool $success) : void{});
 		}
+		$this->current_window_id = ContainerIds::NONE;
 	}
 
 	private function sendWindow() : bool{
-		$this->current_window_id = ContainerIds::NONE;
+		$this->removeWindow();
 
 		try{
 			$position = $this->menu_extradata->getPosition();
@@ -81,6 +82,7 @@ class PlayerSession{
 			$this->current_window_id = $this->player->addWindow($inventory);
 		}catch(InvalidStateException | InvalidArgumentException $e){
 			InvMenuHandler::getRegistrant()->getLogger()->debug("InvMenu failed to send inventory to " . $this->player->getName() . " due to: " . $e->getMessage());
+			$this->removeWindow();
 		}
 
 		return $this->current_window_id !== ContainerIds::NONE;
