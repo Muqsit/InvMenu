@@ -152,7 +152,7 @@ public function registerCustomMenuTypes() : void{
 		BlockFactory::get(Block::DISPENSER), // Block
 		"Dispenser" // block entity identifier
 	);
-	InvMenuHandler::registerMenuType($menu);
+	InvMenuHandler::registerMenuType($type);
 }
 
 $this->registerCustomMenuTypes();
