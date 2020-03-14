@@ -27,6 +27,7 @@ use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\session\PlayerSession;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
@@ -130,10 +131,10 @@ abstract class InvMenu implements MenuIds{
 
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;
 
-	public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action) : bool{
+	public function handleInventoryTransaction(Player $player, Item $in, Item $out, SlotChangeAction $action, InventoryTransaction $transaction) : bool{
 		if($this->readonly){
 			if($this->listener !== null){
-				($this->listener)($player, $in, $out, $action);
+				($this->listener)($player, $in, $out, $action, $transaction);
 			}
 			return false;
 		}

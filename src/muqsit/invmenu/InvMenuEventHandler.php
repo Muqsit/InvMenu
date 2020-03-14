@@ -94,7 +94,7 @@ class InvMenuEventHandler implements Listener{
 				if(
 					$action instanceof SlotChangeAction &&
 					$action->getInventory() === $inventory &&
-					!$menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action)
+					!$menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction)
 				){
 					$event->setCancelled();
 					break;

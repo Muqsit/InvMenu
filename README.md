@@ -99,11 +99,16 @@ What's **`$listener`**?
  * transaction. You can use this to fetch the inventory instance by
  * using $action->getInventory().
  *
+ * @param InventoryTransaction $transaction an instance of the InventoryTransaction
+ * holding all transaction actions that the SlotChangeAction was a part of. This can be
+ * useful to validate whether an item was moved from the menu inventory -> menu inventory or
+ * whether it was moved from some another inventory -> menu inventory.
+ *
  * Should return void if InvMenu is readonly, bool otherwise. Return false if you
  * want to cancel the inventory change from occuring.
  * @return bool|void
  */
-bool|void callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action);
+bool|void callback(Player $player, Item $itemClicked, Item $itemClickedWith, SlotChangeAction $action, InventoryTransaction $transaction);
 ```
 
 ### Inventory closing — Listening to inventory close triggers & How to!
