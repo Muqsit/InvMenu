@@ -102,7 +102,9 @@ abstract class InvMenu implements MenuIds{
 		/** @var PlayerSession $session */
 		$session = PlayerManager::get($player);
 		if($session === null){
-			$callback(false);
+			if($callback !== null){
+				$callback(false);
+			}
 		}else{
 			$network = $session->getNetwork();
 			$network->dropPending();
