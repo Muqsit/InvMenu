@@ -33,6 +33,11 @@ use pocketmine\player\Player;
 
 abstract class InvMenu implements MenuIds{
 
+	/**
+	 * @param string $identifier
+	 * @param mixed ...$args
+	 * @return SharedInvMenu
+	 */
 	public static function create(string $identifier, ...$args) : SharedInvMenu{
 		return new SharedInvMenu(InvMenuHandler::getMenuType($identifier), ...$args);
 	}

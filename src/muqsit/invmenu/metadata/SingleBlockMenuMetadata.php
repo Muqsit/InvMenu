@@ -68,7 +68,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$packets = [];
 		foreach($positions as $pos){
 			array_push($packets,
-				UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $this->block->getRuntimeId()),
+				UpdateBlockPacket::create((int) $pos->x, (int) $pos->y, (int) $pos->z, $this->block->getRuntimeId()),
 				$this->getBlockActorDataPacketAt($player, $pos, $name)
 			);
 		}
@@ -78,9 +78,9 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
 		return BlockActorDataPacket::create(
-			$pos->x,
-			$pos->y,
-			$pos->z,
+			(int) $pos->x,
+			(int) $pos->y,
+			(int) $pos->z,
 			self::$serializer->write(
 				new TreeRoot($this->getBlockActorDataAt($pos, $name))
 			)
@@ -99,6 +99,10 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$player->getWorld()->sendBlocks([$player], $this->getBlockPositions($extradata));
 	}
 
+	/**
+	 * @param MenuExtradata $metadata
+	 * @return Vector3[]
+	 */
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
 		return [$metadata->getPosition()];
 	}

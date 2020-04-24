@@ -30,8 +30,8 @@ class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
 
 	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
 		return parent::getBlockActorDataAt($pos, $name)
-			->setInt("pairx", $pos->x + (($pos->x & 1) ? 1 : -1))
-			->setInt("pairz", $pos->z);
+			->setInt("pairx", (int) ($pos->x + (($pos->x & 1) ? 1 : -1)))
+			->setInt("pairz", (int) $pos->z);
 	}
 
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
