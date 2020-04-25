@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\inventory;
 
-use pocketmine\inventory\BlockInventory;
+use pocketmine\block\inventory\BlockInventory;
 use pocketmine\world\Position;
 
 class InvMenuInventory extends BlockInventory{

@@ -40,15 +40,15 @@ class SharedInvMenuSynchronizer{
 
 		$menu_inventory = $menu->getInventory();
 		$this->synchronizer = new SharedInventorySynchronizer($menu_inventory);
-		$inventory->addChangeListeners($this->synchronizer);
+		$inventory->addListeners($this->synchronizer);
 
 		$this->notifier = new SharedInventoryNotifier($this->inventory, $this->synchronizer);
 		$menu_inventory->setContents($inventory->getContents());
-		$menu_inventory->addChangeListeners($this->notifier);
+		$menu_inventory->addListeners($this->notifier);
 	}
 
 	public function destroy() : void{
-		$this->synchronizer->getSynchronizingInventory()->removeChangeListeners($this->notifier);
-		$this->inventory->removeChangeListeners($this->synchronizer);
+		$this->synchronizer->getSynchronizingInventory()->removeListeners($this->notifier);
+		$this->inventory->removeListeners($this->synchronizer);
 	}
 }

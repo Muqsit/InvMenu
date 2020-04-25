@@ -22,10 +22,10 @@ declare(strict_types=1);
 namespace muqsit\invmenu\inventory;
 
 use pocketmine\inventory\Inventory;
-use pocketmine\inventory\InventoryChangeListener;
+use pocketmine\inventory\InventoryListener;
 use pocketmine\item\Item;
 
-class SharedInventorySynchronizer implements InventoryChangeListener{
+class SharedInventorySynchronizer implements InventoryListener{
 
 	/** @var InvMenuInventory */
 	protected $inventory;

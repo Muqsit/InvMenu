@@ -22,10 +22,10 @@ declare(strict_types=1);
 namespace muqsit\invmenu\inventory;
 
 use pocketmine\inventory\Inventory;
-use pocketmine\inventory\InventoryChangeListener;
+use pocketmine\inventory\InventoryListener;
 use pocketmine\item\Item;
 
-class SharedInventoryNotifier implements InventoryChangeListener{
+class SharedInventoryNotifier implements InventoryListener{
 
 	/** @var Inventory */
 	protected $inventory;
@@ -39,16 +39,16 @@ class SharedInventoryNotifier implements InventoryChangeListener{
 	}
 
 	public function onContentChange(Inventory $inventory, array $old_contents) : void{
-		$this->inventory->removeChangeListeners($this->synchronizer);
+		$this->inventory->removeListeners($this->synchronizer);
 		$this->inventory->setContents($inventory->getContents());
-		$this->inventory->addChangeListeners($this->synchronizer);
+		$this->inventory->addListeners($this->synchronizer);
 	}
 
 	public function onSlotChange(Inventory $inventory, int $slot, Item $old_item) : void{
 		if($slot < $inventory->getSize()){
-			$this->inventory->removeChangeListeners($this->synchronizer);
+			$this->inventory->removeListeners($this->synchronizer);
 			$this->inventory->setItem($slot, $inventory->getItem($slot));
-			$this->inventory->addChangeListeners($this->synchronizer);
+			$this->inventory->addListeners($this->synchronizer);
 		}
 	}
 }
