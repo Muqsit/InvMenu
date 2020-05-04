@@ -29,8 +29,8 @@ use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
+use pocketmine\network\mcpe\protocol\serializer\NetworkNbtSerializer;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
-use pocketmine\network\mcpe\serializer\NetworkNbtSerializer;
 use pocketmine\player\Player;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
@@ -63,7 +63,6 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
 		$positions = $this->getBlockPositions($metadata);
-
 		$name = $metadata->getName();
 		$packets = [];
 		foreach($positions as $pos){
@@ -104,6 +103,6 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	 * @return Vector3[]
 	 */
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
-		return [$metadata->getPosition()];
+		return [$metadata->getPositionNotNull()];
 	}
 }

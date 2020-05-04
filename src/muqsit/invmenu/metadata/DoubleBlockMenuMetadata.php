@@ -35,7 +35,7 @@ class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
 	}
 
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
-		$pos = $metadata->getPosition();
+		$pos = $metadata->getPositionNotNull();
 		return [$pos, ($pos->x & 1) ? $pos->east() : $pos->west()];
 	}
 

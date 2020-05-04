@@ -59,9 +59,10 @@ final class InvMenuHandler{
 	}
 
 	private static function registerDefaultMenuTypes() : void{
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), TileFactory::getSaveId(Chest::class)));
-		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), TileFactory::getSaveId(Chest::class)));
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, VanillaBlocks::HOPPER(), TileFactory::getSaveId(Hopper::class)));
+		$tile_factory = TileFactory::getInstance();
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), $tile_factory->getSaveId(Chest::class)));
+		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), $tile_factory->getSaveId(Chest::class)));
+		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, VanillaBlocks::HOPPER(), $tile_factory->getSaveId(Hopper::class)));
 	}
 
 	public static function registerMenuType(MenuMetadata $type, bool $override = false) : void{
