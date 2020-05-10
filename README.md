@@ -131,17 +131,6 @@ To forcefully close or remove the menu from a player, you can use
 /** @var Player $player */
 $player->removeCurrentWindow();
 ```
-### Sessionizing menu — "per player inventory"
-The "sessionize" feature allows you to create one `InvMenu` instance but send a different inventory instance to each player. You can create a sessionized InvMenu instance using
-```php
-$menu = InvMenu::createSessionized(InvMenu::TYPE_CHEST);
-```
-The difference between `InvMenu::create()` and `InvMenu::createSessionized()` is that sessionized InvMenu instances create a separate inventory for each player while unsessionized InvMenu instances send the same inventory to each player. In sessionized InvMenu instances, each player has their own separate inventory which is undisturbed by others who are viewing the same InvMenu.
-To access a player's inventory in a sessionized InvMenu, use:
-```php
-/** @var Player $player */
-$inventory = $menu->getInventory($player);
-```
 **NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If you want inventory contents to persist, you may listen to inventory close triggers and store the inventory contents.
 
 ### Writing a custom inventory class
