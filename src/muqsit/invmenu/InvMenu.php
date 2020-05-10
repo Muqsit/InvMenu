@@ -22,6 +22,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use Closure;
+use InvalidStateException;
 use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\session\PlayerManager;
@@ -36,7 +37,13 @@ abstract class InvMenu implements MenuIds{
 		return new SharedInvMenu(InvMenuHandler::getMenuType($identifier));
 	}
 
+	/**
+	 * @deprecated Use multiple InvMenu::create() instead.
+	 * @param string $identifier
+	 * @return SessionizedInvMenu
+	 */
 	public static function createSessionized(string $identifier) : SessionizedInvMenu{
+		trigger_error("Use multiple InvMenu instances instead.", E_USER_DEPRECATED);
 		return new SessionizedInvMenu(InvMenuHandler::getMenuType($identifier));
 	}
 
@@ -77,16 +84,25 @@ abstract class InvMenu implements MenuIds{
 	}
 
 	public function readonly(bool $value = true) : self{
+		if(!InvMenuHandler::isRegistered()){
+			throw new InvalidStateException("Tried altering readonly state before registration");
+		}
 		$this->readonly = $value;
 		return $this;
 	}
 
 	public function setListener(?callable $listener) : self{
+		if(!InvMenuHandler::isRegistered()){
+			throw new InvalidStateException("Tried setting listener before registration");
+		}
 		$this->listener = $listener;
 		return $this;
 	}
 
 	public function setInventoryCloseListener(?callable $listener) : self{
+		if(!InvMenuHandler::isRegistered()){
+			throw new InvalidStateException("Tried setting inventory close listener before registration");
+		}
 		$this->inventory_close_listener = $listener;
 		return $this;
 	}
