@@ -102,14 +102,14 @@ class PlayerSession{
 	public function setCurrentMenu(?InvMenu $menu, ?Closure $callback = null) : bool{
 		if($menu !== null){
 			$this->network->wait(function(bool $success) use($callback) : void{
-				if($success && $this->current_menu !== null){
-					if($this->sendWindow()){
+				if($this->current_menu !== null){
+					if($success && $this->sendWindow()){
 						if($callback !== null){
 							$callback(true);
 						}
 						return;
 					}
-					$this->setCurrentMenu(null);
+					$this->removeCurrentMenu();
 				}
 				if($callback !== null){
 					$callback(false);
@@ -134,6 +134,11 @@ class PlayerSession{
 	 * @return bool
 	 */
 	public function removeCurrentMenu() : bool{
-		return $this->setCurrentMenu(null);
+		if($this->current_menu !== null){
+			$this->current_menu->getType()->removeGraphic($this->player, $this->menu_extradata);
+			$this->menu_extradata->reset();
+			return $this->setCurrentMenu(null);
+		}
+		return false;
 	}
 }
