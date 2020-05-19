@@ -40,4 +40,8 @@ final class PlayerManager{
 	public static function get(Player $player) : ?PlayerSession{
 		return self::$sessions[$player->getUniqueId()->toBinary()] ?? null;
 	}
+
+	public static function getNonNullable(Player $player) : PlayerSession{
+		return self::$sessions[$player->getUniqueId()->toBinary()];
+	}
 }

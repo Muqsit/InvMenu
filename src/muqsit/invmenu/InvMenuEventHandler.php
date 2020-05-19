@@ -86,8 +86,7 @@ class InvMenuEventHandler implements Listener{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
-		/** @noinspection NullPointerExceptionInspection */
-		$menu = PlayerManager::get($player)->getCurrentMenu();
+		$menu = PlayerManager::getNonNullable($player)->getCurrentMenu();
 		if($menu !== null){
 			$inventory = $menu->getInventoryForPlayer($player);
 			foreach($transaction->getActions() as $action){

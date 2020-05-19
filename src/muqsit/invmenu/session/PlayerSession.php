@@ -69,8 +69,8 @@ class PlayerSession{
 	public function setCurrentMenu(?InvMenu $menu, ?Closure $callback = null) : bool{
 		if($menu !== null){
 			$this->network->wait(function(bool $success) use($callback) : void{
-				if($success && $this->current_menu !== null){
-					if($this->current_menu->sendInventory($this->player)){
+				if($this->current_menu !== null){
+					if($success && $this->current_menu->sendInventory($this->player)){
 						// TODO: Revert this to the Inventory->moveTo() method when it's possible
 						// for plugins to specify network type for inventories
 						if($this->player->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInvVec3(
@@ -84,8 +84,9 @@ class PlayerSession{
 							}
 							return;
 						}
+						$this->player->removeCurrentWindow();
 					}else{
-						$this->setCurrentMenu(null);
+						$this->removeCurrentMenu();
 					}
 				}
 				if($callback !== null){
@@ -111,6 +112,11 @@ class PlayerSession{
 	 * @return bool
 	 */
 	public function removeCurrentMenu() : bool{
-		return $this->setCurrentMenu(null);
+		if($this->current_menu !== null){
+			$this->current_menu->getType()->removeGraphic($this->player, $this->menu_extradata);
+			$this->menu_extradata->reset();
+			return $this->setCurrentMenu(null);
+		}
+		return false;
 	}
 }

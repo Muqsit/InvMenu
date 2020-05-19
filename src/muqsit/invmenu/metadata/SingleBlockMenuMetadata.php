@@ -27,16 +27,12 @@ use pocketmine\block\tile\Nameable;
 use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\TreeRoot;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
-use pocketmine\network\mcpe\protocol\serializer\NetworkNbtSerializer;
+use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
-
-	/** @var NetworkNbtSerializer */
-	protected static $serializer;
 
 	/** @var Block */
 	protected $block;
@@ -52,11 +48,6 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 
 	public function __construct(string $identifier, int $size, int $window_type, Block $block, string $tile_id){
 		parent::__construct($identifier, $size, $window_type);
-
-		if(self::$serializer === null){
-			self::$serializer = new NetworkNbtSerializer();
-		}
-
 		$this->block = $block;
 		$this->tile_id = $tile_id;
 	}
@@ -80,9 +71,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 			(int) $pos->x,
 			(int) $pos->y,
 			(int) $pos->z,
-			self::$serializer->write(
-				new TreeRoot($this->getBlockActorDataAt($pos, $name))
-			)
+			new CacheableNbt($this->getBlockActorDataAt($pos, $name))
 		);
 	}
 

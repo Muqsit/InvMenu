@@ -26,7 +26,6 @@ use InvalidStateException;
 use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\session\PlayerManager;
-use muqsit\invmenu\session\PlayerSession;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
@@ -123,8 +122,7 @@ abstract class InvMenu implements MenuIds{
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
 		$player->removeCurrentWindow();
 
-		/** @var PlayerSession $session */
-		$session = PlayerManager::get($player);
+		$session = PlayerManager::getNonNullable($player);
 		$network = $session->getNetwork();
 		$network->dropPending();
 		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
@@ -168,8 +166,6 @@ abstract class InvMenu implements MenuIds{
 			($this->inventory_close_listener)($player, $this->getInventoryForPlayer($player));
 		}
 
-		$session = PlayerManager::get($player);
-		$this->type->removeGraphic($player, $session->getMenuExtradata());
-		$session->removeCurrentMenu();
+		PlayerManager::getNonNullable($player)->removeCurrentMenu();
 	}
 }
