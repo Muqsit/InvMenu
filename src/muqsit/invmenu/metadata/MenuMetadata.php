@@ -68,7 +68,7 @@ abstract class MenuMetadata{
 	}
 
 	public function calculateGraphicPosition(Player $player) : Vector3{
-		return $player->getPosition()->add($this->calculateGraphicOffset($player))->floor();
+		return $player->getPosition()->addVector($this->calculateGraphicOffset($player))->floor();
 	}
 
 	abstract public function sendGraphic(Player $player, MenuExtradata $metadata) : void;
