@@ -27,6 +27,6 @@ use pocketmine\world\Position;
 class InvMenuInventory extends BlockInventory{
 
 	public function __construct(int $size){
-		parent::__construct(new Position(), $size);
+		parent::__construct(new Position(0, 0, 0), $size);
 	}
 }
