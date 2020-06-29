@@ -55,15 +55,11 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
 		$positions = $this->getBlockPositions($metadata);
 		$name = $metadata->getName();
-		$packets = [];
+		$network = $player->getNetworkSession();
 		foreach($positions as $pos){
-			array_push($packets,
-				UpdateBlockPacket::create((int) $pos->x, (int) $pos->y, (int) $pos->z, $this->block->getRuntimeId()),
-				$this->getBlockActorDataPacketAt($player, $pos, $name)
-			);
+			$network->sendDataPacket(UpdateBlockPacket::create((int) $pos->x, (int) $pos->y, (int) $pos->z, $this->block->getRuntimeId()));
+			$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
 		}
-
-		$player->getServer()->broadcastPackets([$player], $packets);
 	}
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
