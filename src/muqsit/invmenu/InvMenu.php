@@ -123,13 +123,19 @@ abstract class InvMenu implements MenuIds{
 			$network = $session->getNetwork();
 			$network->dropPending();
 			$session->removeWindow();
-			$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
+			$network->wait(function(bool $success) use($player, $session, $network, $name, $callback) : void{
 				if($success){
 					$extradata = $session->getMenuExtradata();
 					$extradata->setName($name ?? $this->getName());
 					$extradata->setPosition($this->type->calculateGraphicPosition($player));
 					$this->type->sendGraphic($player, $extradata);
-					$session->setCurrentMenu($this, $callback);
+					$network->wait(function(bool $success) use($session, $callback) : void{
+						if($success){
+							$session->setCurrentMenu($this, $callback);
+						}elseif($callback !== null){
+							$callback(false);
+						}
+					});
 				}elseif($callback !== null){
 					$callback(false);
 				}
