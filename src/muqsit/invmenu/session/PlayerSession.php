@@ -65,7 +65,7 @@ class PlayerSession{
 	public function removeWindow() : void{
 		$window = $this->player->getWindow($this->current_window_id);
 		if($window instanceof InvMenuInventory){
-			$this->player->removeWindow($window);
+			$window->closeInventory($this->player);
 			$this->network->wait(static function(bool $success) : void{});
 		}
 		$this->current_window_id = ContainerIds::NONE;

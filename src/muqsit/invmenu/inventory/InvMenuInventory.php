@@ -71,7 +71,9 @@ class InvMenuInventory extends ContainerInventory{
 	public function closeInventory(Player $who){
 		if(isset($this->viewers[spl_object_hash($who)])){
 			/** @noinspection NullPointerExceptionInspection */
-			if(($menu = PlayerManager::getNonNullable($who)->getCurrentMenu()) !== null) $menu->onClose($who);
+			$session = PlayerManager::get($who);
+			if($session === null) return;
+			if(($menu = $session->getCurrentMenu()) !== null) $menu->onClose($who);
 		}
 	}
 }
