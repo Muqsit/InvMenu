@@ -24,6 +24,7 @@ namespace muqsit\invmenu\metadata;
 use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\block\Block;
 use pocketmine\block\tile\Nameable;
+use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
@@ -80,7 +81,17 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	}
 
 	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{
-		$player->getWorld()->sendBlocks([$player], $this->getBlockPositions($extradata));
+		$network = $player->getNetworkSession();
+		$world = $player->getWorld();
+		foreach($this->getBlockPositions($extradata) as $position){
+			$fullBlock = $world->getBlockAt($position->x, $position->y, $position->z);
+			$network->sendDataPacket(UpdateBlockPacket::create($position->x, $position->y, $position->z, $fullBlock->getRuntimeId()), true);
+
+			$tile = $world->getTileAt($position->x, $position->y, $position->z);
+			if($tile instanceof Spawnable){
+				$network->sendDataPacket(BlockActorDataPacket::create($position->x, $position->y, $position->z, $tile->getSerializedSpawnCompound()), true);
+			}
+		}
 	}
 
 	/**

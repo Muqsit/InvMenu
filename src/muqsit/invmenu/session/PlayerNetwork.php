@@ -23,6 +23,7 @@ namespace muqsit\invmenu\session;
 
 use Closure;
 use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\ClientboundPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 final class PlayerNetwork{
@@ -44,6 +45,11 @@ final class PlayerNetwork{
 		$this->awaiting = [];
 	}
 
+	/**
+	 * @param Closure $then
+	 *
+	 * @phpstan-param Closure(bool) : void $then
+	 */
 	public function wait(Closure $then) : void{
 		$timestamp = mt_rand() * 1000; // TODO: remove this hack when fixed
 
