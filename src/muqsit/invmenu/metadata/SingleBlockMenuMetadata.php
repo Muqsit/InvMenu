@@ -102,7 +102,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 			$packet->z = $pos->z;
 			$packet->blockRuntimeId = $level->getBlockAt($pos->x, $pos->y, $pos->z)->getRuntimeId();
 			$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
-			$player->sendDataPacket($packet);
+			$player->sendDataPacket($packet, false, true);
 		}
 	}
 
