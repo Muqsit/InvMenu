@@ -163,4 +163,8 @@ abstract class InvMenu implements MenuIds{
 
 		PlayerManager::getNonNullable($player)->removeCurrentMenu();
 	}
+
+	public function remove(Player $player) : void{
+	    PlayerManager::getNonNullable($player)->removeWindow();
+    }
 }

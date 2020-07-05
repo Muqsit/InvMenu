@@ -123,9 +123,12 @@ void callback(Player $player, InvMenuInventory $inventory);
 ```
 To forcefully close or remove the menu from a player, you can use
 ```php
+/** @var InvMenu $menu */
 /** @var Player $player */
-$player->removeCurrentWindow();
+$menu->remove($player);
 ```
+From 1.16, it is required to use ``InvMenu->remove()`` because the client will crash when using ``Player->removeWindow()``.
+
 **NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If you want inventory contents to persist, you may listen to inventory close triggers and store the inventory contents.
 
 ### Writing a custom inventory class

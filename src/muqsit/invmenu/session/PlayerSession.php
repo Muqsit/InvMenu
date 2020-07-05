@@ -65,7 +65,7 @@ class PlayerSession{
 	public function removeWindow() : void{
 		$window = $this->player->getWindow($this->current_window_id);
 		if($window instanceof InvMenuInventory){
-			$this->player->removeWindow($window);
+            $this->current_menu->getType()->removeGraphic($this->player, $this->menu_extradata);
 			$this->network->wait(static function(bool $success) : void{});
 		}
 		$this->current_window_id = ContainerIds::NONE;
@@ -135,7 +135,6 @@ class PlayerSession{
 	 */
 	public function removeCurrentMenu() : bool{
 		if($this->current_menu !== null){
-			$this->current_menu->getType()->removeGraphic($this->player, $this->menu_extradata);
 			$this->menu_extradata->reset();
 			return $this->setCurrentMenu(null);
 		}
