@@ -28,6 +28,7 @@ use pocketmine\block\tile\Spawnable;
 use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
@@ -57,17 +58,18 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$positions = $this->getBlockPositions($metadata);
 		$name = $metadata->getName();
 		$network = $player->getNetworkSession();
+		$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getId(), $this->block->getMeta());
 		foreach($positions as $pos){
-			$network->sendDataPacket(UpdateBlockPacket::create((int) $pos->x, (int) $pos->y, (int) $pos->z, $this->block->getRuntimeId()));
+			$network->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $block_runtime_id));
 			$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
 		}
 	}
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
 		return BlockActorDataPacket::create(
-			(int) $pos->x,
-			(int) $pos->y,
-			(int) $pos->z,
+			$pos->x,
+			$pos->y,
+			$pos->z,
 			new CacheableNbt($this->getBlockActorDataAt($pos, $name))
 		);
 	}
@@ -83,9 +85,10 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{
 		$network = $player->getNetworkSession();
 		$world = $player->getWorld();
+		$runtime_block_mapping = RuntimeBlockMapping::getInstance();
 		foreach($this->getBlockPositions($extradata) as $position){
-			$fullBlock = $world->getBlockAt($position->x, $position->y, $position->z);
-			$network->sendDataPacket(UpdateBlockPacket::create($position->x, $position->y, $position->z, $fullBlock->getRuntimeId()), true);
+			$block = $world->getBlockAt($position->x, $position->y, $position->z);
+			$network->sendDataPacket(UpdateBlockPacket::create($position->x, $position->y, $position->z, $runtime_block_mapping->toRuntimeId($block->getId(), $block->getMeta())), true);
 
 			$tile = $world->getTileAt($position->x, $position->y, $position->z);
 			if($tile instanceof Spawnable){
