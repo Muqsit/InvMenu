@@ -86,18 +86,32 @@ class InvMenuEventHandler implements Listener{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
-		$menu = PlayerManager::getNonNullable($player)->getCurrentMenu();
+		$player_instance = PlayerManager::getNonNullable($player);
+		$menu = $player_instance->getCurrentMenu();
 		if($menu !== null){
 			$inventory = $menu->getInventory();
+			$network_stack_callbacks = [];
 			foreach($transaction->getActions() as $action){
-				if(
-					$action instanceof SlotChangeAction &&
-					$action->getInventory() === $inventory &&
-					!$menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction)
-				){
-					$event->setCancelled();
-					break;
+				if($action instanceof SlotChangeAction && $action->getInventory() === $inventory){
+					$result = $menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
+					$network_stack_callback = $result->getPostTransactionCallback();
+					if($network_stack_callback !== null){
+						$network_stack_callbacks[] = $network_stack_callback;
+					}
+					if($result->isCancelled()){
+						$event->setCancelled();
+						break;
+					}
 				}
+			}
+			if(count($network_stack_callbacks) > 0){
+				$player_instance->getNetwork()->wait(static function(bool $success) use($player, $network_stack_callbacks) : void{
+					if($success){
+						foreach($network_stack_callbacks as $callback){
+							$callback($player);
+						}
+					}
+				});
 			}
 		}
 	}

@@ -53,6 +53,7 @@ class PlayerSession{
 		if($this->current_menu !== null){
 			$this->player->removeCurrentWindow();
 		}
+		$this->network->dropPending();
 	}
 
 	public function getMenuExtradata() : MenuExtradata{

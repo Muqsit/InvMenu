@@ -39,6 +39,17 @@ final class InvMenuTransactionResult{
 		return $this->cancelled;
 	}
 
+	/**
+	 * Notify when we have escaped from the event stack trace and the
+	 * client's network stack trace.
+	 * Useful for sending forms and other stuff that cant be sent right
+	 * after closing inventory.
+	 *
+	 * @param Closure|null $callback
+	 * @return self
+	 *
+	 * @phpstan-param Closure(\pocketmine\player\Player) : void $callback
+	 */
 	public function then(?Closure $callback) : self{
 		$this->post_transaction_callback = $callback;
 		return $this;
