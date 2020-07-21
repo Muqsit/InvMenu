@@ -22,8 +22,8 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use Closure;
+use Ds\Queue;
 use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\ClientboundPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 final class PlayerNetwork{
@@ -31,18 +31,23 @@ final class PlayerNetwork{
 	/** @var NetworkSession */
 	private $session;
 
-	/** @var Closure[] */
-	private $awaiting = [];
+	/** @var Queue<NetworkStackLatencyEntry> */
+	private $queue;
+
+	/** @var NetworkStackLatencyEntry|null */
+	private $current;
 
 	public function __construct(NetworkSession $session){
 		$this->session = $session;
+		$this->queue = new Queue();
 	}
 
 	public function dropPending() : void{
-		foreach($this->awaiting as $callback){
-			$callback(false);
+		foreach($this->queue as $entry){
+			($entry->then)(false);
 		}
-		$this->awaiting = [];
+		$this->queue->clear();
+		$this->setCurrent(null);
 	}
 
 	/**
@@ -51,23 +56,44 @@ final class PlayerNetwork{
 	 * @phpstan-param Closure(bool) : void $then
 	 */
 	public function wait(Closure $then) : void{
-		$timestamp = mt_rand() * 1000; // TODO: remove this hack when fixed
-
-		$pk = new NetworkStackLatencyPacket();
-		$pk->timestamp = $timestamp;
-		$pk->needResponse = true;
-
-		if($this->session->sendDataPacket($pk)){
-			$this->awaiting[$timestamp] = $then;
+		$entry = new NetworkStackLatencyEntry(mt_rand() * 1000 /* TODO: remove this hack */, $then);
+		if($this->current !== null){
+			$this->queue->push($entry);
 		}else{
-			$then(false);
+			$this->setCurrent($entry);
+		}
+	}
+
+	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
+		if($entry !== null){
+			$pk = new NetworkStackLatencyPacket();
+			$pk->timestamp = $entry->timestamp;
+			$pk->needResponse = true;
+			if(!$this->session->sendDataPacket($pk)){
+				($entry->then)(false);
+			}
+		}else{
+			if($this->current !== null){
+				$this->processCurrent(false);
+			}
+		}
+
+		$this->current = $entry;
+	}
+
+	private function processCurrent(bool $success) : void{
+		if($this->current !== null){
+			($this->current->then)($success);
+			$this->current = null;
+			if(!$this->queue->isEmpty()){
+				$this->setCurrent($this->queue->pop());
+			}
 		}
 	}
 
 	public function notify(int $timestamp) : void{
-		if(isset($this->awaiting[$timestamp])){
-			$this->awaiting[$timestamp](true);
-			unset($this->awaiting[$timestamp]);
+		if($this->current !== null && $timestamp === $this->current->timestamp){
+			$this->processCurrent(true);
 		}
 	}
 }

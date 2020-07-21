@@ -120,24 +120,19 @@ abstract class InvMenu implements MenuIds{
 	}
 
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
-		$player->removeCurrentWindow();
-
 		$session = PlayerManager::getNonNullable($player);
 		$network = $session->getNetwork();
 		$network->dropPending();
-		$network->wait(function(bool $success) use($player, $session, $network, $name, $callback) : void{
+
+		$player->removeCurrentWindow();
+
+		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
 			if($success){
 				$extradata = $session->getMenuExtradata();
 				$extradata->setName($name ?? $this->getName());
 				$extradata->setPosition($this->type->calculateGraphicPosition($player));
 				$this->type->sendGraphic($player, $extradata);
-				$network->wait(function(bool $success) use($session, $callback) : void{
-					if($success){
-						$session->setCurrentMenu($this, $callback);
-					}elseif($callback !== null){
-						$callback(false);
-					}
-				});
+				$session->setCurrentMenu($this, $callback);
 			}elseif($callback !== null){
 				$callback(false);
 			}
