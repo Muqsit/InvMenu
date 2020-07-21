@@ -79,7 +79,7 @@ class PlayerSession{
 							$this->current_menu->getType()->getWindowType(),
 							$this->menu_extradata->getPosition()
 						))){
-							$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventoryForPlayer($this->player));
+							$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventory());
 							if($callback !== null){
 								$callback(true);
 							}

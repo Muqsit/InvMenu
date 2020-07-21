@@ -21,7 +21,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\inventory;
 
-use muqsit\invmenu\SharedInvMenu;
+use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
 
 class SharedInvMenuSynchronizer{
@@ -35,7 +35,7 @@ class SharedInvMenuSynchronizer{
 	/** @var SharedInventoryNotifier */
 	protected $notifier;
 
-	public function __construct(SharedInvMenu $menu, Inventory $inventory){
+	public function __construct(InvMenu $menu, Inventory $inventory){
 		$this->inventory = $inventory;
 
 		$menu_inventory = $menu->getInventory();

@@ -46,7 +46,7 @@ final class InvMenuHandler{
 
 	public static function register(Plugin $plugin) : void{
 		if(self::isRegistered()){
-			throw new InvalidArgumentException($plugin->getName() . " attempted to register " . self::class . " twice.");
+			throw new InvalidArgumentException("{$plugin->getName()} attempted to register " . self::class . " twice.");
 		}
 
 		self::$registrant = $plugin;
@@ -67,7 +67,7 @@ final class InvMenuHandler{
 
 	public static function registerMenuType(MenuMetadata $type, bool $override = false) : void{
 		if(isset(self::$menu_types[$identifier = $type->getIdentifier()]) && !$override){
-			throw new InvalidArgumentException("A menu type with the identifier \"" . $identifier . "\" is already registered as " . get_class(self::$menu_types[$identifier]));
+			throw new InvalidArgumentException("A menu type with the identifier \"{$identifier}\" is already registered as " . get_class(self::$menu_types[$identifier]));
 		}
 
 		self::$menu_types[$identifier] = $type;
