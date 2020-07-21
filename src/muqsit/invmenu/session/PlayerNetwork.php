@@ -22,6 +22,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use Closure;
+use Ds\Queue;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 use pocketmine\Player;
 
@@ -30,42 +31,69 @@ final class PlayerNetwork{
 	/** @var Player */
 	private $player;
 
-	/** @var Closure[] */
-	private $awaiting = [];
+	/** @var Queue<NetworkStackLatencyEntry> */
+	private $queue;
+
+	/** @var NetworkStackLatencyEntry|null */
+	private $current;
 
 	public function __construct(Player $player){
 		$this->player = $player;
+		$this->queue = new Queue();
 	}
 
 	public function dropPending() : void{
-		foreach($this->awaiting as $callback){
-			$callback(false);
+		foreach($this->queue as $entry){
+			($entry->then)(false);
 		}
-		$this->awaiting = [];
+		$this->queue->clear();
+		$this->setCurrent(null);
 	}
 
+	/**
+	 * @param Closure $then
+	 *
+	 * @phpstan-param Closure(bool) : void $then
+	 */
 	public function wait(Closure $then) : void{
-		$timestamp = mt_rand() * 1000; // TODO: remove this hack when fixed
-		$this->awaiting[$timestamp] = $then;
-		if(count($this->awaiting) === 1 && !$this->sendTimestamp($timestamp)){
-			$this->notify($timestamp, false);
+		$entry = new NetworkStackLatencyEntry(mt_rand() * 1000 /* TODO: remove this hack */, $then);
+		if($this->current !== null){
+			$this->queue->push($entry);
+		}else{
+			$this->setCurrent($entry);
 		}
 	}
 
-	public function notify(int $timestamp, bool $success = true) : void{
-		if(isset($this->awaiting[$timestamp])){
-			$this->awaiting[$timestamp]($success);
-			unset($this->awaiting[$timestamp]);
-			if(count($this->awaiting) > 0){
-				$this->sendTimestamp(array_keys($this->awaiting)[0]);
+	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
+		if($entry !== null){
+			$pk = new NetworkStackLatencyPacket();
+			$pk->timestamp = $entry->timestamp;
+			$pk->needResponse = true;
+			if($this->player->sendDataPacket($pk) === false){
+				($entry->then)(false);
+			}
+		}else{
+			if($this->current !== null){
+				$this->processCurrent(false);
+			}
+		}
+
+		$this->current = $entry;
+	}
+
+	private function processCurrent(bool $success) : void{
+		if($this->current !== null){
+			($this->current->then)($success);
+			$this->current = null;
+			if(!$this->queue->isEmpty()){
+				$this->setCurrent($this->queue->pop());
 			}
 		}
 	}
 
-	private function sendTimestamp(int $timestamp) : bool{
-		$pk = new NetworkStackLatencyPacket();
-		$pk->timestamp = $timestamp;
-		$pk->needResponse = true;
-		return $this->player->sendDataPacket($pk);
+	public function notify(int $timestamp) : void{
+		if($this->current !== null && $timestamp === $this->current->timestamp){
+			$this->processCurrent(true);
+		}
 	}
 }

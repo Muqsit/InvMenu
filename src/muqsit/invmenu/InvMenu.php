@@ -114,33 +114,23 @@ abstract class InvMenu implements MenuIds{
 	}
 
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
-		$session = PlayerManager::get($player);
-		if($session === null){
-			if($callback !== null){
+		$session = PlayerManager::getNonNullable($player);
+		$network = $session->getNetwork();
+		$network->dropPending();
+
+		$session->removeWindow();
+
+		$network->wait(function(bool $success) use($player, $session, $name, $callback) : void{
+			if($success){
+				$extradata = $session->getMenuExtradata();
+				$extradata->setName($name ?? $this->getName());
+				$extradata->setPosition($this->type->calculateGraphicPosition($player));
+				$this->type->sendGraphic($player, $extradata);
+				$session->setCurrentMenu($this, $callback);
+			}elseif($callback !== null){
 				$callback(false);
 			}
-		}else{
-			$network = $session->getNetwork();
-			$network->dropPending();
-			$session->removeWindow();
-			$network->wait(function(bool $success) use($player, $session, $network, $name, $callback) : void{
-				if($success){
-					$extradata = $session->getMenuExtradata();
-					$extradata->setName($name ?? $this->getName());
-					$extradata->setPosition($this->type->calculateGraphicPosition($player));
-					$this->type->sendGraphic($player, $extradata);
-					$network->wait(function(bool $success) use($session, $callback) : void{
-						if($success){
-							$session->setCurrentMenu($this, $callback);
-						}elseif($callback !== null){
-							$callback(false);
-						}
-					});
-				}elseif($callback !== null){
-					$callback(false);
-				}
-			});
-		}
+		});
 	}
 
 	abstract public function getInventoryForPlayer(Player $player) : InvMenuInventory;

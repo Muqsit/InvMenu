@@ -97,10 +97,11 @@ class PlayerSession{
 	 *
 	 * @param InvMenu|null $menu
 	 * @param Closure|null $callback
-	 * @return bool
 	 */
-	public function setCurrentMenu(?InvMenu $menu, ?Closure $callback = null) : bool{
-		if($menu !== null){
+	public function setCurrentMenu(?InvMenu $menu, ?Closure $callback = null) : void{
+		$this->current_menu = $menu;
+
+		if($this->current_menu !== null){
 			$this->network->wait(function(bool $success) use($callback) : void{
 				if($this->current_menu !== null){
 					if($success && $this->sendWindow()){
@@ -115,10 +116,9 @@ class PlayerSession{
 					$callback(false);
 				}
 			});
+		}else{
+			$this->network->wait($callback ?? static function(bool $success) : void{});
 		}
-
-		$this->current_menu = $menu;
-		return true;
 	}
 
 	public function getNetwork() : PlayerNetwork{
@@ -137,7 +137,8 @@ class PlayerSession{
 		if($this->current_menu !== null){
 			$this->current_menu->getType()->removeGraphic($this->player, $this->menu_extradata);
 			$this->menu_extradata->reset();
-			return $this->setCurrentMenu(null);
+			$this->setCurrentMenu(null);
+			return true;
 		}
 		return false;
 	}
