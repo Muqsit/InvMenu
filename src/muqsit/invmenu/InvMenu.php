@@ -62,6 +62,9 @@ abstract class InvMenu implements MenuIds{
 	protected $inventory_close_listener;
 
 	public function __construct(MenuMetadata $type){
+		if(!InvMenuHandler::isRegistered()){
+			throw new InvalidStateException("Tried altering readonly state before registration");
+		}
 		$this->type = $type;
 	}
 
@@ -83,25 +86,16 @@ abstract class InvMenu implements MenuIds{
 	}
 
 	public function readonly(bool $value = true) : self{
-		if(!InvMenuHandler::isRegistered()){
-			throw new InvalidStateException("Tried altering readonly state before registration");
-		}
 		$this->readonly = $value;
 		return $this;
 	}
 
 	public function setListener(?callable $listener) : self{
-		if(!InvMenuHandler::isRegistered()){
-			throw new InvalidStateException("Tried setting listener before registration");
-		}
 		$this->listener = $listener;
 		return $this;
 	}
 
 	public function setInventoryCloseListener(?callable $listener) : self{
-		if(!InvMenuHandler::isRegistered()){
-			throw new InvalidStateException("Tried setting inventory close listener before registration");
-		}
 		$this->inventory_close_listener = $listener;
 		return $this;
 	}
