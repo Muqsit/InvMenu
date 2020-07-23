@@ -26,7 +26,6 @@ use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
-use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
@@ -39,14 +38,6 @@ class InvMenuEventHandler implements Listener{
 	 */
 	public function onPlayerLogin(PlayerLoginEvent $event) : void{
 		PlayerManager::create($event->getPlayer());
-	}
-
-	/**
-	 * @param PlayerQuitEvent $event
-	 * @priority MONITOR
-	 */
-	public function onPlayerQuit(PlayerQuitEvent $event) : void{
-		PlayerManager::destroy($event->getPlayer());
 	}
 
 	/**

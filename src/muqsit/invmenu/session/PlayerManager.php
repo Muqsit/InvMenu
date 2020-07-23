@@ -29,19 +29,19 @@ final class PlayerManager{
 	private static $sessions = [];
 
 	public static function create(Player $player) : void{
-		self::$sessions[$player->getUniqueId()->toBinary()] = new PlayerSession($player);
+		self::$sessions[$player->getId()] = new PlayerSession($player);
 	}
 
-	public static function destroy(Player $player) : void{
-		self::$sessions[$uuid = $player->getUniqueId()->toBinary()]->finalize();
-		unset(self::$sessions[$uuid]);
+	public static function destroy(int $player_id) : void{
+		self::$sessions[$player_id]->finalize();
+		unset(self::$sessions[$player_id]);
 	}
 
 	public static function get(Player $player) : ?PlayerSession{
-		return self::$sessions[$player->getUniqueId()->toBinary()] ?? null;
+		return self::$sessions[$player->getId()] ?? null;
 	}
 
 	public static function getNonNullable(Player $player) : PlayerSession{
-		return self::$sessions[$player->getUniqueId()->toBinary()];
+		return self::$sessions[$player->getId()];
 	}
 }
