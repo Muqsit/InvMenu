@@ -151,7 +151,7 @@ $menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $t
 ```
 
 ## Listening players closing or no longer viewing the inventory
-To listen inventory close triggers, you can specify the inventory close Closure using
+To listen inventory close triggers, specify the inventory close Closure using:
 ```php
 /** @var Closure $listener */
 $menu->setInventoryCloseListener($listener);
@@ -161,16 +161,15 @@ What's **`$listener`**?
 /**
  * @param Player $player the player who closed the inventory.
  *
- * @param InvMenuInventory $inventory the inventory instance closed by the player.
+ * @param Inventory $inventory the inventory instance closed by the player.
  */
-Closure(Player $player, InvMenuInventory $inventory) : void;
+Closure(Player $player, Inventory $inventory) : void;
 ```
 To forcefully close or remove the menu from a player, you can use
 ```php
 /** @var Player $player */
 $player->removeCurrentWindow();
 ```
-**NOTE:** Inventory instances aren't persistent. They get destroyed as soon as the player closes the inventory or quits the server. If you want inventory contents to persist, you may listen to inventory close triggers and store the inventory contents.
 
 ## Writing a custom inventory class
 So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER`. You can still create a dispenser InvMenu by registering a `MenuMetadata` object with the information about what a dispenser inventory looks like.
