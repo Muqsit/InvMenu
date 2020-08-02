@@ -157,5 +157,5 @@ $menu = InvMenu::create(self::TYPE_DISPENSER);
 ```
 
 ### InvMenu applications / examples
-Read the [wiki](https://github.com/Muqsit/InvMenu/wiki/Examples) for examples on the different ways InvMenu can be used on servers.
+Read the [wiki](https://github.com/Muqsit/InvMenu/wiki/Examples---InvMenu-v3) for examples on the different ways InvMenu can be used on servers.
 
