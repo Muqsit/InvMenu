@@ -80,7 +80,11 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$packet->x = $pos->x;
 		$packet->y = $pos->y;
 		$packet->z = $pos->z;
-		$packet->namedtag = self::$serializer->write($this->getBlockActorDataAt($pos, $name));
+
+		$namedtag = self::$serializer->write($this->getBlockActorDataAt($pos, $name));
+		assert($namedtag !== false);
+
+		$packet->namedtag = $namedtag;
 		return $packet;
 	}
 
@@ -106,7 +110,11 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		}
 	}
 
+	/**
+	 * @param MenuExtradata $metadata
+	 * @return Vector3[]
+	 */
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
-		return [$metadata->getPosition()];
+		return [$metadata->getPositionNotNull()];
 	}
 }
