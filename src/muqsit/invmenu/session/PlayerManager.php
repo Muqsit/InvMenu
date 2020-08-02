@@ -32,8 +32,8 @@ final class PlayerManager{
 		self::$sessions[$player->getId()] = new PlayerSession($player);
 	}
 
-	public static function destroy(int $player_id) : void{
-		self::$sessions[$player_id]->finalize();
+	public static function destroy(Player $player) : void{
+		self::$sessions[$player_id = $player->getId()]->finalize();
 		unset(self::$sessions[$player_id]);
 	}
 

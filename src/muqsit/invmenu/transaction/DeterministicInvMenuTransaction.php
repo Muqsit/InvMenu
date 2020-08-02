@@ -34,11 +34,11 @@ final class DeterministicInvMenuTransaction extends InvMenuTransaction{
 		$this->result = $result;
 	}
 
-	public function process() : InvMenuTransactionResult{
+	public function continue() : InvMenuTransactionResult{
 		throw new InvalidStateException("Cannot change state of deterministic transactions");
 	}
 
-	public function cancel() : InvMenuTransactionResult{
+	public function discard() : InvMenuTransactionResult{
 		throw new InvalidStateException("Cannot change state of deterministic transactions");
 	}
 

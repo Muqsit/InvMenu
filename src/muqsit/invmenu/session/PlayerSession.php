@@ -23,10 +23,8 @@ namespace muqsit\invmenu\session;
 
 use Closure;
 use muqsit\invmenu\InvMenu;
-use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\player\Player;
-use ReflectionProperty;
 
 class PlayerSession{
 
@@ -47,15 +45,6 @@ class PlayerSession{
 		$network_session = $player->getNetworkSession();
 		$this->network = new PlayerNetwork($network_session);
 		$this->menu_extradata = new MenuExtradata();
-
-		static $_disposeHooks = null;
-		if($_disposeHooks === null){
-			$_disposeHooks = new ReflectionProperty(NetworkSession::class, "disposeHooks");
-			$_disposeHooks->setAccessible(true);
-		}
-
-		$id = $player->getId();
-		$_disposeHooks->getValue($network_session)->add(static function() use($id) : void{ PlayerManager::destroy($id); });
 	}
 
 	/**

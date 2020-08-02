@@ -65,20 +65,21 @@ final class PlayerNetwork{
 	}
 
 	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
+		if($this->current !== null){
+			$this->processCurrent(false);
+			$this->current = null;
+		}
+
 		if($entry !== null){
 			$pk = new NetworkStackLatencyPacket();
 			$pk->timestamp = $entry->timestamp;
 			$pk->needResponse = true;
-			if(!$this->session->sendDataPacket($pk)){
+			if($this->session->sendDataPacket($pk)){
+				$this->current = $entry;
+			}else{
 				($entry->then)(false);
 			}
-		}else{
-			if($this->current !== null){
-				$this->processCurrent(false);
-			}
 		}
-
-		$this->current = $entry;
 	}
 
 	private function processCurrent(bool $success) : void{

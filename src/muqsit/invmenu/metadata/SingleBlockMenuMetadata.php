@@ -76,6 +76,9 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 
 	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
 		$tag = CompoundTag::create()->setString(Tile::TAG_ID, $this->tile_id);
+		$tag->setInt(Tile::TAG_X, $pos->x);
+		$tag->setInt(Tile::TAG_Y, $pos->y);
+		$tag->setInt(Tile::TAG_Z, $pos->z);
 		if($name !== null){
 			$tag->setString(Nameable::TAG_CUSTOM_NAME, $name);
 		}

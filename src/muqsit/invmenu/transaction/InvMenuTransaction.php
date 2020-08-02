@@ -91,11 +91,11 @@ class InvMenuTransaction{
 		return $this->transaction;
 	}
 
-	public function process() : InvMenuTransactionResult{
+	public function continue() : InvMenuTransactionResult{
 		return new InvMenuTransactionResult(false);
 	}
 
-	public function cancel() : InvMenuTransactionResult{
+	public function discard() : InvMenuTransactionResult{
 		return new InvMenuTransactionResult(true);
 	}
 }

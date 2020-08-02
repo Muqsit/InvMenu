@@ -55,7 +55,7 @@ class InvMenu implements MenuIds{
 	 */
 	public static function readonly(?Closure $listener = null) : Closure{
 		return static function(InvMenuTransaction $transaction) use($listener) : InvMenuTransactionResult{
-			$result = $transaction->cancel();
+			$result = $transaction->discard();
 			if($listener !== null){
 				$listener(new DeterministicInvMenuTransaction($transaction, $result));
 			}
@@ -179,7 +179,7 @@ class InvMenu implements MenuIds{
 
 	public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction) : InvMenuTransactionResult{
 		$inv_menu_txn = new InvMenuTransaction($player, $out, $in, $action, $transaction);
-		return $this->listener !== null ? ($this->listener)($inv_menu_txn) : $inv_menu_txn->process();
+		return $this->listener !== null ? ($this->listener)($inv_menu_txn) : $inv_menu_txn->continue();
 	}
 
 	public function onClose(Player $player) : void{
