@@ -144,6 +144,7 @@ $menu->setListener(function(InvMenuTransaction $transaction) : InvMenuTransactio
 ```
 ```php
 $menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $transaction) : void{
+	$transaction->getPlayer()->removeCurrentWindow();
 	$transaction->then(function(Player $player) : void{
 		$player->sendForm(new Form());
 	});
