@@ -24,7 +24,6 @@ namespace muqsit\invmenu\session;
 use Closure;
 use InvalidArgumentException;
 use InvalidStateException;
-use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\network\mcpe\protocol\types\ContainerIds;
@@ -60,15 +59,20 @@ class PlayerSession{
 		if($this->current_menu !== null){
 			$this->removeWindow();
 		}
+		$this->network->dropPending();
 	}
 
 	public function removeWindow() : void{
 		$window = $this->player->getWindow($this->current_window_id);
-		if($window instanceof InvMenuInventory){
+		if($window !== null){
 			$this->player->removeWindow($window);
 			$this->network->wait(static function(bool $success) : void{});
 		}
 		$this->current_window_id = ContainerIds::NONE;
+	}
+
+	public function getMenuExtradata() : MenuExtradata{
+		return $this->menu_extradata;
 	}
 
 	private function sendWindow() : bool{
@@ -76,20 +80,16 @@ class PlayerSession{
 
 		try{
 			$position = $this->menu_extradata->getPosition();
-			$inventory = $this->current_menu->getInventoryForPlayer($this->player);
+			$inventory = $this->current_menu->getInventory();
 			/** @noinspection NullPointerExceptionInspection */
 			$inventory->moveTo($position->x, $position->y, $position->z);
 			$this->current_window_id = $this->player->addWindow($inventory);
 		}catch(InvalidStateException | InvalidArgumentException $e){
-			InvMenuHandler::getRegistrant()->getLogger()->debug("InvMenu failed to send inventory to " . $this->player->getName() . " due to: " . $e->getMessage());
+			InvMenuHandler::getRegistrant()->getLogger()->debug("InvMenu failed to send inventory to {$this->player->getName()} due to: {$e->getMessage()}");
 			$this->removeWindow();
 		}
 
 		return $this->current_window_id !== ContainerIds::NONE;
-	}
-
-	public function getMenuExtradata() : MenuExtradata{
-		return $this->menu_extradata;
 	}
 
 	/**
@@ -130,7 +130,7 @@ class PlayerSession{
 	}
 
 	/**
-	 * @internal use PlayerSession::removeWindow() instead
+	 * @internal use Player::removeWindow() instead
 	 * @return bool
 	 */
 	public function removeCurrentMenu() : bool{

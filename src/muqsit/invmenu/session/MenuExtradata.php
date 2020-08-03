@@ -35,6 +35,10 @@ class MenuExtradata{
 		return $this->position;
 	}
 
+	public function getPositionNotNull() : Vector3{
+		return $this->position;
+	}
+
 	public function getName() : ?string{
 		return $this->name;
 	}

@@ -29,7 +29,7 @@ use pocketmine\Player;
 final class PlayerNetwork{
 
 	/** @var Player */
-	private $player;
+	private $session;
 
 	/** @var Queue<NetworkStackLatencyEntry> */
 	private $queue;
@@ -37,8 +37,8 @@ final class PlayerNetwork{
 	/** @var NetworkStackLatencyEntry|null */
 	private $current;
 
-	public function __construct(Player $player){
-		$this->player = $player;
+	public function __construct(Player $session){
+		$this->session = $session;
 		$this->queue = new Queue();
 	}
 
@@ -65,20 +65,21 @@ final class PlayerNetwork{
 	}
 
 	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
+		if($this->current !== null){
+			$this->processCurrent(false);
+			$this->current = null;
+		}
+
 		if($entry !== null){
 			$pk = new NetworkStackLatencyPacket();
 			$pk->timestamp = $entry->timestamp;
 			$pk->needResponse = true;
-			if($this->player->sendDataPacket($pk) === false){
+			if($this->session->sendDataPacket($pk)){
+				$this->current = $entry;
+			}else{
 				($entry->then)(false);
 			}
-		}else{
-			if($this->current !== null){
-				$this->processCurrent(false);
-			}
 		}
-
-		$this->current = $entry;
 	}
 
 	private function processCurrent(bool $success) : void{
