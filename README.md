@@ -194,5 +194,5 @@ $menu = InvMenu::create(self::TYPE_DISPENSER);
 ```
 
 ## InvMenu Wiki
-Applications, examples, tutorials and featured projects using InvMenu can be found on the [InvMenu Wiki](https://github.com/Muqsit/InvMenu/wiki/InvMenu-v4.0).
+Applications, examples, tutorials and featured projects using InvMenu can be found on the [InvMenu Wiki](https://github.com/Muqsit/InvMenu/wiki).
 
