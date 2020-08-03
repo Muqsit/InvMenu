@@ -36,10 +36,6 @@ use pocketmine\Player;
 
 class InvMenu implements MenuIds{
 
-	/**
-	 * @param string $identifier
-	 * @return InvMenu
-	 */
 	public static function create(string $identifier) : InvMenu{
 		return new InvMenu(InvMenuHandler::getMenuType($identifier));
 	}
