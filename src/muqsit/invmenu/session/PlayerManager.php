@@ -33,8 +33,10 @@ final class PlayerManager{
 	}
 
 	public static function destroy(Player $player) : void{
-		self::$sessions[$uuid = $player->getRawUniqueId()]->finalize();
-		unset(self::$sessions[$uuid]);
+		if(isset(self::$sessions[$uuid = $player->getRawUniqueId()])){
+			self::$sessions[$uuid]->finalize();
+			unset(self::$sessions[$uuid]);
+		}
 	}
 
 	public static function get(Player $player) : ?PlayerSession{
