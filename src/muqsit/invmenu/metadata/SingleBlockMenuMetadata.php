@@ -58,7 +58,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$positions = $this->getBlockPositions($metadata);
 		$name = $metadata->getName();
 		$network = $player->getNetworkSession();
-		$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getId(), $this->block->getMeta());
+		$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId());
 		foreach($positions as $pos){
 			$network->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $block_runtime_id));
 			$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
@@ -91,7 +91,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$runtime_block_mapping = RuntimeBlockMapping::getInstance();
 		foreach($this->getBlockPositions($extradata) as $position){
 			$block = $world->getBlockAt($position->x, $position->y, $position->z);
-			$network->sendDataPacket(UpdateBlockPacket::create($position->x, $position->y, $position->z, $runtime_block_mapping->toRuntimeId($block->getId(), $block->getMeta())), true);
+			$network->sendDataPacket(UpdateBlockPacket::create($position->x, $position->y, $position->z, $runtime_block_mapping->toRuntimeId($block->getFullId())), true);
 
 			$tile = $world->getTileAt($position->x, $position->y, $position->z);
 			if($tile instanceof Spawnable){
