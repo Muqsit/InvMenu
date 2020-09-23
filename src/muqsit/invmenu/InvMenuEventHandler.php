@@ -28,9 +28,38 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\network\mcpe\protocol\LoginPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
+use pocketmine\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\scheduler\ClosureTask;
+use pocketmine\utils\UUID;
 
 class InvMenuEventHandler implements Listener{
+
+	/** @var int[] */
+	private static $cached_device_os = [];
+
+	public static function pullCachedDeviceOS(Player $player) : int{
+		if(isset(self::$cached_device_os[$uuid = $player->getRawUniqueId()])){
+			$device_os = self::$cached_device_os[$uuid];
+			unset(self::$cached_device_os[$uuid]);
+			return $device_os;
+		}
+
+		return -1;
+	}
+
+	public function __construct(Plugin $plugin){
+		$server = $plugin->getServer();
+		$plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(static function(int $currentTick) use($server) : void{
+			foreach(self::$cached_device_os as $uuid => $_){
+				if($server->getPlayerByRawUUID($uuid) === null){
+					unset(self::$cached_device_os[$uuid]);
+				}
+			}
+		}), 100);
+	}
 
 	/**
 	 * @param PlayerJoinEvent $event
@@ -60,6 +89,8 @@ class InvMenuEventHandler implements Listener{
 			if($session !== null){
 				$session->getNetwork()->notify($packet->timestamp);
 			}
+		}elseif($packet instanceof LoginPacket){
+			self::$cached_device_os[UUID::fromString($packet->clientUUID)->toBinary()] = $packet->clientData["DeviceOS"] ?? -1;
 		}
 	}
 

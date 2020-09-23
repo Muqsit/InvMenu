@@ -21,6 +21,8 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\session;
 
+use muqsit\invmenu\InvMenuEventHandler;
+use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
 use pocketmine\Player;
 
 final class PlayerManager{
@@ -29,7 +31,13 @@ final class PlayerManager{
 	private static $sessions = [];
 
 	public static function create(Player $player) : void{
-		self::$sessions[$player->getRawUniqueId()] = new PlayerSession($player);
+		self::$sessions[$player->getRawUniqueId()] = new PlayerSession(
+			$player,
+			new PlayerNetwork(
+				$player,
+				PlayerNetworkHandlerRegistry::get(InvMenuEventHandler::pullCachedDeviceOS($player))
+			)
+		);
 	}
 
 	public static function destroy(Player $player) : void{

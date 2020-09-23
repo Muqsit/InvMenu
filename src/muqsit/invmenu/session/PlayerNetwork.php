@@ -23,6 +23,8 @@ namespace muqsit\invmenu\session;
 
 use Closure;
 use Ds\Queue;
+use muqsit\invmenu\session\network\handler\PlayerNetworkHandler;
+use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 use pocketmine\Player;
 
@@ -37,8 +39,12 @@ final class PlayerNetwork{
 	/** @var NetworkStackLatencyEntry|null */
 	private $current;
 
-	public function __construct(Player $session){
+	/** @var PlayerNetworkHandler */
+	private $handler;
+
+	public function __construct(Player $session, PlayerNetworkHandler $handler){
 		$this->session = $session;
+		$this->handler = $handler;
 		$this->queue = new Queue();
 	}
 
@@ -56,7 +62,7 @@ final class PlayerNetwork{
 	 * @phpstan-param Closure(bool) : void $then
 	 */
 	public function wait(Closure $then) : void{
-		$entry = new NetworkStackLatencyEntry(mt_rand() * 1000 /* TODO: remove this hack */, $then);
+		$entry = $this->handler->createNetworkStackLatencyEntry($then);
 		if($this->current !== null){
 			$this->queue->push($entry);
 		}else{

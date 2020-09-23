@@ -22,10 +22,10 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use InvalidArgumentException;
-use InvalidStateException;
 use muqsit\invmenu\metadata\DoubleBlockMenuMetadata;
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\metadata\SingleBlockMenuMetadata;
+use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
 use pocketmine\network\mcpe\protocol\types\WindowTypes;
@@ -51,7 +51,8 @@ final class InvMenuHandler{
 
 		self::$registrant = $plugin;
 		self::registerDefaultMenuTypes();
-		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
+		PlayerNetworkHandlerRegistry::init();
+		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler($plugin), $plugin);
 	}
 
 	public static function isRegistered() : bool{

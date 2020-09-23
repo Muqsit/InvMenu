@@ -46,9 +46,9 @@ class PlayerSession{
 	/** @var int */
 	protected $current_window_id = ContainerIds::NONE;
 
-	public function __construct(Player $player){
+	public function __construct(Player $player, PlayerNetwork $network){
 		$this->player = $player;
-		$this->network = new PlayerNetwork($player);
+		$this->network = $network;
 		$this->menu_extradata = new MenuExtradata();
 	}
 
