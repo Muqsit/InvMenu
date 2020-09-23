@@ -23,6 +23,7 @@ namespace muqsit\invmenu\session;
 
 use Closure;
 use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\player\Player;
 
@@ -40,10 +41,9 @@ class PlayerSession{
 	/** @var InvMenu|null */
 	protected $current_menu;
 
-	public function __construct(Player $player){
+	public function __construct(Player $player, PlayerNetwork $network){
 		$this->player = $player;
-		$network_session = $player->getNetworkSession();
-		$this->network = new PlayerNetwork($network_session);
+		$this->network = $network;
 		$this->menu_extradata = new MenuExtradata();
 	}
 

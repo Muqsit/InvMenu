@@ -25,6 +25,7 @@ use InvalidArgumentException;
 use muqsit\invmenu\metadata\DoubleBlockMenuMetadata;
 use muqsit\invmenu\metadata\MenuMetadata;
 use muqsit\invmenu\metadata\SingleBlockMenuMetadata;
+use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
 use pocketmine\block\tile\Chest;
 use pocketmine\block\tile\Hopper;
 use pocketmine\block\tile\TileFactory;
@@ -51,6 +52,7 @@ final class InvMenuHandler{
 
 		self::$registrant = $plugin;
 		self::registerDefaultMenuTypes();
+		PlayerNetworkHandlerRegistry::init();
 		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
 	}
 

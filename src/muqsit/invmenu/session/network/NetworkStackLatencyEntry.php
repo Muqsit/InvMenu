@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\invmenu\session;
+namespace muqsit\invmenu\session\network;
 
 use Closure;
 

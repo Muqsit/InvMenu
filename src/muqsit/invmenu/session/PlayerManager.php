@@ -21,7 +21,10 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\session;
 
+use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
+use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\player\Player;
+use ReflectionProperty;
 
 final class PlayerManager{
 
@@ -29,7 +32,19 @@ final class PlayerManager{
 	private static $sessions = [];
 
 	public static function create(Player $player) : void{
-		self::$sessions[$player->getId()] = new PlayerSession($player);
+		static $_playerInfo = null;
+		if($_playerInfo === null){
+			$_playerInfo = new ReflectionProperty(Player::class, "playerInfo");
+			$_playerInfo->setAccessible(true);
+		}
+
+		self::$sessions[$player->getId()] = new PlayerSession(
+			$player,
+			new PlayerNetwork(
+				$player->getNetworkSession(),
+				PlayerNetworkHandlerRegistry::get($_playerInfo->getValue($player)->getExtraData()["DeviceOS"] ?? -1)
+			)
+		);
 	}
 
 	public static function destroy(Player $player) : void{
