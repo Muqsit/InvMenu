@@ -99,7 +99,7 @@ class InvMenuEventHandler implements Listener{
 						$network_stack_callbacks[] = $network_stack_callback;
 					}
 					if($result->isCancelled()){
-						$event->setCancelled();
+						$event->cancel();
 						break;
 					}
 				}
