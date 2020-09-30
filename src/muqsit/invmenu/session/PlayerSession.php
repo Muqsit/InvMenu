@@ -102,7 +102,7 @@ class PlayerSession{
 		$this->current_menu = $menu;
 
 		if($this->current_menu !== null){
-			$this->network->wait(function(bool $success) use($callback) : void{
+			$this->network->waitUntil($this->network->getGraphicWaitDuration(), function(bool $success) use($callback) : void{
 				if($this->current_menu !== null){
 					if($success && $this->sendWindow()){
 						if($callback !== null){
