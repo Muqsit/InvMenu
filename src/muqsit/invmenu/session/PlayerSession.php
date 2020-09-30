@@ -71,7 +71,7 @@ class PlayerSession{
 		$this->current_menu = $menu;
 
 		if($this->current_menu !== null){
-			$this->network->wait(function(bool $success) use ($callback) : void{
+			$this->network->waitUntil($this->network->getGraphicWaitDuration(), function(bool $success) use ($callback) : void{
 				if($this->current_menu !== null){
 					if($success && $this->current_menu->sendInventory($this->player)){
 						// TODO: Revert this to the Inventory->moveTo() method when it's possible

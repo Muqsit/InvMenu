@@ -23,6 +23,7 @@ namespace muqsit\invmenu\session\network;
 
 use Closure;
 use Ds\Queue;
+use InvalidArgumentException;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandler;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
@@ -41,10 +42,31 @@ final class PlayerNetwork{
 	/** @var PlayerNetworkHandler */
 	private $handler;
 
+	/** @var int */
+	private $graphic_wait_duration = 100;
+
 	public function __construct(NetworkSession $session, PlayerNetworkHandler $handler){
 		$this->session = $session;
 		$this->handler = $handler;
 		$this->queue = new Queue();
+	}
+
+	public function getGraphicWaitDuration() : int{
+		return $this->graphic_wait_duration;
+	}
+
+	/**
+	 * Duration (in milliseconds) to wait between sending the graphic (block)
+	 * and sending the inventory.
+	 *
+	 * @param int $graphic_wait_duration
+	 */
+	public function setGraphicWaitDuration(int $graphic_wait_duration) : void{
+		if($graphic_wait_duration < 0){
+			throw new InvalidArgumentException("graphic_wait_duration must be >= 0, got {$graphic_wait_duration}");
+		}
+
+		$this->graphic_wait_duration = $graphic_wait_duration;
 	}
 
 	public function dropPending() : void{
@@ -67,6 +89,28 @@ final class PlayerNetwork{
 		}else{
 			$this->setCurrent($entry);
 		}
+	}
+
+	/**
+	 * Waits at least $wait_ms before calling $then(true).
+	 *
+	 * @param int $wait_ms
+	 * @param Closure $then
+	 * @param int|null $since_ms
+	 *
+	 * @phpstan-param Closure(bool) : void $then
+	 */
+	public function waitUntil(int $wait_ms, Closure $then, ?int $since_ms = null) : void{
+		if($since_ms === null){
+			$since_ms = (int) floor(microtime(true) * 1000);
+		}
+		$this->wait(function(bool $success) use($since_ms, $wait_ms, $then) : void{
+			if($success && ((microtime(true) * 1000) - $since_ms) < $wait_ms){
+				$this->waitUntil($wait_ms, $then, $since_ms);
+			}else{
+				$then($success);
+			}
+		});
 	}
 
 	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
