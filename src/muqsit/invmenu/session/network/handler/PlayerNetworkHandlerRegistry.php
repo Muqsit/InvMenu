@@ -26,7 +26,7 @@ use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
 
 final class PlayerNetworkHandlerRegistry{
 
-	private const OS_ORBIS = 10;
+	private const OS_ORBIS = 11;
 
 	/** @var PlayerNetworkHandler */
 	private static $default;
@@ -39,7 +39,8 @@ final class PlayerNetworkHandlerRegistry{
 			return new NetworkStackLatencyEntry(mt_rand() * 1000 /* TODO: remove this hack */, $then);
 		}));
 		self::register(self::OS_ORBIS, new ClosurePlayerNetworkHandler(static function(Closure $then) : NetworkStackLatencyEntry{
-			return new NetworkStackLatencyEntry(mt_rand(), $then);
+			$timestamp = mt_rand();
+			return new NetworkStackLatencyEntry($timestamp, $then, $timestamp * 1000);
 		}));
 	}
 
@@ -52,6 +53,7 @@ final class PlayerNetworkHandlerRegistry{
 	}
 
 	public static function get(int $os_id) : PlayerNetworkHandler{
+		var_dump("GET {$os_id}");
 		return self::$game_os_handlers[$os_id] ?? self::$default;
 	}
 }

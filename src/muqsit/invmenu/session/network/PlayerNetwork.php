@@ -121,7 +121,7 @@ final class PlayerNetwork{
 
 		if($entry !== null){
 			$pk = new NetworkStackLatencyPacket();
-			$pk->timestamp = $entry->timestamp;
+			$pk->timestamp = $entry->network_timestamp;
 			$pk->needResponse = true;
 			if($this->session->sendDataPacket($pk)){
 				$this->current = $entry;
