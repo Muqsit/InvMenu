@@ -53,7 +53,6 @@ final class PlayerNetworkHandlerRegistry{
 	}
 
 	public static function get(int $os_id) : PlayerNetworkHandler{
-		var_dump("GET {$os_id}");
 		return self::$game_os_handlers[$os_id] ?? self::$default;
 	}
 }
