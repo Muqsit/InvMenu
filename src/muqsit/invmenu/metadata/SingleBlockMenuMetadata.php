@@ -33,6 +33,7 @@ use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
+use pocketmine\world\World;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
 
@@ -54,15 +55,19 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$this->tile_id = $tile_id;
 	}
 
-	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
+	public function sendGraphic(Player $player, MenuExtradata $metadata) : bool{
 		$positions = $this->getBlockPositions($metadata);
-		$name = $metadata->getName();
-		$network = $player->getNetworkSession();
-		$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId());
-		foreach($positions as $pos){
-			$network->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $block_runtime_id));
-			$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+		if(count($positions) > 0){
+			$name = $metadata->getName();
+			$network = $player->getNetworkSession();
+			$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId());
+			foreach($positions as $pos){
+				$network->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $block_runtime_id));
+				$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+			}
+			return true;
 		}
+		return false;
 	}
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
@@ -105,6 +110,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	 * @return Vector3[]
 	 */
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
-		return [$metadata->getPositionNotNull()];
+		$pos = $metadata->getPositionNotNull();
+		return $pos->y >= 0 && $pos->y < World::Y_MAX ? [$pos] : [];
 	}
 }

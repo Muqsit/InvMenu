@@ -71,7 +71,7 @@ abstract class MenuMetadata{
 		return $player->getPosition()->addVector($this->calculateGraphicOffset($player))->floor();
 	}
 
-	abstract public function sendGraphic(Player $player, MenuExtradata $metadata) : void;
+	abstract public function sendGraphic(Player $player, MenuExtradata $metadata) : bool;
 
 	abstract public function removeGraphic(Player $player, MenuExtradata $extradata) : void;
 }
