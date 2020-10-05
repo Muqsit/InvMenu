@@ -23,6 +23,7 @@ namespace muqsit\invmenu\metadata;
 
 use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\block\Block;
+use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NetworkLittleEndianNBTStream;
 use pocketmine\nbt\tag\CompoundTag;
@@ -60,19 +61,23 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 		$this->tile_id = $tile_id;
 	}
 
-	public function sendGraphic(Player $player, MenuExtradata $metadata) : void{
+	public function sendGraphic(Player $player, MenuExtradata $metadata) : bool{
 		$positions = $this->getBlockPositions($metadata);
-		$name = $metadata->getName();
-		foreach($positions as $pos){
-			$packet = new UpdateBlockPacket();
-			$packet->x = $pos->x;
-			$packet->y = $pos->y;
-			$packet->z = $pos->z;
-			$packet->blockRuntimeId = $this->block->getRuntimeId();
-			$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
-			$player->sendDataPacket($packet);
-			$player->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+		if(count($positions) > 0){
+			$name = $metadata->getName();
+			foreach($positions as $pos){
+				$packet = new UpdateBlockPacket();
+				$packet->x = $pos->x;
+				$packet->y = $pos->y;
+				$packet->z = $pos->z;
+				$packet->blockRuntimeId = $this->block->getRuntimeId();
+				$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
+				$player->sendDataPacket($packet);
+				$player->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+			}
+			return true;
 		}
+		return false;
 	}
 
 	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
@@ -115,6 +120,7 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	 * @return Vector3[]
 	 */
 	protected function getBlockPositions(MenuExtradata $metadata) : array{
-		return [$metadata->getPositionNotNull()];
+		$pos = $metadata->getPositionNotNull();
+		return $pos->y >= 0 && $pos->y < Level::Y_MAX ? [$pos] : [];
 	}
 }
