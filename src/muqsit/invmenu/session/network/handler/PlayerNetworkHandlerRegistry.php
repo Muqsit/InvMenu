@@ -23,10 +23,9 @@ namespace muqsit\invmenu\session\network\handler;
 
 use Closure;
 use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
+use pocketmine\network\mcpe\protocol\types\DeviceOS;
 
 final class PlayerNetworkHandlerRegistry{
-
-	private const OS_ORBIS = 10;
 
 	/** @var PlayerNetworkHandler */
 	private static $default;
@@ -38,8 +37,9 @@ final class PlayerNetworkHandlerRegistry{
 		self::registerDefault(new ClosurePlayerNetworkHandler(static function(Closure $then) : NetworkStackLatencyEntry{
 			return new NetworkStackLatencyEntry(mt_rand() * 1000 /* TODO: remove this hack */, $then);
 		}));
-		self::register(self::OS_ORBIS, new ClosurePlayerNetworkHandler(static function(Closure $then) : NetworkStackLatencyEntry{
-			return new NetworkStackLatencyEntry(mt_rand(), $then);
+		self::register(DeviceOS::PLAYSTATION, new ClosurePlayerNetworkHandler(static function(Closure $then) : NetworkStackLatencyEntry{
+			$timestamp = mt_rand();
+			return new NetworkStackLatencyEntry($timestamp, $then, $timestamp * 1000);
 		}));
 	}
 
