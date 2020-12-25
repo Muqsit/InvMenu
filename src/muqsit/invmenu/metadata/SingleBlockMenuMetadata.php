@@ -25,81 +25,38 @@ use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\block\Block;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\NetworkLittleEndianNBTStream;
-use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\Player;
-use pocketmine\tile\Nameable;
-use pocketmine\tile\Tile;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
-
-	/** @var NetworkLittleEndianNBTStream */
-	protected static $serializer;
 
 	/** @var Block */
 	protected $block;
 
-	/** @var string */
-	protected $identifier;
-
-	/** @var int */
-	protected $size;
-
-	/** @var string */
-	protected $tile_id;
-
-	public function __construct(string $identifier, int $size, int $window_type, Block $block, string $tile_id){
+	public function __construct(string $identifier, int $size, int $window_type, Block $block){
 		parent::__construct($identifier, $size, $window_type);
-
-		if(self::$serializer === null){
-			self::$serializer = new NetworkLittleEndianNBTStream();
-		}
-
 		$this->block = $block;
-		$this->tile_id = $tile_id;
 	}
 
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : bool{
 		$positions = $this->getBlockPositions($metadata);
 		if(count($positions) > 0){
-			$name = $metadata->getName();
 			foreach($positions as $pos){
-				$packet = new UpdateBlockPacket();
-				$packet->x = $pos->x;
-				$packet->y = $pos->y;
-				$packet->z = $pos->z;
-				$packet->blockRuntimeId = $this->block->getRuntimeId();
-				$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
-				$player->sendDataPacket($packet);
-				$player->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+				$this->sendGraphicAt($pos, $player, $metadata);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
-		$packet = new BlockActorDataPacket();
+	protected function sendGraphicAt(Vector3 $pos, Player $player, MenuExtradata $metadata) : void{
+		$packet = new UpdateBlockPacket();
 		$packet->x = $pos->x;
 		$packet->y = $pos->y;
 		$packet->z = $pos->z;
-
-		$namedtag = self::$serializer->write($this->getBlockActorDataAt($pos, $name));
-		assert($namedtag !== false);
-
-		$packet->namedtag = $namedtag;
-		return $packet;
-	}
-
-	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
-		$tag = new CompoundTag();
-		$tag->setString(Tile::TAG_ID, $this->tile_id);
-		if($name !== null){
-			$tag->setString(Nameable::TAG_CUSTOM_NAME, $name);
-		}
-		return $tag;
+		$packet->blockRuntimeId = $this->block->getRuntimeId();
+		$packet->flags = UpdateBlockPacket::FLAG_NETWORK;
+		$player->sendDataPacket($packet);
 	}
 
 	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{

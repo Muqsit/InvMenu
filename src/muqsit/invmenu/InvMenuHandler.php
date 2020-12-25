@@ -22,9 +22,9 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use InvalidArgumentException;
-use muqsit\invmenu\metadata\DoubleBlockMenuMetadata;
+use muqsit\invmenu\metadata\DoubleBlockActorMenuMetadata;
 use muqsit\invmenu\metadata\MenuMetadata;
-use muqsit\invmenu\metadata\SingleBlockMenuMetadata;
+use muqsit\invmenu\metadata\SingleBlockActorMenuMetadata;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockIds;
@@ -60,9 +60,9 @@ final class InvMenuHandler{
 	}
 
 	private static function registerDefaultMenuTypes() : void{
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
-		self::registerMenuType(new DoubleBlockMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
-		self::registerMenuType(new SingleBlockMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockIds::HOPPER_BLOCK), "Hopper"));
+		self::registerMenuType(new SingleBlockActorMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
+		self::registerMenuType(new DoubleBlockActorMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, BlockFactory::get(BlockIds::CHEST), Tile::CHEST));
+		self::registerMenuType(new SingleBlockActorMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, BlockFactory::get(BlockIds::HOPPER_BLOCK), "Hopper"));
 	}
 
 	public static function registerMenuType(MenuMetadata $type, bool $override = false) : void{
