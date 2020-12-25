@@ -25,7 +25,9 @@ use Closure;
 use Ds\Queue;
 use InvalidArgumentException;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandler;
+use muqsit\invmenu\session\PlayerSession;
 use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 final class PlayerNetwork{
@@ -43,7 +45,7 @@ final class PlayerNetwork{
 	private $handler;
 
 	/** @var int */
-	private $graphic_wait_duration = 100;
+	private $graphic_wait_duration = 200;
 
 	public function __construct(NetworkSession $session, PlayerNetworkHandler $handler){
 		$this->session = $session;
@@ -145,5 +147,24 @@ final class PlayerNetwork{
 		if($this->current !== null && $timestamp === $this->current->timestamp){
 			$this->processCurrent(true);
 		}
+	}
+
+	public function translateContainerOpen(PlayerSession $session, int $window_id, int $window_type, int $x, int $y, int $z) : bool{
+		$inventory = $this->session->getInvManager()->getWindow($window_id);
+		if(
+			$inventory !== null &&
+			($current_menu = $session->getCurrentMenu()) !== null &&
+			$current_menu->getInventory() === $inventory &&
+			($pos = $session->getMenuExtradata()->getPosition()) !== null && (
+				$x !== $pos->x ||
+				$y !== $pos->y ||
+				$z !== $pos->z ||
+				$window_type !== $current_menu->getType()->getWindowType()
+			)
+		){
+			$this->session->sendDataPacket(ContainerOpenPacket::blockInvVec3($window_id, $current_menu->getType()->getWindowType(), $pos));
+			return true;
+		}
+		return false;
 	}
 }

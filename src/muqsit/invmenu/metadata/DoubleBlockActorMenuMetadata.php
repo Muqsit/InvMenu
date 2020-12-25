@@ -27,7 +27,7 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\Player;
 use pocketmine\world\World;
 
-class DoubleBlockMenuMetadata extends SingleBlockMenuMetadata{
+class DoubleBlockActorMenuMetadata extends SingleBlockActorMenuMetadata{
 
 	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
 		return parent::getBlockActorDataAt($pos, $name)

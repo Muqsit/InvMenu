@@ -28,7 +28,9 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
+use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 class InvMenuEventHandler implements Listener{
@@ -59,6 +61,27 @@ class InvMenuEventHandler implements Listener{
 			$session = PlayerManager::get($event->getOrigin()->getPlayer());
 			if($session !== null){
 				$session->getNetwork()->notify($packet->timestamp);
+			}
+		}
+	}
+
+	/**
+	 * @param DataPacketSendEvent $event
+	 * @priority NORMAL
+	 */
+	public function onDataPacketSend(DataPacketSendEvent $event) : void{
+		$packets = $event->getPackets();
+		if(count($packets) === 1){
+			$packet = reset($packets);
+			if($packet instanceof ContainerOpenPacket){
+				$targets = $event->getTargets();
+				if(count($targets) === 1){
+					$target = reset($targets);
+					$session = PlayerManager::get($target->getPlayer());
+					if($session !== null && $session->getNetwork()->translateContainerOpen($session, $packet->windowId, $packet->type, $packet->x, $packet->y, $packet->z)){
+						$event->cancel();
+					}
+				}
 			}
 		}
 	}

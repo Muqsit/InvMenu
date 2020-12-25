@@ -74,24 +74,13 @@ class PlayerSession{
 			$this->network->waitUntil($this->network->getGraphicWaitDuration(), function(bool $success) use ($callback) : void{
 				if($this->current_menu !== null){
 					if($success && $this->current_menu->sendInventory($this->player)){
-						// TODO: Revert this to the Inventory->moveTo() method when it's possible
-						// for plugins to specify network type for inventories
-						if($this->player->getNetworkSession()->sendDataPacket(ContainerOpenPacket::blockInvVec3(
-							$this->player->getNetworkSession()->getInvManager()->getCurrentWindowId(),
-							$this->current_menu->getType()->getWindowType(),
-							$this->menu_extradata->getPosition()
-						))){
-							$this->player->getNetworkSession()->getInvManager()->syncContents($this->current_menu->getInventory());
-							if($callback !== null){
-								$callback(true);
-							}
-							return;
+						if($callback !== null){
+							$callback(true);
 						}
-						$this->player->removeCurrentWindow();
-					}else{
-						$this->removeCurrentMenu();
+						return;
 					}
 
+					$this->removeCurrentMenu();
 					if($callback !== null){
 						$callback(false);
 					}

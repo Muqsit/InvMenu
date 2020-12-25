@@ -23,14 +23,10 @@ namespace muqsit\invmenu\metadata;
 
 use muqsit\invmenu\session\MenuExtradata;
 use pocketmine\block\Block;
-use pocketmine\block\tile\Nameable;
 use pocketmine\block\tile\Spawnable;
-use pocketmine\block\tile\Tile;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
-use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
 use pocketmine\world\World;
@@ -40,54 +36,24 @@ class SingleBlockMenuMetadata extends MenuMetadata{
 	/** @var Block */
 	protected $block;
 
-	/** @var string */
-	protected $identifier;
-
-	/** @var int */
-	protected $size;
-
-	/** @var string */
-	protected $tile_id;
-
-	public function __construct(string $identifier, int $size, int $window_type, Block $block, string $tile_id){
+	public function __construct(string $identifier, int $size, int $window_type, Block $block){
 		parent::__construct($identifier, $size, $window_type);
 		$this->block = $block;
-		$this->tile_id = $tile_id;
 	}
 
 	public function sendGraphic(Player $player, MenuExtradata $metadata) : bool{
 		$positions = $this->getBlockPositions($metadata);
 		if(count($positions) > 0){
-			$name = $metadata->getName();
-			$network = $player->getNetworkSession();
-			$block_runtime_id = RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId());
 			foreach($positions as $pos){
-				$network->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, $block_runtime_id));
-				$network->sendDataPacket($this->getBlockActorDataPacketAt($player, $pos, $name));
+				$this->sendGraphicAt($pos, $player, $metadata);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	protected function getBlockActorDataPacketAt(Player $player, Vector3 $pos, ?string $name) : BlockActorDataPacket{
-		return BlockActorDataPacket::create(
-			$pos->x,
-			$pos->y,
-			$pos->z,
-			new CacheableNbt($this->getBlockActorDataAt($pos, $name))
-		);
-	}
-
-	protected function getBlockActorDataAt(Vector3 $pos, ?string $name) : CompoundTag{
-		$tag = CompoundTag::create()->setString(Tile::TAG_ID, $this->tile_id);
-		$tag->setInt(Tile::TAG_X, $pos->x);
-		$tag->setInt(Tile::TAG_Y, $pos->y);
-		$tag->setInt(Tile::TAG_Z, $pos->z);
-		if($name !== null){
-			$tag->setString(Nameable::TAG_CUSTOM_NAME, $name);
-		}
-		return $tag;
+	protected function sendGraphicAt(Vector3 $pos, Player $player, MenuExtradata $metadata) : void{
+		$player->getNetworkSession()->sendDataPacket(UpdateBlockPacket::create($pos->x, $pos->y, $pos->z, RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId())));
 	}
 
 	public function removeGraphic(Player $player, MenuExtradata $extradata) : void{
