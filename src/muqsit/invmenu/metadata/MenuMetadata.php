@@ -61,9 +61,10 @@ abstract class MenuMetadata{
 
 	protected function calculateGraphicOffset(Player $player) : Vector3{
 		$offset = $player->getDirectionVector();
-		$offset->x *= -(1 + $player->width);
-		$offset->y *= -(1 + $player->height);
-		$offset->z *= -(1 + $player->width);
+		$size = $player->size;
+		$offset->x *= -(1 + $size->getWidth());
+		$offset->y *= -(1 + $size->getHeight());
+		$offset->z *= -(1 + $size->getWidth());
 		return $offset;
 	}
 
