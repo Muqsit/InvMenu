@@ -51,6 +51,8 @@ class InvMenu implements MenuIds{
 			$result = $transaction->discard();
 			if ($result->isCancelled() && $transaction->getItemClickedWith()->getId() != 0) {
 				$transaction->getPlayer()->getCursorInventory()->setItem(0, $transaction->getItemClickedWith());
+			} else {
+				$transaction->getPlayer()->getCursorInventory()->setItem(0, Item::get(0));
 			}
 			if($listener !== null){
 				$listener(new DeterministicInvMenuTransaction($transaction, $result));
