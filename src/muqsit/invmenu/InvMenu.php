@@ -49,7 +49,7 @@ class InvMenu implements MenuIds{
 	public static function readonly(?Closure $listener = null) : Closure{
 		return static function(InvMenuTransaction $transaction) use($listener) : InvMenuTransactionResult{
 			$result = $transaction->discard();
-			if ($result->isCancelled() && $transaction->getItemClickedWith()->getId() != 0) {
+			if ($transaction->getItemClickedWith()->getId() != 0) {
 				$transaction->getPlayer()->getCursorInventory()->setItem(0, $transaction->getItemClickedWith());
 			} else {
 				$transaction->getPlayer()->getCursorInventory()->setItem(0, Item::get(0));
