@@ -173,4 +173,15 @@ class InvMenu implements MenuIds{
 
 		PlayerManager::getNonNullable($player)->removeCurrentMenu();
 	}
+
+	public function __clone(){
+		$this->inventory = clone $this->inventory;
+		$this->type = clone $this->type;
+		if($this->listener !== null){
+			$this->listener = clone $this->listener;
+		}
+		if($this->inventory_close_listener !== null){
+			$this->inventory_close_listener = clone $this->inventory_close_listener;
+		}
+	}
 }
