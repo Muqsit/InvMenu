@@ -32,6 +32,7 @@ use pocketmine\block\tile\TileFactory;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\plugin\Plugin;
+use pocketmine\Server;
 
 final class InvMenuHandler{
 
@@ -53,7 +54,7 @@ final class InvMenuHandler{
 		self::$registrant = $plugin;
 		self::registerDefaultMenuTypes();
 		PlayerNetworkHandlerRegistry::init();
-		$plugin->getServer()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
+		Server::getInstance()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
 	}
 
 	public static function isRegistered() : bool{

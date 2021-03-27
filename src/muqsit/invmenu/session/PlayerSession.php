@@ -24,7 +24,6 @@ namespace muqsit\invmenu\session;
 use Closure;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\session\network\PlayerNetwork;
-use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\player\Player;
 
 class PlayerSession{
