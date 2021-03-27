@@ -3,3 +3,4 @@ antigen: muqsit\invmenu
 api: 4.0.0
 version: 4.2.0
 author: Muqsit
+php: [7.3, 8.0]
