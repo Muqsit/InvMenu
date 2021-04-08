@@ -26,8 +26,7 @@ use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
 
 final class ClosurePlayerNetworkHandler implements PlayerNetworkHandler{
 
-	/** @var Closure */
-	private $creator;
+	private Closure $creator;
 
 	/**
 	 * @param Closure $creator

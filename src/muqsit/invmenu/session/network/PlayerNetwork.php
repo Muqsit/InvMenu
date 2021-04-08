@@ -32,20 +32,13 @@ use SplQueue;
 
 final class PlayerNetwork{
 
-	/** @var NetworkSession */
-	private $session;
+	private NetworkSession $session;
+	private PlayerNetworkHandler $handler;
+	private ?NetworkStackLatencyEntry $current = null;
+	private int $graphic_wait_duration = 200;
 
 	/** @var SplQueue<NetworkStackLatencyEntry> */
-	private $queue;
-
-	/** @var NetworkStackLatencyEntry|null */
-	private $current;
-
-	/** @var PlayerNetworkHandler */
-	private $handler;
-
-	/** @var int */
-	private $graphic_wait_duration = 200;
+	private SplQueue $queue;
 
 	public function __construct(NetworkSession $session, PlayerNetworkHandler $handler){
 		$this->session = $session;

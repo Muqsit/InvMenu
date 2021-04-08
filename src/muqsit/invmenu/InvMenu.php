@@ -63,23 +63,12 @@ class InvMenu implements MenuIds{
 		};
 	}
 
-	/** @var MenuMetadata */
-	protected $type;
-
-	/** @var string|null */
-	protected $name;
-
-	/** @var Closure|null */
-	protected $listener;
-
-	/** @var Closure|null */
-	protected $inventory_close_listener;
-
-	/** @var InvMenuInventory */
-	protected $inventory;
-
-	/** @var SharedInvMenuSynchronizer|null */
-	protected $synchronizer;
+	protected MenuMetadata $type;
+	protected ?string $name = null;
+	protected ?Closure $listener = null;
+	protected ?Closure $inventory_close_listener = null;
+	protected InvMenuInventory $inventory;
+	protected ?SharedInvMenuSynchronizer $synchronizer;
 
 	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
 		if(!InvMenuHandler::isRegistered()){

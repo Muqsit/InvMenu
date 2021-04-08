@@ -28,14 +28,9 @@ use pocketmine\player\Player;
 
 abstract class MenuMetadata{
 
-	/** @var string */
-	protected $identifier;
-
-	/** @var int */
-	protected $size;
-
-	/** @var int */
-	protected $window_type;
+	protected string $identifier;
+	protected int $size;
+	protected int $window_type;
 
 	public function __construct(string $identifier, int $size, int $window_type){
 		$this->identifier = $identifier;

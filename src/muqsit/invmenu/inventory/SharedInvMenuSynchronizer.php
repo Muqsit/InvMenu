@@ -26,14 +26,9 @@ use pocketmine\inventory\Inventory;
 
 class SharedInvMenuSynchronizer{
 
-	/** @var Inventory */
-	protected $inventory;
-
-	/** @var SharedInventorySynchronizer */
-	protected $synchronizer;
-
-	/** @var SharedInventoryNotifier */
-	protected $notifier;
+	protected Inventory $inventory;
+	protected SharedInventorySynchronizer $synchronizer;
+	protected SharedInventoryNotifier $notifier;
 
 	public function __construct(InvMenu $menu, Inventory $inventory){
 		$this->inventory = $inventory;

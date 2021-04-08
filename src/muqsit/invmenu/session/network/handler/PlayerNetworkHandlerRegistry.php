@@ -27,11 +27,10 @@ use pocketmine\network\mcpe\protocol\types\DeviceOS;
 
 final class PlayerNetworkHandlerRegistry{
 
-	/** @var PlayerNetworkHandler */
-	private static $default;
+	private static PlayerNetworkHandler $default;
 
 	/** @var PlayerNetworkHandler[] */
-	private static $game_os_handlers = [];
+	private static array $game_os_handlers = [];
 
 	public static function init() : void{
 		self::registerDefault(new ClosurePlayerNetworkHandler(static function(Closure $then) : NetworkStackLatencyEntry{

@@ -25,14 +25,9 @@ use Closure;
 
 final class NetworkStackLatencyEntry{
 
-	/** @var int */
-	public $timestamp;
-
-	/** @var int */
-	public $network_timestamp;
-
-	/** @var Closure */
-	public $then;
+	public int $timestamp;
+	public int $network_timestamp;
+	public Closure $then;
 
 	public function __construct(int $timestamp, Closure $then, ?int $network_timestamp = null){
 		$this->timestamp = $timestamp;

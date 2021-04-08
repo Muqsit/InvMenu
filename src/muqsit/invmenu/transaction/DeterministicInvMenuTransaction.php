@@ -26,8 +26,7 @@ use InvalidStateException;
 
 final class DeterministicInvMenuTransaction extends InvMenuTransaction{
 
-	/** @var InvMenuTransactionResult */
-	private $result;
+	private InvMenuTransactionResult $result;
 
 	public function __construct(InvMenuTransaction $transaction, InvMenuTransactionResult $result){
 		parent::__construct($transaction->getPlayer(), $transaction->getOut(), $transaction->getIn(), $transaction->getAction(), $transaction->getTransaction());

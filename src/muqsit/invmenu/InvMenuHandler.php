@@ -36,11 +36,10 @@ use pocketmine\Server;
 
 final class InvMenuHandler{
 
-	/** @var Plugin|null */
-	private static $registrant;
+	private static ?Plugin $registrant = null;
 
 	/** @var MenuMetadata[] */
-	private static $menu_types = [];
+	private static array $menu_types = [];
 
 	public static function getRegistrant() : Plugin{
 		return self::$registrant;

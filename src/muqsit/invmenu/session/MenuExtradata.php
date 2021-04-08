@@ -25,11 +25,8 @@ use pocketmine\math\Vector3;
 
 class MenuExtradata{
 
-	/** @var Vector3|null */
-	protected $position;
-
-	/** @var string|null */
-	protected $name;
+	protected ?Vector3 $position = null;
+	protected ?string $name = null;
 
 	public function getPosition() : ?Vector3{
 		return $this->position;

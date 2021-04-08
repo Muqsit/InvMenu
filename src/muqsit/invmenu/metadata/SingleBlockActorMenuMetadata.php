@@ -33,8 +33,7 @@ use pocketmine\player\Player;
 
 class SingleBlockActorMenuMetadata extends SingleBlockMenuMetadata{
 
-	/** @var string */
-	protected $tile_id;
+	protected string $tile_id;
 
 	public function __construct(string $identifier, int $size, int $window_type, Block $block, string $tile_id){
 		parent::__construct($identifier, $size, $window_type, $block);

@@ -33,8 +33,7 @@ use pocketmine\world\World;
 
 class SingleBlockMenuMetadata extends MenuMetadata{
 
-	/** @var Block */
-	protected $block;
+	protected Block $block;
 
 	public function __construct(string $identifier, int $size, int $window_type, Block $block){
 		parent::__construct($identifier, $size, $window_type);

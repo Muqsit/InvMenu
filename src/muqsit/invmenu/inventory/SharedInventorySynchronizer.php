@@ -27,8 +27,7 @@ use pocketmine\item\Item;
 
 class SharedInventorySynchronizer implements InventoryListener{
 
-	/** @var InvMenuInventory */
-	protected $inventory;
+	protected InvMenuInventory $inventory;
 
 	public function __construct(InvMenuInventory $inventory){
 		$this->inventory = $inventory;

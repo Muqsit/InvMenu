@@ -28,17 +28,10 @@ use pocketmine\player\Player;
 
 class PlayerSession{
 
-	/** @var Player */
-	protected $player;
-
-	/** @var PlayerNetwork */
-	protected $network;
-
-	/** @var MenuExtradata */
-	protected $menu_extradata;
-
-	/** @var InvMenu|null */
-	protected $current_menu;
+	protected Player $player;
+	protected PlayerNetwork $network;
+	protected MenuExtradata $menu_extradata;
+	protected ?InvMenu $current_menu = null;
 
 	public function __construct(Player $player, PlayerNetwork $network){
 		$this->player = $player;

@@ -22,14 +22,12 @@ declare(strict_types=1);
 namespace muqsit\invmenu\transaction;
 
 use Closure;
+use pocketmine\player\Player;
 
 final class InvMenuTransactionResult{
 
-	/** @var bool */
-	private $cancelled;
-
-	/** @var Closure|null */
-	private $post_transaction_callback;
+	private bool $cancelled;
+	private ?Closure $post_transaction_callback = null;
 
 	public function __construct(bool $cancelled){
 		$this->cancelled = $cancelled;
@@ -48,7 +46,7 @@ final class InvMenuTransactionResult{
 	 * @param Closure|null $callback
 	 * @return self
 	 *
-	 * @phpstan-param Closure(\pocketmine\player\Player) : void $callback
+	 * @phpstan-param Closure(Player) : void $callback
 	 */
 	public function then(?Closure $callback) : self{
 		$this->post_transaction_callback = $callback;

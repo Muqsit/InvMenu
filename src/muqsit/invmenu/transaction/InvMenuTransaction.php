@@ -28,20 +28,11 @@ use pocketmine\player\Player;
 
 class InvMenuTransaction{
 
-	/** @var Player */
-	private $player;
-
-	/** @var Item */
-	private $out;
-
-	/** @var Item */
-	private $in;
-
-	/** @var SlotChangeAction */
-	private $action;
-
-	/** @var InventoryTransaction */
-	private $transaction;
+	private Player $player;
+	private Item $out;
+	private Item $in;
+	private SlotChangeAction $action;
+	private InventoryTransaction $transaction;
 
 	public function __construct(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction){
 		$this->player = $player;

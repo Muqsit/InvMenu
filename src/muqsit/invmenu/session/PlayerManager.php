@@ -29,7 +29,7 @@ use ReflectionProperty;
 final class PlayerManager{
 
 	/** @var PlayerSession[] */
-	private static $sessions = [];
+	private static array $sessions = [];
 
 	public static function create(Player $player) : void{
 		static $_playerInfo = null;
