@@ -68,7 +68,7 @@ class InvMenu implements MenuIds{
 	protected ?Closure $listener = null;
 	protected ?Closure $inventory_close_listener = null;
 	protected InvMenuInventory $inventory;
-	protected ?SharedInvMenuSynchronizer $synchronizer;
+	protected ?SharedInvMenuSynchronizer $synchronizer = null;
 
 	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
 		if(!InvMenuHandler::isRegistered()){
