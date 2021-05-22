@@ -22,11 +22,15 @@ declare(strict_types=1);
 namespace muqsit\invmenu\inventory;
 
 use pocketmine\block\inventory\BlockInventory;
+use pocketmine\block\inventory\BlockInventoryTrait;
+use pocketmine\inventory\SimpleInventory;
 use pocketmine\world\Position;
 
-class InvMenuInventory extends BlockInventory{
+class InvMenuInventory extends SimpleInventory implements BlockInventory{
+	use BlockInventoryTrait;
 
 	public function __construct(int $size){
-		parent::__construct(new Position(0, 0, 0, null), $size);
+		$this->holder = new Position(0, 0, 0, null);
+		parent::__construct($size);
 	}
 }
