@@ -172,20 +172,18 @@ To forcefully close or remove the menu from a player, you can use
 $player->removeCurrentWindow();
 ```
 
-## Writing a custom inventory class
+## Registering a custom InvMenu type
 So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER`. You can still create a dispenser InvMenu by registering a `MenuMetadata` object with the information about what a dispenser inventory looks like.
 ```php
 public const TYPE_DISPENSER = "myplugin:dispenser";
 
 public function registerCustomMenuTypes() : void{
-	$type = new SingleBlockMenuMetadata(
-		self::TYPE_DISPENSER, // identifier
-		9, // number of slots
-		WindowTypes::DISPENSER, // mcpe window type id
-		BlockFactory::get(Block::DISPENSER), // Block
-		"Dispenser" // block entity identifier
-	);
-	InvMenuHandler::registerMenuType($type);
+	InvMenuHandler::getRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_FIXED()
+		->setBlock(BlockFactory::get(Block::DISPENSER))
+		->setBlockActorId("Dispenser")
+		->setSize(9)
+		->setNetworkWindowType(WindowTypes::DISPENSER)
+	->build());
 }
 
 $this->registerCustomMenuTypes();
