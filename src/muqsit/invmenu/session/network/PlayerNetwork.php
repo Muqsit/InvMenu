@@ -142,20 +142,15 @@ final class PlayerNetwork{
 		}
 	}
 
-	public function translateContainerOpen(PlayerSession $session, int $window_id, int $window_type, int $x, int $y, int $z) : bool{
-		$inventory = $this->session->getInvManager()->getWindow($window_id);
+	public function translateContainerOpen(PlayerSession $session, ContainerOpenPacket $packet) : bool{
+		$inventory = $this->session->getInvManager()->getWindow($packet->windowId);
 		if(
 			$inventory !== null &&
-			($current_menu = $session->getCurrentMenu()) !== null &&
-			$current_menu->getInventory() === $inventory &&
-			($pos = $session->getMenuExtradata()->getPosition()) !== null && (
-				$x !== $pos->x ||
-				$y !== $pos->y ||
-				$z !== $pos->z ||
-				$window_type !== $current_menu->getType()->getWindowType()
-			)
+			($current = $session->getCurrent()) !== null &&
+			$current->menu->getInventory() === $inventory &&
+			($translation = $current->graphic->getNetworkTranslator()) !== null
 		){
-			$this->session->sendDataPacket(ContainerOpenPacket::blockInvVec3($window_id, $current_menu->getType()->getWindowType(), $pos));
+			$translation->translate($session, $current, $packet);
 			return true;
 		}
 		return false;

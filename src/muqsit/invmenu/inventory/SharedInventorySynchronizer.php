@@ -27,13 +27,13 @@ use pocketmine\item\Item;
 
 class SharedInventorySynchronizer implements InventoryListener{
 
-	protected InvMenuInventory $inventory;
+	protected Inventory $inventory;
 
-	public function __construct(InvMenuInventory $inventory){
+	public function __construct(Inventory $inventory){
 		$this->inventory = $inventory;
 	}
 
-	public function getSynchronizingInventory() : InvMenuInventory{
+	public function getSynchronizingInventory() : Inventory{
 		return $this->inventory;
 	}
 

@@ -23,20 +23,21 @@ namespace muqsit\invmenu;
 
 use Closure;
 use InvalidStateException;
-use muqsit\invmenu\inventory\InvMenuInventory;
 use muqsit\invmenu\inventory\SharedInvMenuSynchronizer;
-use muqsit\invmenu\metadata\MenuMetadata;
+use muqsit\invmenu\session\InvMenuInfo;
 use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use muqsit\invmenu\type\InvMenuType;
+use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\inventory\Inventory;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
-class InvMenu implements MenuIds{
+class InvMenu implements InvMenuTypeIds{
 
 	/**
 	 * @param string $identifier
@@ -44,7 +45,7 @@ class InvMenu implements MenuIds{
 	 * @return InvMenu
 	 */
 	public static function create(string $identifier, ...$args) : InvMenu{
-		return new InvMenu(InvMenuHandler::getMenuType($identifier), ...$args);
+		return new InvMenu(InvMenuHandler::getTypeRegistry()->get($identifier), ...$args);
 	}
 
 	/**
@@ -63,14 +64,14 @@ class InvMenu implements MenuIds{
 		};
 	}
 
-	protected MenuMetadata $type;
+	protected InvMenuType $type;
 	protected ?string $name = null;
 	protected ?Closure $listener = null;
 	protected ?Closure $inventory_close_listener = null;
-	protected InvMenuInventory $inventory;
+	protected Inventory $inventory;
 	protected ?SharedInvMenuSynchronizer $synchronizer = null;
 
-	public function __construct(MenuMetadata $type, ?Inventory $custom_inventory = null){
+	public function __construct(InvMenuType $type, ?Inventory $custom_inventory = null){
 		if(!InvMenuHandler::isRegistered()){
 			throw new InvalidStateException("Tried creating menu before calling " . InvMenuHandler::class . "::register()");
 		}
@@ -79,7 +80,7 @@ class InvMenu implements MenuIds{
 		$this->setInventory($custom_inventory);
 	}
 
-	public function getType() : MenuMetadata{
+	public function getType() : InvMenuType{
 		return $this->type;
 	}
 
@@ -130,13 +131,12 @@ class InvMenu implements MenuIds{
 
 		$network->waitUntil($network->getGraphicWaitDuration(), function(bool $success) use($player, $session, $name, $callback) : void{
 			if($success){
-				$extra_data = $session->getMenuExtradata();
-				$extra_data->setName($name ?? $this->getName());
-				$extra_data->setPosition($this->type->calculateGraphicPosition($player));
-				if($this->type->sendGraphic($player, $extra_data)){
-					$session->setCurrentMenu($this, $callback);
+				$graphic = $this->type->createGraphic($this, $player);
+				if($graphic !== null){
+					$graphic->send($player, $name);
+					$session->setCurrentMenu(new InvMenuInfo($this, $graphic), $callback);
 				}else{
-					$extra_data->reset();
+					$session->removeCurrentMenu();
 					if($callback !== null){
 						$callback(false);
 					}
@@ -147,7 +147,7 @@ class InvMenu implements MenuIds{
 		});
 	}
 
-	public function getInventory() : InvMenuInventory{
+	public function getInventory() : Inventory{
 		return $this->inventory;
 	}
 

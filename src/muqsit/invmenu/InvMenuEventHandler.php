@@ -78,8 +78,8 @@ class InvMenuEventHandler implements Listener{
 				if(count($targets) === 1){
 					$target = reset($targets);
 					$session = PlayerManager::get($target->getPlayer());
-					if($session !== null && $session->getNetwork()->translateContainerOpen($session, $packet->windowId, $packet->type, $packet->x, $packet->y, $packet->z)){
-						$event->cancel();
+					if($session !== null){
+						$session->getNetwork()->translateContainerOpen($session, $packet);
 					}
 				}
 			}
@@ -94,9 +94,9 @@ class InvMenuEventHandler implements Listener{
 		$player = $event->getPlayer();
 		$session = PlayerManager::get($player);
 		if($session !== null){
-			$menu = $session->getCurrentMenu();
-			if($menu !== null && $event->getInventory() === $menu->getInventory()){
-				$menu->onClose($player);
+			$current = $session->getCurrent();
+			if($current !== null && $event->getInventory() === $current->menu->getInventory()){
+				$current->menu->onClose($player);
 			}
 		}
 	}
@@ -110,13 +110,13 @@ class InvMenuEventHandler implements Listener{
 		$player = $transaction->getSource();
 
 		$player_instance = PlayerManager::getNonNullable($player);
-		$menu = $player_instance->getCurrentMenu();
-		if($menu !== null){
-			$inventory = $menu->getInventory();
+		$current = $player_instance->getCurrent();
+		if($current !== null){
+			$inventory = $current->menu->getInventory();
 			$network_stack_callbacks = [];
 			foreach($transaction->getActions() as $action){
 				if($action instanceof SlotChangeAction && $action->getInventory() === $inventory){
-					$result = $menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
+					$result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
 					$network_stack_callback = $result->getPostTransactionCallback();
 					if($network_stack_callback !== null){
 						$network_stack_callbacks[] = $network_stack_callback;

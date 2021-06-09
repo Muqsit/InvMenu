@@ -22,28 +22,15 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use InvalidArgumentException;
-use muqsit\invmenu\metadata\DoubleBlockActorMenuMetadata;
-use muqsit\invmenu\metadata\MenuMetadata;
-use muqsit\invmenu\metadata\SingleBlockActorMenuMetadata;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
-use pocketmine\block\tile\Chest;
-use pocketmine\block\tile\Hopper;
-use pocketmine\block\tile\TileFactory;
-use pocketmine\block\VanillaBlocks;
-use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+use muqsit\invmenu\type\InvMenuTypeRegistry;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 
 final class InvMenuHandler{
 
 	private static ?Plugin $registrant = null;
-
-	/** @var MenuMetadata[] */
-	private static array $menu_types = [];
-
-	public static function getRegistrant() : Plugin{
-		return self::$registrant;
-	}
+	private static InvMenuTypeRegistry $type_registry;
 
 	public static function register(Plugin $plugin) : void{
 		if(self::isRegistered()){
@@ -51,7 +38,7 @@ final class InvMenuHandler{
 		}
 
 		self::$registrant = $plugin;
-		self::registerDefaultMenuTypes();
+		self::$type_registry = new InvMenuTypeRegistry();
 		PlayerNetworkHandlerRegistry::init();
 		Server::getInstance()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
 	}
@@ -60,22 +47,11 @@ final class InvMenuHandler{
 		return self::$registrant instanceof Plugin;
 	}
 
-	private static function registerDefaultMenuTypes() : void{
-		$tile_factory = TileFactory::getInstance();
-		self::registerMenuType(new SingleBlockActorMenuMetadata(InvMenu::TYPE_CHEST, 27, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), $tile_factory->getSaveId(Chest::class)));
-		self::registerMenuType(new DoubleBlockActorMenuMetadata(InvMenu::TYPE_DOUBLE_CHEST, 54, WindowTypes::CONTAINER, VanillaBlocks::CHEST(), $tile_factory->getSaveId(Chest::class)));
-		self::registerMenuType(new SingleBlockActorMenuMetadata(InvMenu::TYPE_HOPPER, 5, WindowTypes::HOPPER, VanillaBlocks::HOPPER(), $tile_factory->getSaveId(Hopper::class)));
+	public static function getRegistrant() : Plugin{
+		return self::$registrant;
 	}
 
-	public static function registerMenuType(MenuMetadata $type, bool $override = false) : void{
-		if(isset(self::$menu_types[$identifier = $type->getIdentifier()]) && !$override){
-			throw new InvalidArgumentException("A menu type with the identifier \"{$identifier}\" is already registered as " . get_class(self::$menu_types[$identifier]));
-		}
-
-		self::$menu_types[$identifier] = $type;
-	}
-
-	public static function getMenuType(string $identifier) : ?MenuMetadata{
-		return self::$menu_types[$identifier] ?? null;
+	public static function getTypeRegistry() : InvMenuTypeRegistry{
+		return self::$type_registry;
 	}
 }
