@@ -16,7 +16,7 @@ use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
-class InvMenuEventHandler implements Listener{
+final class InvMenuEventHandler implements Listener{
 
 	/**
 	 * @param PlayerLoginEvent $event

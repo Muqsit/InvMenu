@@ -8,7 +8,7 @@ use pocketmine\inventory\Inventory;
 use pocketmine\inventory\InventoryListener;
 use pocketmine\item\Item;
 
-class SharedInventoryNotifier implements InventoryListener{
+final class SharedInventoryNotifier implements InventoryListener{
 
 	protected Inventory $inventory;
 	protected SharedInventorySynchronizer $synchronizer;

@@ -9,7 +9,7 @@ use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\player\Player;
 
-class PlayerSession{
+final class PlayerSession{
 
 	protected Player $player;
 	protected PlayerNetwork $network;

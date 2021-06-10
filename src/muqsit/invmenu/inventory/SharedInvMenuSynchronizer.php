@@ -7,7 +7,7 @@ namespace muqsit\invmenu\inventory;
 use muqsit\invmenu\InvMenu;
 use pocketmine\inventory\Inventory;
 
-class SharedInvMenuSynchronizer{
+final class SharedInvMenuSynchronizer{
 
 	protected Inventory $inventory;
 	protected SharedInventorySynchronizer $synchronizer;

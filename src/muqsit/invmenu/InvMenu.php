@@ -12,6 +12,7 @@ use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use muqsit\invmenu\transaction\SimpleInvMenuTransaction;
 use muqsit\invmenu\type\InvMenuType;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\inventory\Inventory;
@@ -156,7 +157,7 @@ class InvMenu implements InvMenuTypeIds{
 	}
 
 	public function handleInventoryTransaction(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction) : InvMenuTransactionResult{
-		$inv_menu_txn = new InvMenuTransaction($player, $out, $in, $action, $transaction);
+		$inv_menu_txn = new SimpleInvMenuTransaction($player, $out, $in, $action, $transaction);
 		return $this->listener !== null ? ($this->listener)($inv_menu_txn) : $inv_menu_txn->continue();
 	}
 

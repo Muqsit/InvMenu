@@ -8,7 +8,7 @@ use pocketmine\block\inventory\BlockInventory;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\world\Position;
 
-class InvMenuInventory extends SimpleInventory implements BlockInventory{
+final class InvMenuInventory extends SimpleInventory implements BlockInventory{
 
 	protected Position $holder;
 
