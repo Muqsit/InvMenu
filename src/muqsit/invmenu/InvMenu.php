@@ -8,7 +8,6 @@ use Closure;
 use InvalidStateException;
 use muqsit\invmenu\inventory\SharedInvMenuSynchronizer;
 use muqsit\invmenu\session\InvMenuInfo;
-use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
@@ -107,7 +106,7 @@ class InvMenu implements InvMenuTypeIds{
 	 * @phpstan-param Closure(bool) : void $callback
 	 */
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
-		$session = PlayerManager::getNonNullable($player);
+		$session = InvMenuHandler::getPlayerManager()->getNonNullable($player);
 		$network = $session->getNetwork();
 		$network->dropPending();
 
@@ -166,6 +165,6 @@ class InvMenu implements InvMenuTypeIds{
 			($this->inventory_close_listener)($player, $this->getInventory());
 		}
 
-		PlayerManager::getNonNullable($player)->removeCurrentMenu();
+		InvMenuHandler::getPlayerManager()->getNonNullable($player)->removeCurrentMenu();
 	}
 }

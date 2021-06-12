@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use InvalidArgumentException;
-use muqsit\invmenu\session\network\handler\PlayerNetworkHandlerRegistry;
+use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\type\InvMenuTypeRegistry;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
@@ -14,6 +14,7 @@ final class InvMenuHandler{
 
 	private static ?Plugin $registrant = null;
 	private static InvMenuTypeRegistry $type_registry;
+	private static PlayerManager $player_manager;
 
 	public static function register(Plugin $plugin) : void{
 		if(self::isRegistered()){
@@ -22,8 +23,8 @@ final class InvMenuHandler{
 
 		self::$registrant = $plugin;
 		self::$type_registry = new InvMenuTypeRegistry();
-		PlayerNetworkHandlerRegistry::init();
-		Server::getInstance()->getPluginManager()->registerEvents(new InvMenuEventHandler(), $plugin);
+		self::$player_manager = new PlayerManager(self::getRegistrant());
+		Server::getInstance()->getPluginManager()->registerEvents(new InvMenuEventHandler(self::getPlayerManager()), $plugin);
 	}
 
 	public static function isRegistered() : bool{
@@ -36,5 +37,9 @@ final class InvMenuHandler{
 
 	public static function getTypeRegistry() : InvMenuTypeRegistry{
 		return self::$type_registry;
+	}
+
+	public static function getPlayerManager() : PlayerManager{
+		return self::$player_manager;
 	}
 }

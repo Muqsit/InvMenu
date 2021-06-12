@@ -8,8 +8,6 @@ use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerLoginEvent;
-use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
@@ -17,21 +15,11 @@ use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 final class InvMenuEventHandler implements Listener{
-
-	/**
-	 * @param PlayerLoginEvent $event
-	 * @priority MONITOR
-	 */
-	public function onPlayerLogin(PlayerLoginEvent $event) : void{
-		PlayerManager::create($event->getPlayer());
-	}
-
-	/**
-	 * @param PlayerQuitEvent $event
-	 * @priority MONITOR
-	 */
-	public function onPlayerQuit(PlayerQuitEvent $event) : void{
-		PlayerManager::destroy($event->getPlayer());
+	
+	private PlayerManager $player_manager;
+	
+	public function __construct(PlayerManager $player_manager){
+		$this->player_manager = $player_manager;
 	}
 
 	/**
@@ -41,7 +29,7 @@ final class InvMenuEventHandler implements Listener{
 	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
 		$packet = $event->getPacket();
 		if($packet instanceof NetworkStackLatencyPacket){
-			$session = PlayerManager::get($event->getOrigin()->getPlayer());
+			$session = $this->player_manager->get($event->getOrigin()->getPlayer());
 			if($session !== null){
 				$session->getNetwork()->notify($packet->timestamp);
 			}
@@ -60,7 +48,7 @@ final class InvMenuEventHandler implements Listener{
 				$targets = $event->getTargets();
 				if(count($targets) === 1){
 					$target = reset($targets);
-					$session = PlayerManager::get($target->getPlayer());
+					$session = $this->player_manager->get($target->getPlayer());
 					if($session !== null){
 						$session->getNetwork()->translateContainerOpen($session, $packet);
 					}
@@ -75,7 +63,7 @@ final class InvMenuEventHandler implements Listener{
 	 */
 	public function onInventoryClose(InventoryCloseEvent $event) : void{
 		$player = $event->getPlayer();
-		$session = PlayerManager::get($player);
+		$session = $this->player_manager->get($player);
 		if($session !== null){
 			$current = $session->getCurrent();
 			if($current !== null && $event->getInventory() === $current->menu->getInventory()){
@@ -92,7 +80,7 @@ final class InvMenuEventHandler implements Listener{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
-		$player_instance = PlayerManager::getNonNullable($player);
+		$player_instance = $this->player_manager->getNonNullable($player);
 		$current = $player_instance->getCurrent();
 		if($current !== null){
 			$inventory = $current->menu->getInventory();
