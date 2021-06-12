@@ -16,7 +16,7 @@ if(!InvMenuHandler::isRegistered()){
 ```
 
 ## Creating an InvMenu instance
-`InvMenu::create($identifier)` creates a new instance of InvMenu. `$identifier` must be an identifier of a registered `MenuMedata` object. InvMenu comes with 3 pre-registered `MenuMetadata` identifiers by default: `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
+`InvMenu::create($identifier)` creates a new instance of InvMenu. `$identifier` must be an identifier of a registered `InvMenuType` object. InvMenu comes with 3 pre-registered `InvMenuType` identifiers: `InvMenu::TYPE_CHEST`, `InvMenu::TYPE_DOUBLE_CHEST` and `InvMenu::TYPE_HOPPER`.
 
 ```php
 $menu = InvMenu::create(InvMenu::TYPE_CHEST);
@@ -27,7 +27,7 @@ To access this menu's inventory, you can use:
 $inventory = $menu->getInventory();
 ```
 
-The `$inventory` extends pocketmine's `Inventory` class, so you can use all the fancy pocketmine inventory methods.
+The `$inventory` implements pocketmine's `Inventory` interface, so you can access all the fancy pocketmine inventory methods.
 ```php
 $menu->getInventory()->setContents([
 	Item::get(Item::DIAMOND_SWORD),
@@ -96,7 +96,7 @@ $menu->setListener(function(InvMenuTransaction $transaction) : InvMenuTransactio
 	$itemClicked = $transaction->getItemClicked();
 	$itemClickedWith = $transaction->getItemClickedWith();
 	$action = $transaction->getAction();
-	$inv_transaction = $transaction->getTransaction();
+	$invTransaction = $transaction->getTransaction();
 	return $transaction->continue();
 });
 ```
@@ -166,18 +166,18 @@ What's **`$listener`**?
  */
 Closure(Player $player, Inventory $inventory) : void;
 ```
-To forcefully close or remove the menu from a player, you can use
+To forcefully close or remove the menu from a player:
 ```php
 /** @var Player $player */
 $player->removeCurrentWindow();
 ```
 
 ## Registering a custom InvMenu type
-So let's say you'd like to send players a dispenser inventory. Sadly, InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER`. You can still create a dispenser InvMenu by registering a `MenuMetadata` object with the information about what a dispenser inventory looks like.
+So let's say you'd like to send players a dispenser inventory. While InvMenu doesn't ship with a `InvMenu::TYPE_DISPENSER`, you can still create a dispenser InvMenu by registering an `InvMenuType` object with the information about what a dispenser inventory looks like.
 ```php
 public const TYPE_DISPENSER = "myplugin:dispenser";
 
-public function registerCustomMenuTypes() : void{
+protected function onEnable() : void{
 	InvMenuHandler::getRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_FIXED()
 		->setBlock(BlockFactory::get(Block::DISPENSER))
 		->setBlockActorId("Dispenser")
@@ -185,8 +185,6 @@ public function registerCustomMenuTypes() : void{
 		->setNetworkWindowType(WindowTypes::DISPENSER)
 	->build());
 }
-
-$this->registerCustomMenuTypes();
 ```
 Sweet! Now you can create a dispenser menu using
 ```php
