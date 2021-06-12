@@ -46,6 +46,10 @@ final class InvMenuTypeRegistry{
 	}
 
 	public function register(string $identifier, InvMenuType $type) : void{
+		if(isset($this->types[$identifier])){
+			unset($this->identifiers[spl_object_id($this->types[$identifier])], $this->types[$identifier]);
+		}
+
 		$this->types[$identifier] = $type;
 		$this->identifiers[spl_object_id($type)] = $identifier;
 	}
