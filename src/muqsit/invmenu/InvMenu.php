@@ -106,7 +106,7 @@ class InvMenu implements InvMenuTypeIds{
 	 * @phpstan-param Closure(bool) : void $callback
 	 */
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
-		$session = InvMenuHandler::getPlayerManager()->getNonNullable($player);
+		$session = InvMenuHandler::getPlayerManager()->get($player);
 		$network = $session->getNetwork();
 		$network->dropPending();
 
@@ -165,6 +165,6 @@ class InvMenu implements InvMenuTypeIds{
 			($this->inventory_close_listener)($player, $this->getInventory());
 		}
 
-		InvMenuHandler::getPlayerManager()->getNonNullable($player)->removeCurrentMenu();
+		InvMenuHandler::getPlayerManager()->get($player)->removeCurrentMenu();
 	}
 }

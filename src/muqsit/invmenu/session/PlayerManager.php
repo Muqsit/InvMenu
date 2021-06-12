@@ -53,12 +53,12 @@ final class PlayerManager{
 		}
 	}
 
-	public function get(Player $player) : ?PlayerSession{
-		return $this->sessions[$player->getId()] ?? null;
+	public function get(Player $player) : PlayerSession{
+		return $this->sessions[$player->getId()];
 	}
 
-	public function getNonNullable(Player $player) : PlayerSession{
-		return $this->sessions[$player->getId()];
+	public function getNullable(Player $player) : ?PlayerSession{
+		return $this->sessions[$player->getId()] ?? null;
 	}
 
 	public function getNetworkHandlerRegistry() : PlayerNetworkHandlerRegistry{

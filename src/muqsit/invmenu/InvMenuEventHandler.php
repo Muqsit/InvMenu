@@ -29,7 +29,7 @@ final class InvMenuEventHandler implements Listener{
 	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
 		$packet = $event->getPacket();
 		if($packet instanceof NetworkStackLatencyPacket){
-			$session = $this->player_manager->get($event->getOrigin()->getPlayer());
+			$session = $this->player_manager->getNullable($event->getOrigin()->getPlayer());
 			if($session !== null){
 				$session->getNetwork()->notify($packet->timestamp);
 			}
@@ -48,7 +48,7 @@ final class InvMenuEventHandler implements Listener{
 				$targets = $event->getTargets();
 				if(count($targets) === 1){
 					$target = reset($targets);
-					$session = $this->player_manager->get($target->getPlayer());
+					$session = $this->player_manager->getNullable($target->getPlayer());
 					if($session !== null){
 						$session->getNetwork()->translateContainerOpen($session, $packet);
 					}
@@ -63,7 +63,7 @@ final class InvMenuEventHandler implements Listener{
 	 */
 	public function onInventoryClose(InventoryCloseEvent $event) : void{
 		$player = $event->getPlayer();
-		$session = $this->player_manager->get($player);
+		$session = $this->player_manager->getNullable($player);
 		if($session !== null){
 			$current = $session->getCurrent();
 			if($current !== null && $event->getInventory() === $current->menu->getInventory()){
@@ -80,7 +80,7 @@ final class InvMenuEventHandler implements Listener{
 		$transaction = $event->getTransaction();
 		$player = $transaction->getSource();
 
-		$player_instance = $this->player_manager->getNonNullable($player);
+		$player_instance = $this->player_manager->get($player);
 		$current = $player_instance->getCurrent();
 		if($current !== null){
 			$inventory = $current->menu->getInventory();
