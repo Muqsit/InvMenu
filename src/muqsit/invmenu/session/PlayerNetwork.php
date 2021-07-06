@@ -22,20 +22,21 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use Closure;
-use Ds\Queue;
 use InvalidArgumentException;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandler;
 use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 use pocketmine\Player;
+use RuntimeException;
+use SplQueue;
 
 final class PlayerNetwork{
 
 	/** @var Player */
 	private $session;
 
-	/** @var Queue<NetworkStackLatencyEntry> */
-	private $queue;
+	/** @var SplQueue<NetworkStackLatencyEntry> */
+	private $queued;
 
 	/** @var NetworkStackLatencyEntry|null */
 	private $current;
@@ -49,7 +50,7 @@ final class PlayerNetwork{
 	public function __construct(Player $session, PlayerNetworkHandler $handler){
 		$this->session = $session;
 		$this->handler = $handler;
-		$this->queue = new Queue();
+		$this->queued = new SplQueue();
 	}
 
 	public function getGraphicWaitDuration() : int{
@@ -71,10 +72,10 @@ final class PlayerNetwork{
 	}
 
 	public function dropPending() : void{
-		foreach($this->queue as $entry){
+		foreach($this->queued as $entry){
 			($entry->then)(false);
 		}
-		$this->queue->clear();
+		$this->queued = new SplQueue();
 		$this->setCurrent(null);
 	}
 
@@ -86,7 +87,7 @@ final class PlayerNetwork{
 	public function wait(Closure $then) : void{
 		$entry = $this->handler->createNetworkStackLatencyEntry($then);
 		if($this->current !== null){
-			$this->queue->push($entry);
+			$this->queued->enqueue($entry);
 		}else{
 			$this->setCurrent($entry);
 		}
@@ -136,9 +137,13 @@ final class PlayerNetwork{
 		if($this->current !== null){
 			($this->current->then)($success);
 			$this->current = null;
-			if(!$this->queue->isEmpty()){
-				$this->setCurrent($this->queue->pop());
+
+			try{
+				$entry = $this->queued->dequeue();
+			}catch(RuntimeException $_){
+				return;
 			}
+			$this->setCurrent($entry);
 		}
 	}
 
