@@ -25,8 +25,8 @@ final class PlayerSession{
 	 */
 	public function finalize() : void{
 		if($this->current !== null){
-			$this->player->removeCurrentWindow();
 			$this->current->graphic->remove($this->player);
+			$this->player->removeCurrentWindow();
 		}
 		$this->network->dropPending();
 	}
