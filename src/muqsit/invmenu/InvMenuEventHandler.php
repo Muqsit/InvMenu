@@ -98,7 +98,7 @@ final class InvMenuEventHandler implements Listener{
 					}
 				}
 			}
-			if(count($network_stack_callbacks) > 0){
+			if(!empty($network_stack_callbacks)){
 				$player_instance->getNetwork()->wait(static function(bool $success) use($player, $network_stack_callbacks) : void{
 					if($success){
 						foreach($network_stack_callbacks as $callback){
