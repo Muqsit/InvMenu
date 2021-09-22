@@ -1,5 +1,5 @@
 name: InvMenu
 antigen: muqsit\invmenu
-api: 4.0.0
+api: [4.0.0-BETA3]
 version: 4.3.3
 author: Muqsit
