@@ -12,6 +12,7 @@ use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\player\Player;
 
@@ -46,7 +47,7 @@ final class BlockActorInvMenuGraphic implements PositionedInvMenuGraphic{
 		if($name !== null){
 			$this->tile->setString(Nameable::TAG_CUSTOM_NAME, $name);
 		}
-		$player->getNetworkSession()->sendDataPacket(BlockActorDataPacket::create($this->position->x, $this->position->y, $this->position->z, new CacheableNbt($this->tile)));
+		$player->getNetworkSession()->sendDataPacket(BlockActorDataPacket::create(BlockPosition::fromVector3(new Vector3($this->position->x, $this->position->y, $this->position->z)), new CacheableNbt($this->tile)));
 	}
 
 	public function sendInventory(Player $player, Inventory $inventory) : bool{

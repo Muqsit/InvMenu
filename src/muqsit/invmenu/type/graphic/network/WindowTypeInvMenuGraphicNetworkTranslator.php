@@ -17,6 +17,6 @@ final class WindowTypeInvMenuGraphicNetworkTranslator implements InvMenuGraphicN
 	}
 
 	public function translate(PlayerSession $session, InvMenuInfo $current, ContainerOpenPacket $packet) : void{
-		$packet->type = $this->window_type;
+		$packet->windowType = $this->window_type;
 	}
 }

@@ -9,6 +9,7 @@ use muqsit\invmenu\session\InvMenuInfo;
 use muqsit\invmenu\session\PlayerSession;
 use muqsit\invmenu\type\graphic\PositionedInvMenuGraphic;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 
 final class BlockInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetworkTranslator{
 
@@ -27,8 +28,6 @@ final class BlockInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetwor
 		}
 
 		$pos = $graphic->getPosition();
-		$packet->x = (int) $pos->x;
-		$packet->y = (int) $pos->y;
-		$packet->z = (int) $pos->z;
+		$packet->blockPosition = BlockPosition::fromVector3($pos->asVector3());
 	}
 }
