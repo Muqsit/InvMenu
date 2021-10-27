@@ -30,7 +30,9 @@ final class InvMenuEventHandler implements Listener{
 		$packet = $event->getPacket();
 		if($packet instanceof NetworkStackLatencyPacket){
 			$session = $this->player_manager->getNullable($event->getOrigin()->getPlayer());
-			$session?->getNetwork()->notify($packet->timestamp);
+			if($session !== null){
+				$session->getNetwork()->notify($packet->timestamp);
+			}
 		}
 	}
 
@@ -47,7 +49,9 @@ final class InvMenuEventHandler implements Listener{
 				if(count($targets) === 1){
 					$target = reset($targets);
 					$session = $this->player_manager->getNullable($target->getPlayer());
-					$session?->getNetwork()->translateContainerOpen($session, $packet);
+					if($session !== null){
+						$session->getNetwork()->translateContainerOpen($session, $packet);
+					}
 				}
 			}
 		}
