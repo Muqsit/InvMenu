@@ -28,6 +28,6 @@ final class BlockInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetwor
 		}
 
 		$pos = $graphic->getPosition();
-		$packet->blockPosition = BlockPosition::fromVector3($pos->asVector3());
+		$packet->blockPosition = BlockPosition::fromVector3($pos);
 	}
 }
