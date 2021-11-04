@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\type\util\builder;
 
-use InvalidStateException;
+use LogicException;
 
 trait FixedInvMenuTypeBuilderTrait{
 
@@ -17,7 +17,7 @@ trait FixedInvMenuTypeBuilderTrait{
 
 	protected function getSize() : int{
 		if($this->size === null){
-			throw new InvalidStateException("No size was provided");
+			throw new LogicException("No size was provided");
 		}
 
 		return $this->size;

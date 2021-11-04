@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu\transaction;
 
 use Closure;
-use InvalidStateException;
+use LogicException;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\inventory\transaction\InventoryTransaction;
 use pocketmine\item\Item;
@@ -22,11 +22,11 @@ final class DeterministicInvMenuTransaction implements InvMenuTransaction{
 	}
 
 	public function continue() : InvMenuTransactionResult{
-		throw new InvalidStateException("Cannot change state of deterministic transactions");
+		throw new LogicException("Cannot change state of deterministic transactions");
 	}
 
 	public function discard() : InvMenuTransactionResult{
-		throw new InvalidStateException("Cannot change state of deterministic transactions");
+		throw new LogicException("Cannot change state of deterministic transactions");
 	}
 
 	public function then(?Closure $callback) : void{

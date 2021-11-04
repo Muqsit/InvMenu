@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\type\graphic;
 
-use InvalidStateException;
+use LogicException;
 use muqsit\invmenu\type\graphic\network\InvMenuGraphicNetworkTranslator;
 use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;
@@ -25,7 +25,7 @@ final class MultiBlockInvMenuGraphic implements PositionedInvMenuGraphic{
 	private function first() : PositionedInvMenuGraphic{
 		$first = current($this->graphics);
 		if($first === false){
-			throw new InvalidStateException("Tried sending inventory from a multi graphic consisting of zero entries");
+			throw new LogicException("Tried sending inventory from a multi graphic consisting of zero entries");
 		}
 
 		return $first;

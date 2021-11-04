@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\type\util\builder;
 
-use InvalidStateException;
+use LogicException;
 use pocketmine\block\Block;
 
 trait BlockInvMenuTypeBuilderTrait{
@@ -18,7 +18,7 @@ trait BlockInvMenuTypeBuilderTrait{
 
 	protected function getBlock() : Block{
 		if($this->block === null){
-			throw new InvalidStateException("No block was provided");
+			throw new LogicException("No block was provided");
 		}
 
 		return $this->block;

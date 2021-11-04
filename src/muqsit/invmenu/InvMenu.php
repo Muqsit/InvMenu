@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use Closure;
-use InvalidStateException;
+use LogicException;
 use muqsit\invmenu\inventory\SharedInvMenuSynchronizer;
 use muqsit\invmenu\session\InvMenuInfo;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
@@ -56,7 +56,7 @@ class InvMenu implements InvMenuTypeIds{
 
 	public function __construct(InvMenuType $type, ?Inventory $custom_inventory = null){
 		if(!InvMenuHandler::isRegistered()){
-			throw new InvalidStateException("Tried creating menu before calling " . InvMenuHandler::class . "::register()");
+			throw new LogicException("Tried creating menu before calling " . InvMenuHandler::class . "::register()");
 		}
 		$this->type = $type;
 		$this->inventory = $this->type->createInventory();

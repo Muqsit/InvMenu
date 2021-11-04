@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu\type\util\builder;
 
-use InvalidStateException;
+use LogicException;
 use muqsit\invmenu\type\BlockActorFixedInvMenuType;
 use muqsit\invmenu\type\graphic\network\BlockInvMenuGraphicNetworkTranslator;
 
@@ -26,7 +26,7 @@ final class BlockActorFixedInvMenuTypeBuilder implements InvMenuTypeBuilder{
 
 	private function getBlockActorId() : string{
 		if($this->block_actor_id === null){
-			throw new InvalidStateException("No block actor ID was specified");
+			throw new LogicException("No block actor ID was specified");
 		}
 
 		return $this->block_actor_id;
