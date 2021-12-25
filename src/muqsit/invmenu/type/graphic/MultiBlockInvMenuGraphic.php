@@ -54,4 +54,15 @@ final class MultiBlockInvMenuGraphic implements PositionedInvMenuGraphic{
 	public function getPosition() : Vector3{
 		return $this->first()->getPosition();
 	}
+
+	public function getAnimationDuration() : int{
+		$max = 0;
+		foreach($this->graphics as $graphic){
+			$duration = $graphic->getAnimationDuration();
+			if($duration > $max){
+				$max = $duration;
+			}
+		}
+		return $max;
+	}
 }

@@ -21,12 +21,14 @@ final class BlockActorFixedInvMenuType implements FixedInvMenuType{
 	private int $size;
 	private string $tile_id;
 	private ?InvMenuGraphicNetworkTranslator $network_translator;
+	private int $animation_duration;
 
-	public function __construct(Block $block, int $size, string $tile_id, ?InvMenuGraphicNetworkTranslator $network_translator = null){
+	public function __construct(Block $block, int $size, string $tile_id, ?InvMenuGraphicNetworkTranslator $network_translator = null, int $animation_duration = 0){
 		$this->block = $block;
 		$this->size = $size;
 		$this->tile_id = $tile_id;
 		$this->network_translator = $network_translator;
+		$this->animation_duration = $animation_duration;
 	}
 
 	public function getSize() : int{
@@ -39,7 +41,7 @@ final class BlockActorFixedInvMenuType implements FixedInvMenuType{
 			return null;
 		}
 
-		return new BlockActorInvMenuGraphic($this->block, $origin, BlockActorInvMenuGraphic::createTile($this->tile_id, $menu->getName()), $this->network_translator);
+		return new BlockActorInvMenuGraphic($this->block, $origin, BlockActorInvMenuGraphic::createTile($this->tile_id, $menu->getName()), $this->network_translator, $this->animation_duration);
 	}
 
 	public function createInventory() : Inventory{
