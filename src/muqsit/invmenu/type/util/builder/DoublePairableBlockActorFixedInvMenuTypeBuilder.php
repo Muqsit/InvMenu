@@ -12,6 +12,7 @@ final class DoublePairableBlockActorFixedInvMenuTypeBuilder implements InvMenuTy
 	use BlockInvMenuTypeBuilderTrait;
 	use FixedInvMenuTypeBuilderTrait;
 	use GraphicNetworkTranslatableInvMenuTypeBuilderTrait;
+	use AnimationDurationInvMenuTypeBuilderTrait;
 
 	private ?string $block_actor_id = null;
 
@@ -33,6 +34,6 @@ final class DoublePairableBlockActorFixedInvMenuTypeBuilder implements InvMenuTy
 	}
 
 	public function build() : DoublePairableBlockActorFixedInvMenuType{
-		return new DoublePairableBlockActorFixedInvMenuType($this->getBlock(), $this->getSize(), $this->getBlockActorId(), $this->getGraphicNetworkTranslator());
+		return new DoublePairableBlockActorFixedInvMenuType($this->getBlock(), $this->getSize(), $this->getBlockActorId(), $this->getGraphicNetworkTranslator(), $this->getAnimationDuration());
 	}
 }

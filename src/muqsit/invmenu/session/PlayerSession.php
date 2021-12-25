@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use Closure;
-use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\player\Player;
 
@@ -41,19 +40,19 @@ final class PlayerSession{
 	 * @param InvMenuInfo|null $current
 	 * @param Closure|null $callback
 	 *
-	 * @phpstan-param Closure(bool) : void $callback
+	 * @phpstan-param Closure(bool) : bool $callback
 	 */
 	public function setCurrentMenu(?InvMenuInfo $current, ?Closure $callback = null) : void{
 		$this->current = $current;
 
 		if($this->current !== null){
-			$this->network->waitUntil($this->network->getGraphicWaitDuration(), function(bool $success) use($callback) : void{
+			$this->network->waitUntil($this->current->graphic->getAnimationDuration(), function(bool $success) use($callback) : bool{
 				if($this->current !== null){
 					if($success && $this->current->graphic->sendInventory($this->player, $this->current->menu->getInventory())){
 						if($callback !== null){
 							$callback(true);
 						}
-						return;
+						return false;
 					}
 
 					$this->removeCurrentMenu();
@@ -61,9 +60,10 @@ final class PlayerSession{
 						$callback(false);
 					}
 				}
+				return false;
 			});
 		}else{
-			$this->network->wait($callback ?? static function(bool $success) : void{});
+			$this->network->wait($callback ?? static fn(bool $success) : bool => false);
 		}
 	}
 

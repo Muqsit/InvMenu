@@ -47,6 +47,10 @@ final class PlayerNetwork{
 		$this->graphic_wait_duration = $graphic_wait_duration;
 	}
 
+	public function getPending() : int{
+		return $this->queue->count();
+	}
+
 	public function dropPending() : void{
 		foreach($this->queue as $entry){
 			($entry->then)(false);
@@ -58,7 +62,7 @@ final class PlayerNetwork{
 	/**
 	 * @param Closure $then
 	 *
-	 * @phpstan-param Closure(bool) : void $then
+	 * @phpstan-param Closure(bool) : bool $then
 	 */
 	public function wait(Closure $then) : void{
 		$entry = $this->handler->createNetworkStackLatencyEntry($then);
@@ -74,46 +78,53 @@ final class PlayerNetwork{
 	 *
 	 * @param int $wait_ms
 	 * @param Closure $then
-	 * @param int|null $since_ms
 	 *
-	 * @phpstan-param Closure(bool) : void $then
+	 * @phpstan-param Closure(bool) : bool $then
 	 */
-	public function waitUntil(int $wait_ms, Closure $then, ?int $since_ms = null) : void{
-		if($since_ms === null){
-			$since_ms = (int) floor(microtime(true) * 1000);
+	public function waitUntil(int $wait_ms, Closure $then) : void{
+		if($wait_ms <= 0 && $this->queue->isEmpty()){
+			$then(true);
+			return;
 		}
-		$this->wait(function(bool $success) use($since_ms, $wait_ms, $then) : void{
-			if($success && ((microtime(true) * 1000) - $since_ms) < $wait_ms){
-				$this->waitUntil($wait_ms, $then, $since_ms);
-			}else{
-				$then($success);
+
+		$elapsed_ms = 0.0;
+		$this->wait(function(bool $success) use($wait_ms, $then, &$elapsed_ms) : bool{
+			$elapsed_ms += (microtime(true) * 1000) - $this->current->sent_at;
+			if($success && $elapsed_ms < $wait_ms){
+				return true;
 			}
+
+			$then($success);
+			return false;
 		});
 	}
 
 	private function setCurrent(?NetworkStackLatencyEntry $entry) : void{
 		if($this->current !== null){
 			$this->processCurrent(false);
-			$this->current = null;
 		}
 
+		$this->current = $entry;
 		if($entry !== null){
 			$pk = new NetworkStackLatencyPacket();
 			$pk->timestamp = $entry->network_timestamp;
 			$pk->needResponse = true;
 			if($this->session->sendDataPacket($pk)){
-				$this->current = $entry;
+				$entry->sent_at = microtime(true) * 1000;
 			}else{
-				($entry->then)(false);
+				$this->processCurrent(false);
 			}
 		}
 	}
 
 	private function processCurrent(bool $success) : void{
 		if($this->current !== null){
-			($this->current->then)($success);
+			$current = $this->current;
+			$repeat = ($current->then)($success);
 			$this->current = null;
-			if(!$this->queue->isEmpty()){
+			if($repeat && $success){
+				$this->setCurrent($current);
+			}elseif(!$this->queue->isEmpty()){
 				$this->setCurrent($this->queue->dequeue());
 			}
 		}

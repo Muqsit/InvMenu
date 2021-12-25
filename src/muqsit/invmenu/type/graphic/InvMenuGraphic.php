@@ -17,4 +17,12 @@ interface InvMenuGraphic{
 	public function remove(Player $player) : void;
 
 	public function getNetworkTranslator() : ?InvMenuGraphicNetworkTranslator;
+
+	/**
+	 * Returns a rough duration (in milliseconds) the client
+	 * takes to animate the inventory opening and closing.
+	 *
+	 * @return int
+	 */
+	public function getAnimationDuration() : int;
 }

@@ -30,12 +30,14 @@ final class BlockActorInvMenuGraphic implements PositionedInvMenuGraphic{
 	private Vector3 $position;
 	private CompoundTag $tile;
 	private ?InvMenuGraphicNetworkTranslator $network_translator;
+	private int $animation_duration;
 
-	public function __construct(Block $block, Vector3 $position, CompoundTag $tile, ?InvMenuGraphicNetworkTranslator $network_translator = null){
+	public function __construct(Block $block, Vector3 $position, CompoundTag $tile, ?InvMenuGraphicNetworkTranslator $network_translator = null, int $animation_duration = 0){
 		$this->block_graphic = new BlockInvMenuGraphic($block, $position);
 		$this->position = $position;
 		$this->tile = $tile;
 		$this->network_translator = $network_translator;
+		$this->animation_duration = $animation_duration;
 	}
 
 	public function getPosition() : Vector3{
@@ -60,5 +62,9 @@ final class BlockActorInvMenuGraphic implements PositionedInvMenuGraphic{
 
 	public function getNetworkTranslator() : ?InvMenuGraphicNetworkTranslator{
 		return $this->network_translator;
+	}
+
+	public function getAnimationDuration() : int{
+		return $this->animation_duration;
 	}
 }
