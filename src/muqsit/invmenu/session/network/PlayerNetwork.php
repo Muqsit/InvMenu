@@ -57,9 +57,7 @@ final class PlayerNetwork{
 	}
 
 	/**
-	 * @param Closure $then
-	 *
-	 * @phpstan-param Closure(bool) : bool $then
+	 * @param Closure(bool) : bool $then
 	 */
 	public function wait(Closure $then) : void{
 		$entry = $this->handler->createNetworkStackLatencyEntry($then);
@@ -74,9 +72,7 @@ final class PlayerNetwork{
 	 * Waits at least $wait_ms before calling $then(true).
 	 *
 	 * @param int $wait_ms
-	 * @param Closure $then
-	 *
-	 * @phpstan-param Closure(bool) : bool $then
+	 * @param Closure(bool) : bool $then
 	 */
 	public function waitUntil(int $wait_ms, Closure $then) : void{
 		if($wait_ms <= 0 && $this->queue->isEmpty()){

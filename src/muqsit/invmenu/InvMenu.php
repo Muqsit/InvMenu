@@ -32,10 +32,8 @@ class InvMenu implements InvMenuTypeIds{
 	}
 
 	/**
-	 * @param Closure|null $listener
-	 * @return Closure
-	 *
-	 * @phpstan-param Closure(DeterministicInvMenuTransaction) : void $listener
+	 * @param (Closure(DeterministicInvMenuTransaction) : void)|null $listener
+	 * @return Closure(InvMenuTransaction) : InvMenuTransactionResult
 	 */
 	public static function readonly(?Closure $listener = null) : Closure{
 		return static function(InvMenuTransaction $transaction) use($listener) : InvMenuTransactionResult{
@@ -77,10 +75,8 @@ class InvMenu implements InvMenuTypeIds{
 	}
 
 	/**
-	 * @param Closure|null $listener
+	 * @param (Closure(InvMenuTransaction) : InvMenuTransactionResult)|null $listener
 	 * @return self
-	 *
-	 * @phpstan-param Closure(InvMenuTransaction) : InvMenuTransactionResult $listener
 	 */
 	public function setListener(?Closure $listener) : self{
 		$this->listener = $listener;
@@ -88,10 +84,8 @@ class InvMenu implements InvMenuTypeIds{
 	}
 
 	/**
-	 * @param Closure|null $listener
+	 * @param (Closure(Player, Inventory) : void)|null $listener
 	 * @return self
-	 *
-	 * @phpstan-param Closure(Player, Inventory) : void $listener
 	 */
 	public function setInventoryCloseListener(?Closure $listener) : self{
 		$this->inventory_close_listener = $listener;
@@ -101,9 +95,7 @@ class InvMenu implements InvMenuTypeIds{
 	/**
 	 * @param Player $player
 	 * @param string|null $name
-	 * @param Closure|null $callback
-	 *
-	 * @phpstan-param Closure(bool) : void $callback
+	 * @param (Closure(bool) : void)|null $callback
 	 */
 	final public function send(Player $player, ?string $name = null, ?Closure $callback = null) : void{
 		$player->removeCurrentWindow();

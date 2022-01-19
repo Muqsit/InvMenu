@@ -36,9 +36,7 @@ final class PlayerSession{
 	 * @internal use InvMenu::send() instead.
 	 *
 	 * @param InvMenuInfo|null $current
-	 * @param Closure|null $callback
-	 *
-	 * @phpstan-param Closure(bool) : bool $callback
+	 * @param (Closure(bool) : bool)|null $callback
 	 */
 	public function setCurrentMenu(?InvMenuInfo $current, ?Closure $callback = null) : void{
 		$this->current = $current;
