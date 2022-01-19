@@ -40,20 +40,26 @@ final class InvMenuEventHandler implements Listener{
 	 */
 	public function onDataPacketSend(DataPacketSendEvent $event) : void{
 		$packets = $event->getPackets();
-		if(count($packets) === 1){
-			$packet = reset($packets);
-			if($packet instanceof ContainerOpenPacket){
-				$targets = $event->getTargets();
-				if(count($targets) === 1){
-					$target = reset($targets)->getPlayer();
-					if($target !== null){
-						$session = $this->player_manager->getNullable($target);
-						if($session !== null){
-							$session->getNetwork()->translateContainerOpen($session, $packet);
-						}
-					}
-				}
-			}
+		if(count($packets) !== 1){
+			return;
+		}
+		$packet = reset($packets);
+		if(!($packet instanceof ContainerOpenPacket)){
+			return;
+		}
+
+		$targets = $event->getTargets();
+		if(count($targets) !== 1){
+			return;
+		}
+		$target = reset($targets)->getPlayer();
+		if($target === null){
+			return;
+		}
+
+		$session = $this->player_manager->getNullable($target);
+		if($session !== null){
+			$session->getNetwork()->translateContainerOpen($session, $packet);
 		}
 	}
 
@@ -64,13 +70,15 @@ final class InvMenuEventHandler implements Listener{
 	public function onInventoryClose(InventoryCloseEvent $event) : void{
 		$player = $event->getPlayer();
 		$session = $this->player_manager->getNullable($player);
-		if($session !== null){
-			$current = $session->getCurrent();
-			if($current !== null && $event->getInventory() === $current->menu->getInventory()){
-				$current->menu->onClose($player);
-			}
-			$session->getNetwork()->waitUntil(325, static fn(bool $success) : bool => false);
+		if($session === null){
+			return;
 		}
+
+		$current = $session->getCurrent();
+		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
+			$current->menu->onClose($player);
+		}
+		$session->getNetwork()->waitUntil(325, static fn(bool $success) : bool => false);
 	}
 
 	/**
@@ -83,32 +91,37 @@ final class InvMenuEventHandler implements Listener{
 
 		$player_instance = $this->player_manager->get($player);
 		$current = $player_instance->getCurrent();
-		if($current !== null){
-			$inventory = $current->menu->getInventory();
-			$network_stack_callbacks = [];
-			foreach($transaction->getActions() as $action){
-				if($action instanceof SlotChangeAction && $action->getInventory() === $inventory){
-					$result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
-					$network_stack_callback = $result->getPostTransactionCallback();
-					if($network_stack_callback !== null){
-						$network_stack_callbacks[] = $network_stack_callback;
-					}
-					if($result->isCancelled()){
-						$event->cancel();
-						break;
+		if($current === null){
+			return;
+		}
+
+		$inventory = $current->menu->getInventory();
+		$network_stack_callbacks = [];
+		foreach($transaction->getActions() as $action){
+			if(!($action instanceof SlotChangeAction) || $action->getInventory() !== $inventory){
+				continue;
+			}
+
+			$result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
+			$network_stack_callback = $result->getPostTransactionCallback();
+			if($network_stack_callback !== null){
+				$network_stack_callbacks[] = $network_stack_callback;
+			}
+			if($result->isCancelled()){
+				$event->cancel();
+				break;
+			}
+		}
+
+		if(count($network_stack_callbacks) > 0){
+			$player_instance->getNetwork()->wait(static function(bool $success) use($player, $network_stack_callbacks) : bool{
+				if($success){
+					foreach($network_stack_callbacks as $callback){
+						$callback($player);
 					}
 				}
-			}
-			if(count($network_stack_callbacks) > 0){
-				$player_instance->getNetwork()->wait(static function(bool $success) use($player, $network_stack_callbacks) : bool{
-					if($success){
-						foreach($network_stack_callbacks as $callback){
-							$callback($player);
-						}
-					}
-					return false;
-				});
-			}
+				return false;
+			});
 		}
 	}
 }
