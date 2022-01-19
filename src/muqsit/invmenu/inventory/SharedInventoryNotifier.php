@@ -11,8 +11,8 @@ use pocketmine\item\Item;
 final class SharedInventoryNotifier implements InventoryListener{
 
 	public function __construct(
-		protected Inventory $inventory,
-		protected SharedInventorySynchronizer $synchronizer
+		private Inventory $inventory,
+		private SharedInventorySynchronizer $synchronizer
 	){}
 
 	public function onContentChange(Inventory $inventory, array $old_contents) : void{
