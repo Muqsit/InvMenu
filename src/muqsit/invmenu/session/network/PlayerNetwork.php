@@ -24,7 +24,9 @@ final class PlayerNetwork{
 	public function __construct(
 		private NetworkSession $session,
 		private PlayerNetworkHandler $handler
-	){}
+	){
+		$this->queue = new SplQueue();
+	}
 
 	public function getGraphicWaitDuration() : int{
 		return $this->graphic_wait_duration;
@@ -82,13 +84,18 @@ final class PlayerNetwork{
 
 		$elapsed_ms = 0.0;
 		$this->wait(function(bool $success) use($wait_ms, $then, &$elapsed_ms) : bool{
-			$elapsed_ms += (microtime(true) * 1000) - $this->current->sent_at;
-			if($success && $elapsed_ms < $wait_ms){
-				return true;
+			if($this->current === null){
+				$then(false);
+				return false;
 			}
 
-			$then($success);
-			return false;
+			$elapsed_ms += (microtime(true) * 1000) - $this->current->sent_at;
+			if(!$success || $elapsed_ms >= $wait_ms){
+				$then($success);
+				return false;
+			}
+
+			return true;
 		});
 	}
 
@@ -130,7 +137,7 @@ final class PlayerNetwork{
 	}
 
 	public function translateContainerOpen(PlayerSession $session, ContainerOpenPacket $packet) : bool{
-		$inventory = $this->session->getInvManager()->getWindow($packet->windowId);
+		$inventory = $this->session->getInvManager()?->getWindow($packet->windowId);
 		if(
 			$inventory !== null &&
 			($current = $session->getCurrent()) !== null &&

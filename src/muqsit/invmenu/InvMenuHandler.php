@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace muqsit\invmenu;
 
 use InvalidArgumentException;
+use LogicException;
 use muqsit\invmenu\session\PlayerManager;
 use muqsit\invmenu\type\InvMenuTypeRegistry;
 use pocketmine\plugin\Plugin;
@@ -32,7 +33,7 @@ final class InvMenuHandler{
 	}
 
 	public static function getRegistrant() : Plugin{
-		return self::$registrant;
+		return self::$registrant ?? throw new LogicException("Cannot obtain registrant before registration");
 	}
 
 	public static function getTypeRegistry() : InvMenuTypeRegistry{
