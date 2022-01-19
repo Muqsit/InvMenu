@@ -13,13 +13,10 @@ use pocketmine\player\Player;
 
 final class DeterministicInvMenuTransaction implements InvMenuTransaction{
 
-	private InvMenuTransaction $inner;
-	private InvMenuTransactionResult $result;
-
-	public function __construct(InvMenuTransaction $transaction, InvMenuTransactionResult $result){
-		$this->inner = $transaction;
-		$this->result = $result;
-	}
+	public function __construct(
+		private InvMenuTransaction $inner,
+		private InvMenuTransactionResult $result
+	){}
 
 	public function continue() : InvMenuTransactionResult{
 		throw new LogicException("Cannot change state of deterministic transactions");

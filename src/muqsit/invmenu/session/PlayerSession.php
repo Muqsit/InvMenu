@@ -10,14 +10,12 @@ use pocketmine\player\Player;
 
 final class PlayerSession{
 
-	protected Player $player;
-	protected PlayerNetwork $network;
 	protected ?InvMenuInfo $current = null;
 
-	public function __construct(Player $player, PlayerNetwork $network){
-		$this->player = $player;
-		$this->network = $network;
-	}
+	public function __construct(
+		protected Player $player,
+		protected PlayerNetwork $network
+	){}
 
 	/**
 	 * @internal

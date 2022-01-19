@@ -17,10 +17,6 @@ trait BlockInvMenuTypeBuilderTrait{
 	}
 
 	protected function getBlock() : Block{
-		if($this->block === null){
-			throw new LogicException("No block was provided");
-		}
-
-		return $this->block;
+		return $this->block ?? throw new LogicException("No block was provided");
 	}
 }

@@ -12,15 +12,12 @@ use pocketmine\player\Player;
 
 final class MultiBlockInvMenuGraphic implements PositionedInvMenuGraphic{
 
-	/** @var PositionedInvMenuGraphic[] */
-	private array $graphics;
-
 	/**
 	 * @param PositionedInvMenuGraphic[] $graphics
 	 */
-	public function __construct(array $graphics){
-		$this->graphics = $graphics;
-	}
+	public function __construct(
+		protected array $graphics
+	){}
 
 	private function first() : PositionedInvMenuGraphic{
 		$first = current($this->graphics);

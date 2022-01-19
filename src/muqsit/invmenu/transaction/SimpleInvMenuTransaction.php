@@ -11,19 +11,13 @@ use pocketmine\player\Player;
 
 final class SimpleInvMenuTransaction implements InvMenuTransaction{
 
-	private Player $player;
-	private Item $out;
-	private Item $in;
-	private SlotChangeAction $action;
-	private InventoryTransaction $transaction;
-
-	public function __construct(Player $player, Item $out, Item $in, SlotChangeAction $action, InventoryTransaction $transaction){
-		$this->player = $player;
-		$this->out = $out;
-		$this->in = $in;
-		$this->action = $action;
-		$this->transaction = $transaction;
-	}
+	public function __construct(
+		private Player $player,
+		private Item $out,
+		private Item $in,
+		private SlotChangeAction $action,
+		private InventoryTransaction $transaction
+	){}
 
 	public function getPlayer() : Player{
 		return $this->player;

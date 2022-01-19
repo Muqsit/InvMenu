@@ -26,11 +26,7 @@ final class BlockActorFixedInvMenuTypeBuilder implements InvMenuTypeBuilder{
 	}
 
 	private function getBlockActorId() : string{
-		if($this->block_actor_id === null){
-			throw new LogicException("No block actor ID was specified");
-		}
-
-		return $this->block_actor_id;
+		return $this->block_actor_id ?? throw new LogicException("No block actor ID was specified");
 	}
 
 	public function build() : BlockActorFixedInvMenuType{

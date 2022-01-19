@@ -9,12 +9,11 @@ use pocketmine\player\Player;
 
 final class InvMenuTransactionResult{
 
-	private bool $cancelled;
 	private ?Closure $post_transaction_callback = null;
 
-	public function __construct(bool $cancelled){
-		$this->cancelled = $cancelled;
-	}
+	public function __construct(
+		private bool $cancelled
+	){}
 
 	public function isCancelled() : bool{
 		return $this->cancelled;

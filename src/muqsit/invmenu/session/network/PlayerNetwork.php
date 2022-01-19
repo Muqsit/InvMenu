@@ -15,19 +15,16 @@ use SplQueue;
 
 final class PlayerNetwork{
 
-	private NetworkSession $session;
-	private PlayerNetworkHandler $handler;
 	private ?NetworkStackLatencyEntry $current = null;
 	private int $graphic_wait_duration = 200;
 
 	/** @var SplQueue<NetworkStackLatencyEntry> */
 	private SplQueue $queue;
 
-	public function __construct(NetworkSession $session, PlayerNetworkHandler $handler){
-		$this->session = $session;
-		$this->handler = $handler;
-		$this->queue = new SplQueue();
-	}
+	public function __construct(
+		private NetworkSession $session,
+		private PlayerNetworkHandler $handler
+	){}
 
 	public function getGraphicWaitDuration() : int{
 		return $this->graphic_wait_duration;

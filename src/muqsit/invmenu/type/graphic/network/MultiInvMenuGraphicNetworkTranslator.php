@@ -10,15 +10,12 @@ use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 
 final class MultiInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetworkTranslator{
 
-	/** @var InvMenuGraphicNetworkTranslator[] */
-	private array $translators;
-
 	/**
 	 * @param InvMenuGraphicNetworkTranslator[] $translators
 	 */
-	public function __construct(array $translators){
-		$this->translators = $translators;
-	}
+	public function __construct(
+		private array $translators
+	){}
 
 	public function translate(PlayerSession $session, InvMenuInfo $current, ContainerOpenPacket $packet) : void{
 		foreach($this->translators as $translator){

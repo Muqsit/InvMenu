@@ -17,15 +17,11 @@ use pocketmine\world\World;
 
 final class BlockFixedInvMenuType implements FixedInvMenuType{
 
-	private Block $block;
-	private int $size;
-	private ?InvMenuGraphicNetworkTranslator $network_translator;
-
-	public function __construct(Block $block, int $size, ?InvMenuGraphicNetworkTranslator $network_translator = null){
-		$this->block = $block;
-		$this->size = $size;
-		$this->network_translator = $network_translator;
-	}
+	public function __construct(
+		private Block $block,
+		private int $size,
+		private ?InvMenuGraphicNetworkTranslator $network_translator = null
+	){}
 
 	public function getSize() : int{
 		return $this->size;

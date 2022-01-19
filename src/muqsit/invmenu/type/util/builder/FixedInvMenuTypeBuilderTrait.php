@@ -16,10 +16,6 @@ trait FixedInvMenuTypeBuilderTrait{
 	}
 
 	protected function getSize() : int{
-		if($this->size === null){
-			throw new LogicException("No size was provided");
-		}
-
-		return $this->size;
+		return $this->size ?? throw new LogicException("No size was provided");
 	}
 }

@@ -9,16 +9,14 @@ use muqsit\invmenu\session\network\NetworkStackLatencyEntry;
 
 final class ClosurePlayerNetworkHandler implements PlayerNetworkHandler{
 
-	private Closure $creator;
-
 	/**
 	 * @param Closure $creator
 	 *
 	 * @phpstan-param Closure(Closure) : NetworkStackLatencyEntry $creator
 	 */
-	public function __construct(Closure $creator){
-		$this->creator = $creator;
-	}
+	public function __construct(
+		private Closure $creator
+	){}
 
 	public function createNetworkStackLatencyEntry(Closure $then) : NetworkStackLatencyEntry{
 		return ($this->creator)($then);
