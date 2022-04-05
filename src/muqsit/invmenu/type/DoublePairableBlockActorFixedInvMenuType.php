@@ -15,7 +15,6 @@ use pocketmine\block\Block;
 use pocketmine\block\tile\Chest;
 use pocketmine\inventory\Inventory;
 use pocketmine\player\Player;
-use pocketmine\world\World;
 
 final class DoublePairableBlockActorFixedInvMenuType implements FixedInvMenuType{
 
@@ -33,7 +32,7 @@ final class DoublePairableBlockActorFixedInvMenuType implements FixedInvMenuType
 
 	public function createGraphic(InvMenu $menu, Player $player) : ?InvMenuGraphic{
 		$origin = $player->getPosition()->addVector(InvMenuTypeHelper::getBehindPositionOffset($player))->floor();
-		if($origin->y < World::Y_MIN || $origin->y >= World::Y_MAX){
+		if(!InvMenuTypeHelper::isValidYCoordinate($origin->y)){
 			return null;
 		}
 
