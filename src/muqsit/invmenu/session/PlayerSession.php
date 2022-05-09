@@ -73,7 +73,13 @@ final class PlayerSession{
 	 */
 	public function removeCurrentMenu() : bool{
 		if($this->current !== null){
-			$this->current->graphic->remove($this->player);
+			$graphic = $this->current->graphic;
+			$this->network->wait(function(bool $success) use($graphic) : bool{
+				if($success){
+					$graphic->remove($this->player);
+				}
+				return false;
+			});
 			$this->setCurrentMenu(null);
 			return true;
 		}
