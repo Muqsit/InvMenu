@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace muqsit\invmenu\session;
 
 use Closure;
+use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
 
 final class PlayerSession{
 
@@ -73,13 +75,15 @@ final class PlayerSession{
 	 */
 	public function removeCurrentMenu() : bool{
 		if($this->current !== null){
+			$server = $this->player->getServer();
+			$uuid = $this->player->getUniqueId();
 			$graphic = $this->current->graphic;
-			$this->network->wait(function(bool $success) use($graphic) : bool{
-				if($success){
-					$graphic->remove($this->player);
+			InvMenuHandler::getRegistrant()->getScheduler()->scheduleDelayedTask(new ClosureTask(static function() use($server, $uuid, $graphic) : void{
+				$player = $server->getPlayerByUUID($uuid);
+				if($player !== null){
+					$graphic->remove($player);
 				}
-				return false;
-			});
+			}), 1);
 			$this->setCurrentMenu(null);
 			return true;
 		}
