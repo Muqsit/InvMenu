@@ -1,0 +1,14 @@
+{
+  "name": "muqsit/invmenu",
+  "description": "A PocketMine-MP virion to create and manage virtual inventories!",
+  "type": "library",
+  "license": "GPL-3.0-or-later",
+  "require-dev": {
+    "pocketmine/pocketmine-mp": ">=4.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "muqsit\\invmenu\\": "src/"
+    }
+  }
+}
