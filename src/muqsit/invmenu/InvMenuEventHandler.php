@@ -52,6 +52,7 @@ final class InvMenuEventHandler implements Listener{
 		if(count($targets) !== 1){
 			return;
 		}
+
 		$target = reset($targets)->getPlayer();
 		if($target === null){
 			return;
