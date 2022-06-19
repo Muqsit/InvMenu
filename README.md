@@ -178,8 +178,8 @@ So let's say you'd like to send players a dispenser inventory. While InvMenu doe
 public const TYPE_DISPENSER = "myplugin:dispenser";
 
 protected function onEnable() : void{
-	InvMenuHandler::getRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_FIXED()
-		->setBlock(BlockFactory::get(Block::DISPENSER))
+	InvMenuHandler::getTypeRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_ACTOR_FIXED()
+		->setBlock(BlockFactory::getInstance()->get(BlockLegacyIds::DISPENSER, 0))
 		->setBlockActorId("Dispenser")
 		->setSize(9)
 		->setNetworkWindowType(WindowTypes::DISPENSER)
