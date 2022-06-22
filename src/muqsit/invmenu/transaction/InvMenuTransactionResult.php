@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace muqsit\invmenu\transaction;
 
 use Closure;
-use pocketmine\player\Player;
 
 final class InvMenuTransactionResult{
 

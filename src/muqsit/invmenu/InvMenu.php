@@ -120,14 +120,12 @@ class InvMenu implements InvMenuTypeIds{
 			$graphic = $this->type->createGraphic($this, $player);
 			if($graphic !== null){
 				$graphic->send($player, $name);
-				$session->setCurrentMenu(new InvMenuInfo($this, $graphic), static function(bool $success) use($callback) : bool{
+				$session->setCurrentMenu(new InvMenuInfo($this, $graphic), static function(bool $success) use($callback) : void{
 					if($callback !== null){
 						$callback($success);
 					}
-					return false;
 				});
 			}else{
-				$session->removeCurrentMenu();
 				if($callback !== null){
 					$callback(false);
 				}

@@ -7,6 +7,7 @@ namespace muqsit\invmenu\session;
 use Closure;
 use muqsit\invmenu\session\network\PlayerNetwork;
 use pocketmine\player\Player;
+use function spl_object_id;
 
 final class PlayerSession{
 
@@ -36,14 +37,19 @@ final class PlayerSession{
 	 * @internal use InvMenu::send() instead.
 	 *
 	 * @param InvMenuInfo|null $current
-	 * @param (Closure(bool) : bool)|null $callback
+	 * @param (Closure(bool) : void)|null $callback
 	 */
 	public function setCurrentMenu(?InvMenuInfo $current, ?Closure $callback = null) : void{
+		if($this->current !== null){
+			$this->current->graphic->remove($this->player);
+		}
+
 		$this->current = $current;
 
 		if($this->current !== null){
-			$this->network->waitUntil($this->current->graphic->getAnimationDuration(), function(bool $success) use($callback) : bool{
-				if($this->current !== null){
+			$current_id = spl_object_id($this->current);
+			$this->network->waitUntil($this->current->graphic->getAnimationDuration(), function(bool $success) use($callback, $current_id) : bool{
+				if($this->current !== null && spl_object_id($this->current) === $current_id){
 					if($success && $this->current->graphic->sendInventory($this->player, $this->current->menu->getInventory())){
 						if($callback !== null){
 							$callback(true);
@@ -52,14 +58,19 @@ final class PlayerSession{
 					}
 
 					$this->removeCurrentMenu();
-					if($callback !== null){
-						$callback(false);
-					}
+				}
+				if($callback !== null){
+					$callback(false);
 				}
 				return false;
 			});
 		}else{
-			$this->network->wait($callback ?? static fn(bool $success) : bool => false);
+			$this->network->wait(static function(bool $success) use($callback) : bool{
+				if($callback !== null){
+					$callback($success);
+				}
+				return false;
+			});
 		}
 	}
 
