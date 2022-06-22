@@ -8,6 +8,7 @@ use Closure;
 
 final class InvMenuTransactionResult{
 
+	/** @var (Closure(\pocketmine\player\Player) : void)|null */
 	private ?Closure $post_transaction_callback = null;
 
 	public function __construct(
@@ -24,7 +25,7 @@ final class InvMenuTransactionResult{
 	 * Useful for sending forms and other stuff that cant be sent right
 	 * after closing inventory.
 	 *
-	 * @param (Closure(Player) : void)|null $callback
+	 * @param (Closure(\pocketmine\player\Player) : void)|null $callback
 	 * @return self
 	 */
 	public function then(?Closure $callback) : self{
