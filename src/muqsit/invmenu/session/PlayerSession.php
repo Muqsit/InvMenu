@@ -48,7 +48,8 @@ final class PlayerSession{
 
 		if($this->current !== null){
 			$current_id = spl_object_id($this->current);
-			$this->network->waitUntil($this->current->graphic->getAnimationDuration(), function(bool $success) use($callback, $current_id) : bool{
+			$this->current->graphic->send($this->player, $this->current->graphic_name);
+			$this->network->waitUntil(PlayerNetwork::DELAY_TYPE_OPERATION, $this->current->graphic->getAnimationDuration(), function(bool $success) use($callback, $current_id) : bool{
 				if($this->current !== null && spl_object_id($this->current) === $current_id){
 					if($success && $this->current->graphic->sendInventory($this->player, $this->current->menu->getInventory())){
 						if($callback !== null){
@@ -65,7 +66,7 @@ final class PlayerSession{
 				return false;
 			});
 		}else{
-			$this->network->wait(static function(bool $success) use($callback) : bool{
+			$this->network->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function(bool $success) use($callback) : bool{
 				if($callback !== null){
 					$callback($success);
 				}
@@ -84,7 +85,6 @@ final class PlayerSession{
 	 */
 	public function removeCurrentMenu() : bool{
 		if($this->current !== null){
-			$this->current->graphic->remove($this->player);
 			$this->setCurrentMenu(null);
 			return true;
 		}

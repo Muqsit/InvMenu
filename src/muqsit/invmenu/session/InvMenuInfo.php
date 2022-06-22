@@ -11,6 +11,7 @@ final class InvMenuInfo{
 
 	public function __construct(
 		public InvMenu $menu,
-		public InvMenuGraphic $graphic
+		public InvMenuGraphic $graphic,
+		public ?string $graphic_name
 	){}
 }

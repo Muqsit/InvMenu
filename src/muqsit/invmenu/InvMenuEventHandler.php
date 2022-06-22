@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\invmenu;
 
+use muqsit\invmenu\session\network\PlayerNetwork;
 use muqsit\invmenu\session\PlayerManager;
 use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
@@ -79,7 +80,7 @@ final class InvMenuEventHandler implements Listener{
 		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
 			$current->menu->onClose($player);
 		}
-		$session->getNetwork()->waitUntil(325, static fn(bool $success) : bool => false);
+		$session->getNetwork()->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success) : bool => false);
 	}
 
 	/**
@@ -115,7 +116,7 @@ final class InvMenuEventHandler implements Listener{
 		}
 
 		if(count($network_stack_callbacks) > 0){
-			$player_instance->getNetwork()->wait(static function(bool $success) use($player, $network_stack_callbacks) : bool{
+			$player_instance->getNetwork()->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function(bool $success) use($player, $network_stack_callbacks) : bool{
 				if($success){
 					foreach($network_stack_callbacks as $callback){
 						$callback($player);
