@@ -6,11 +6,16 @@ namespace muqsit\invmenu\session\network;
 
 use Closure;
 use InvalidArgumentException;
+use muqsit\invmenu\session\InvMenuInfo;
 use muqsit\invmenu\session\network\handler\PlayerNetworkHandler;
 use muqsit\invmenu\session\PlayerSession;
+use pocketmine\block\inventory\BlockInventory;
+use pocketmine\inventory\Inventory;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
+use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use SplQueue;
 use function spl_object_id;
 
@@ -18,6 +23,9 @@ final class PlayerNetwork{
 
 	public const DELAY_TYPE_ANIMATION_WAIT = 0;
 	public const DELAY_TYPE_OPERATION = 1;
+
+	/** @var Closure(int, Inventory) : (list<\pocketmine\network\mcpe\protocol\ClientboundPacket>|null) */
+	private Closure $container_open_callback;
 
 	private ?NetworkStackLatencyEntry $current = null;
 	private int $graphic_wait_duration = 200;
@@ -29,10 +37,17 @@ final class PlayerNetwork{
 	private array $entry_types = [];
 
 	public function __construct(
-		private NetworkSession $session,
+		private NetworkSession $network_session,
 		private PlayerNetworkHandler $handler
 	){
 		$this->queue = new SplQueue();
+		$this->nullifyContainerOpenCallback();
+	}
+
+	public function finalize() : void{
+		$this->dropPending();
+		$this->network_session->getInvManager()?->getContainerOpenCallbacks()->remove($this->container_open_callback);
+		$this->nullifyContainerOpenCallback();
 	}
 
 	public function getGraphicWaitDuration() : int{
@@ -134,7 +149,7 @@ final class PlayerNetwork{
 		$this->current = $entry;
 		if($entry !== null){
 			unset($this->entry_types[spl_object_id($entry)]);
-			if($this->session->sendDataPacket(NetworkStackLatencyPacket::create($entry->network_timestamp, true))){
+			if($this->network_session->sendDataPacket(NetworkStackLatencyPacket::create($entry->network_timestamp, true))){
 				$entry->sent_at = microtime(true) * 1000;
 			}else{
 				$this->processCurrent(false);
@@ -161,17 +176,54 @@ final class PlayerNetwork{
 		}
 	}
 
-	public function translateContainerOpen(PlayerSession $session, ContainerOpenPacket $packet) : bool{
-		$inventory = $this->session->getInvManager()?->getWindow($packet->windowId);
-		if(
-			$inventory !== null &&
-			($current = $session->getCurrent()) !== null &&
-			$current->menu->getInventory() === $inventory &&
-			($translation = $current->graphic->getNetworkTranslator()) !== null
-		){
-			$translation->translate($session, $current, $packet);
-			return true;
+	public function onBeforeSendMenu(PlayerSession $session, InvMenuInfo $info) : void{
+		$translator = $info->graphic->getNetworkTranslator();
+		if($translator === null){
+			return;
 		}
-		return false;
+
+		$callbacks = $this->network_session->getInvManager()?->getContainerOpenCallbacks();
+		if($callbacks === null){
+			return;
+		}
+
+		$callbacks->remove($this->container_open_callback);
+
+		// Take priority over other container open callbacks.
+		// PocketMine's default container open callback disallows any BlockInventory
+		// from having a custom callback
+		$previous = $callbacks->toArray();
+		$callbacks->clear();
+		$callbacks->add($this->container_open_callback = function(int $window_id, Inventory $inventory) use($info, $session, $translator, $previous, $callbacks) : ?array{
+			$callbacks->remove($this->container_open_callback);
+			$this->nullifyContainerOpenCallback();
+			if($inventory === $info->menu->getInventory()){
+				$packets = null;
+				foreach($previous as $callback){
+					$packets = $callback($window_id, $inventory);
+					if($packets !== null){
+						break;
+					}
+				}
+
+				$packets ??= [ContainerOpenPacket::blockInv(
+					$window_id,
+					WindowTypes::CONTAINER,
+					$inventory instanceof BlockInventory ? BlockPosition::fromVector3($inventory->getHolder()) : new BlockPosition(0, 0, 0)
+				)];
+
+				foreach($packets as $packet){
+					if($packet instanceof ContainerOpenPacket){
+						$translator->translate($session, $info, $packet);
+					}
+				}
+				return $packets;
+			}
+			return null;
+		}, ...$previous);
+	}
+
+	private function nullifyContainerOpenCallback() : void{
+		$this->container_open_callback = static fn(int $window_id, Inventory $inventory) : ?array => null;
 	}
 }

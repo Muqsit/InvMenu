@@ -10,9 +10,7 @@ use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
-use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
 final class InvMenuEventHandler implements Listener{
@@ -32,36 +30,6 @@ final class InvMenuEventHandler implements Listener{
 			if($player !== null){
 				$this->player_manager->getNullable($player)?->getNetwork()->notify($packet->timestamp);
 			}
-		}
-	}
-
-	/**
-	 * @param DataPacketSendEvent $event
-	 * @priority NORMAL
-	 */
-	public function onDataPacketSend(DataPacketSendEvent $event) : void{
-		$packets = $event->getPackets();
-		if(count($packets) !== 1){
-			return;
-		}
-		$packet = reset($packets);
-		if(!($packet instanceof ContainerOpenPacket)){
-			return;
-		}
-
-		$targets = $event->getTargets();
-		if(count($targets) !== 1){
-			return;
-		}
-
-		$target = reset($targets)->getPlayer();
-		if($target === null){
-			return;
-		}
-
-		$session = $this->player_manager->getNullable($target);
-		if($session !== null){
-			$session->getNetwork()->translateContainerOpen($session, $packet);
 		}
 	}
 

@@ -26,7 +26,7 @@ final class PlayerSession{
 			$this->current->graphic->remove($this->player);
 			$this->player->removeCurrentWindow();
 		}
-		$this->network->dropPending();
+		$this->network->finalize();
 	}
 
 	public function getCurrent() : ?InvMenuInfo{
@@ -50,12 +50,17 @@ final class PlayerSession{
 			$current_id = spl_object_id($this->current);
 			$this->current->graphic->send($this->player, $this->current->graphic_name);
 			$this->network->waitUntil(PlayerNetwork::DELAY_TYPE_OPERATION, $this->current->graphic->getAnimationDuration(), function(bool $success) use($callback, $current_id) : bool{
-				if($this->current !== null && spl_object_id($this->current) === $current_id){
-					if($success && $this->current->graphic->sendInventory($this->player, $this->current->menu->getInventory())){
-						if($callback !== null){
-							$callback(true);
+				$current = $this->current;
+				if($current !== null && spl_object_id($current) === $current_id){
+					if($success){
+						$this->network->onBeforeSendMenu($this, $current);
+						$result = $current->graphic->sendInventory($this->player, $current->menu->getInventory());
+						if($result){
+							if($callback !== null){
+								$callback(true);
+							}
+							return false;
 						}
-						return false;
 					}
 
 					$this->removeCurrentMenu();
