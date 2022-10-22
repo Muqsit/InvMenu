@@ -30,11 +30,11 @@ $inventory = $menu->getInventory();
 The `$inventory` implements pocketmine's `Inventory` interface, so you can access all the fancy pocketmine inventory methods.
 ```php
 $menu->getInventory()->setContents([
-	Item::get(Item::DIAMOND_SWORD),
-	Item::get(Item::DIAMOND_PICKAXE)
+	VanillaItems::DIAMOND_SWORD(),
+	VanillaItems::DIAMOND_PICKAXE()
 ]);
-$menu->getInventory()->addItem(Item::get(Item::DIAMOND_AXE));
-$menu->getInventory()->setItem(3, Item::get(Item::GOLD_INGOT));
+$menu->getInventory()->addItem(VanillaItems::DIAMOND_AXE());
+$menu->getInventory()->setItem(3, VanillaItems::GOLD_INGOT());
 ```
 To send the menu to a player, use:
 ```php
@@ -178,8 +178,8 @@ So let's say you'd like to send players a dispenser inventory. While InvMenu doe
 public const TYPE_DISPENSER = "myplugin:dispenser";
 
 protected function onEnable() : void{
-	InvMenuHandler::getRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_FIXED()
-		->setBlock(BlockFactory::get(Block::DISPENSER))
+	InvMenuHandler::getTypeRegistry()->register(self::TYPE_DISPENSER, InvMenuTypeBuilders::BLOCK_ACTOR_FIXED()
+		->setBlock(BlockFactory::getInstance()->get(BlockLegacyIds::DISPENSER, 0))
 		->setBlockActorId("Dispenser")
 		->setSize(9)
 		->setNetworkWindowType(WindowTypes::DISPENSER)

@@ -8,6 +8,7 @@ use Closure;
 use LogicException;
 use muqsit\invmenu\inventory\SharedInvMenuSynchronizer;
 use muqsit\invmenu\session\InvMenuInfo;
+use muqsit\invmenu\session\network\PlayerNetwork;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
@@ -102,14 +103,18 @@ class InvMenu implements InvMenuTypeIds{
 
 		$session = InvMenuHandler::getPlayerManager()->get($player);
 		$network = $session->getNetwork();
+
+		// Avoid players from spamming InvMenu::send() and other similar
+		// requests and filling up queued tasks in memory.
+		// It would be better if this check were implemented by plugins,
+		// however I suppose it is more convenient if done within InvMenu...
 		if($network->getPending() >= 8){
-			// Avoid players from spamming InvMenu::send() and other similar
-			// requests and filling up queued tasks in memory.
-			// It would be better if this check were implemented by plugins,
-			// however I suppose it is more convenient if done within InvMenu...
 			$network->dropPending();
+		}else{
+			$network->dropPendingOfType(PlayerNetwork::DELAY_TYPE_OPERATION);
 		}
-		$network->waitUntil(0, function(bool $success) use($player, $session, $name, $callback) : bool{
+
+		$network->waitUntil(PlayerNetwork::DELAY_TYPE_OPERATION, 0, function(bool $success) use($player, $session, $name, $callback) : bool{
 			if(!$success){
 				if($callback !== null){
 					$callback(false);
@@ -119,15 +124,12 @@ class InvMenu implements InvMenuTypeIds{
 
 			$graphic = $this->type->createGraphic($this, $player);
 			if($graphic !== null){
-				$graphic->send($player, $name);
-				$session->setCurrentMenu(new InvMenuInfo($this, $graphic), static function(bool $success) use($callback) : bool{
+				$session->setCurrentMenu(new InvMenuInfo($this, $graphic, $name), static function(bool $success) use($callback) : void{
 					if($callback !== null){
 						$callback($success);
 					}
-					return false;
 				});
 			}else{
-				$session->removeCurrentMenu();
 				if($callback !== null){
 					$callback(false);
 				}
