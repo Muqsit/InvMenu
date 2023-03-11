@@ -114,7 +114,7 @@ final class PlayerNetwork{
 	/**
 	 * Waits at least $wait_ms before calling $then(true).
 	 *
-	 * @param self::DELAY_TYPE_* int $type
+	 * @param self::DELAY_TYPE_* $type
 	 * @param int $wait_ms
 	 * @param Closure(bool) : bool $then
 	 */
