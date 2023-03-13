@@ -1,7 +1,7 @@
 --- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/Muqsit/InvMenu
 branches:
-- master
 - "4.0"
+- master
 projects:
   InvMenu:
     model: virion
