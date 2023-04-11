@@ -12,7 +12,6 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
-use ReflectionProperty;
 
 final class PlayerManager{
 
