@@ -9,7 +9,7 @@ use pocketmine\block\Block;
 use pocketmine\block\tile\Spawnable;
 use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;
-use pocketmine\network\mcpe\convert\RuntimeBlockMapping;
+use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
@@ -29,7 +29,8 @@ final class BlockInvMenuGraphic implements PositionedInvMenuGraphic{
 	}
 
 	public function send(Player $player, ?string $name) : void{
-		$player->getNetworkSession()->sendDataPacket(UpdateBlockPacket::create(BlockPosition::fromVector3($this->position), RuntimeBlockMapping::getInstance()->toRuntimeId($this->block->getFullId()), UpdateBlockPacket::FLAG_NETWORK, UpdateBlockPacket::DATA_LAYER_NORMAL));
+        $player->getNetworkSession()->sendDataPacket(UpdateBlockPacket::create(BlockPosition::fromVector3($this->position), TypeConverter::getInstance()->getBlockTranslator()->internalIdToNetworkId($this->block->getStateId()), UpdateBlockPacket::FLAG_NETWORK, UpdateBlockPacket::DATA_LAYER_NORMAL));
+
 	}
 
 	public function sendInventory(Player $player, Inventory $inventory) : bool{
@@ -39,9 +40,8 @@ final class BlockInvMenuGraphic implements PositionedInvMenuGraphic{
 	public function remove(Player $player) : void{
 		$network = $player->getNetworkSession();
 		$world = $player->getWorld();
-		$runtime_block_mapping = RuntimeBlockMapping::getInstance();
 		$block = $world->getBlockAt($this->position->x, $this->position->y, $this->position->z);
-		$network->sendDataPacket(UpdateBlockPacket::create(BlockPosition::fromVector3($this->position), $runtime_block_mapping->toRuntimeId($block->getFullId()), UpdateBlockPacket::FLAG_NETWORK, UpdateBlockPacket::DATA_LAYER_NORMAL), true);
+        $network->sendDataPacket(UpdateBlockPacket::create(BlockPosition::fromVector3($this->position), TypeConverter::getInstance()->getBlockTranslator()->internalIdToNetworkId($block->getStateId()), UpdateBlockPacket::FLAG_NETWORK, UpdateBlockPacket::DATA_LAYER_NORMAL));
 
 		$tile = $world->getTileAt($this->position->x, $this->position->y, $this->position->z);
 		if($tile instanceof Spawnable){
