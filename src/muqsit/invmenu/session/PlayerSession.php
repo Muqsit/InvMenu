@@ -14,8 +14,8 @@ final class PlayerSession{
 	private ?InvMenuInfo $current = null;
 
 	public function __construct(
-		readonly private Player $player,
-		readonly private PlayerNetwork $network
+		readonly public Player $player,
+		readonly public PlayerNetwork $network
 	){}
 
 	/**
@@ -80,6 +80,10 @@ final class PlayerSession{
 		}
 	}
 
+	/**
+	 * @deprecated Access {@see PlayerSession::$network} directly
+	 * @return PlayerNetwork
+	 */
 	public function getNetwork() : PlayerNetwork{
 		return $this->network;
 	}

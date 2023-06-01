@@ -10,12 +10,16 @@ use pocketmine\player\Player;
 final class InvMenuTransactionResult{
 
 	/** @var (Closure(Player) : void)|null */
-	private ?Closure $post_transaction_callback = null;
+	public ?Closure $post_transaction_callback = null;
 
 	public function __construct(
-		readonly private bool $cancelled
+		readonly public bool $cancelled
 	){}
 
+	/**
+	 * @deprecated Access {@see InvMenuTransactionResult::$cancelled} directly
+	 * @return bool
+	 */
 	public function isCancelled() : bool{
 		return $this->cancelled;
 	}
@@ -34,6 +38,10 @@ final class InvMenuTransactionResult{
 		return $this;
 	}
 
+	/**
+	 * @deprecated Access {@see InvMenuTransactionResult::$post_transaction_callback} directly
+	 * @return (Closure(Player) : void)|null
+	 */
 	public function getPostTransactionCallback() : ?Closure{
 		return $this->post_transaction_callback;
 	}

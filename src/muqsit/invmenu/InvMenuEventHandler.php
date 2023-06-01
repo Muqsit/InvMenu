@@ -28,7 +28,7 @@ final class InvMenuEventHandler implements Listener{
 		if($packet instanceof NetworkStackLatencyPacket){
 			$player = $event->getOrigin()->getPlayer();
 			if($player !== null){
-				$this->player_manager->getNullable($player)?->getNetwork()->notify($packet->timestamp);
+				$this->player_manager->getNullable($player)?->network->notify($packet->timestamp);
 			}
 		}
 	}
@@ -48,7 +48,7 @@ final class InvMenuEventHandler implements Listener{
 		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
 			$current->menu->onClose($player);
 		}
-		$session->getNetwork()->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success) : bool => false);
+		$session->network->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success) : bool => false);
 	}
 
 	/**
@@ -73,18 +73,18 @@ final class InvMenuEventHandler implements Listener{
 			}
 
 			$result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
-			$network_stack_callback = $result->getPostTransactionCallback();
+			$network_stack_callback = $result->post_transaction_callback;
 			if($network_stack_callback !== null){
 				$network_stack_callbacks[] = $network_stack_callback;
 			}
-			if($result->isCancelled()){
+			if($result->cancelled){
 				$event->cancel();
 				break;
 			}
 		}
 
 		if(count($network_stack_callbacks) > 0){
-			$player_instance->getNetwork()->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function(bool $success) use($player, $network_stack_callbacks) : bool{
+			$player_instance->network->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function(bool $success) use($player, $network_stack_callbacks) : bool{
 				if($success){
 					foreach($network_stack_callbacks as $callback){
 						$callback($player);

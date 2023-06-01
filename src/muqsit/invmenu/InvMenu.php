@@ -46,7 +46,7 @@ class InvMenu implements InvMenuTypeIds{
 		};
 	}
 
-	protected InvMenuType $type;
+	readonly public InvMenuType $type;
 	protected ?string $name = null;
 	protected ?Closure $listener = null;
 	protected ?Closure $inventory_close_listener = null;
@@ -62,6 +62,10 @@ class InvMenu implements InvMenuTypeIds{
 		$this->setInventory($custom_inventory);
 	}
 
+	/**
+	 * @deprecated Access {@see InvMenu::$type} directly
+	 * @return InvMenuType
+	 */
 	public function getType() : InvMenuType{
 		return $this->type;
 	}
@@ -102,7 +106,7 @@ class InvMenu implements InvMenuTypeIds{
 		$player->removeCurrentWindow();
 
 		$session = InvMenuHandler::getPlayerManager()->get($player);
-		$network = $session->getNetwork();
+		$network = $session->network;
 
 		// Avoid players from spamming InvMenu::send() and other similar
 		// requests and filling up queued tasks in memory.

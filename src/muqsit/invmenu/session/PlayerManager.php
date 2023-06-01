@@ -15,7 +15,7 @@ use pocketmine\Server;
 
 final class PlayerManager{
 
-	readonly private PlayerNetworkHandlerRegistry $network_handler_registry;
+	readonly public PlayerNetworkHandlerRegistry $network_handler_registry;
 
 	/** @var PlayerSession[] */
 	private array $sessions = [];
@@ -54,6 +54,10 @@ final class PlayerManager{
 		return $this->sessions[$player->getId()] ?? null;
 	}
 
+	/**
+	 * @deprecated Access {@see PlayerManager::$network_handler_registry} directly
+	 * @return PlayerNetworkHandlerRegistry
+	 */
 	public function getNetworkHandlerRegistry() : PlayerNetworkHandlerRegistry{
 		return $this->network_handler_registry;
 	}
