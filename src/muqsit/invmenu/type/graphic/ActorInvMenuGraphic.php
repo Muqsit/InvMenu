@@ -24,11 +24,11 @@ final class ActorInvMenuGraphic implements InvMenuGraphic{
 	 * @param int $animation_duration
 	 */
 	public function __construct(
-		private string $actor_identifier,
-		private int $actor_runtime_identifier,
-		private array $actor_metadata,
-		private ?InvMenuGraphicNetworkTranslator $network_translator = null,
-		private int $animation_duration = 0
+		readonly private string $actor_identifier,
+		readonly private int $actor_runtime_identifier,
+		readonly private array $actor_metadata,
+		readonly private ?InvMenuGraphicNetworkTranslator $network_translator = null,
+		readonly private int $animation_duration = 0
 	){}
 
 	public function send(Player $player, ?string $name) : void{

@@ -12,7 +12,7 @@ final class InvMenuTransactionResult{
 	private ?Closure $post_transaction_callback = null;
 
 	public function __construct(
-		private bool $cancelled
+		readonly private bool $cancelled
 	){}
 
 	public function isCancelled() : bool{

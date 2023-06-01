@@ -16,7 +16,7 @@ use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 final class InvMenuEventHandler implements Listener{
 	
 	public function __construct(
-		private PlayerManager $player_manager
+		readonly private PlayerManager $player_manager
 	){}
 
 	/**

@@ -11,7 +11,7 @@ use pocketmine\item\Item;
 final class SharedInventorySynchronizer implements InventoryListener{
 
 	public function __construct(
-		private Inventory $inventory
+		readonly private Inventory $inventory
 	){}
 
 	public function getSynchronizingInventory() : Inventory{

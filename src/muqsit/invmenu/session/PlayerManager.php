@@ -15,7 +15,7 @@ use pocketmine\Server;
 
 final class PlayerManager{
 
-	private PlayerNetworkHandlerRegistry $network_handler_registry;
+	readonly private PlayerNetworkHandlerRegistry $network_handler_registry;
 
 	/** @var PlayerSession[] */
 	private array $sessions = [];

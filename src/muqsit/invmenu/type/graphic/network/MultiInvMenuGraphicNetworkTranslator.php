@@ -14,7 +14,7 @@ final class MultiInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetwor
 	 * @param InvMenuGraphicNetworkTranslator[] $translators
 	 */
 	public function __construct(
-		private array $translators
+		readonly private array $translators
 	){}
 
 	public function translate(PlayerSession $session, InvMenuInfo $current, ContainerOpenPacket $packet) : void{

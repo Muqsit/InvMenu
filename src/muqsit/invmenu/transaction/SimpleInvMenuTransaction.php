@@ -12,11 +12,11 @@ use pocketmine\player\Player;
 final class SimpleInvMenuTransaction implements InvMenuTransaction{
 
 	public function __construct(
-		private Player $player,
-		private Item $out,
-		private Item $in,
-		private SlotChangeAction $action,
-		private InventoryTransaction $transaction
+		readonly private Player $player,
+		readonly private Item $out,
+		readonly private Item $in,
+		readonly private SlotChangeAction $action,
+		readonly private InventoryTransaction $transaction
 	){}
 
 	public function getPlayer() : Player{

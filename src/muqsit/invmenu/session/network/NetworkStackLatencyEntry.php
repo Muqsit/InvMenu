@@ -8,9 +8,9 @@ use Closure;
 
 final class NetworkStackLatencyEntry{
 
-	public int $timestamp;
-	public int $network_timestamp;
-	public Closure $then;
+	readonly public int $timestamp;
+	readonly public int $network_timestamp;
+	readonly public Closure $then;
 	public float $sent_at = 0.0;
 
 	public function __construct(int $timestamp, Closure $then, ?int $network_timestamp = null){

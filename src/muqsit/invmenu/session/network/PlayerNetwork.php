@@ -37,8 +37,8 @@ final class PlayerNetwork{
 	private array $entry_types = [];
 
 	public function __construct(
-		private NetworkSession $network_session,
-		private PlayerNetworkHandler $handler
+		readonly private NetworkSession $network_session,
+		readonly private PlayerNetworkHandler $handler
 	){
 		$this->queue = new SplQueue();
 		$this->nullifyContainerOpenCallback();

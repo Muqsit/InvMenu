@@ -11,7 +11,7 @@ use pocketmine\network\mcpe\protocol\ContainerOpenPacket;
 final class WindowTypeInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetworkTranslator{
 
 	public function __construct(
-		private int $window_type
+		readonly private int $window_type
 	){}
 
 	public function translate(PlayerSession $session, InvMenuInfo $current, ContainerOpenPacket $packet) : void{

@@ -22,11 +22,11 @@ use pocketmine\player\Player;
 final class DoublePairableBlockActorFixedInvMenuType implements FixedInvMenuType{
 
 	public function __construct(
-		private Block $block,
-		private int $size,
-		private string $tile_id,
-		private ?InvMenuGraphicNetworkTranslator $network_translator = null,
-		private int $animation_duration = 0
+		readonly private Block $block,
+		readonly private int $size,
+		readonly private string $tile_id,
+		readonly private ?InvMenuGraphicNetworkTranslator $network_translator = null,
+		readonly private int $animation_duration = 0
 	){}
 
 	public function getSize() : int{

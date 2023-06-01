@@ -23,11 +23,11 @@ final class ActorFixedInvMenuType implements FixedInvMenuType{
 	 * @param InvMenuGraphicNetworkTranslator|null $network_translator
 	 */
 	public function __construct(
-		private string $actor_identifier,
-		private int $actor_runtime_identifier,
-		private array $actor_metadata,
-		private int $size,
-		private ?InvMenuGraphicNetworkTranslator $network_translator = null
+		readonly private string $actor_identifier,
+		readonly private int $actor_runtime_identifier,
+		readonly private array $actor_metadata,
+		readonly private int $size,
+		readonly private ?InvMenuGraphicNetworkTranslator $network_translator = null
 	){}
 
 	public function getSize() : int{

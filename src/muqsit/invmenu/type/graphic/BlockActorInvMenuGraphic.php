@@ -26,11 +26,11 @@ final class BlockActorInvMenuGraphic implements PositionedInvMenuGraphic{
 		return $tag;
 	}
 
-	private BlockInvMenuGraphic $block_graphic;
-	private Vector3 $position;
-	private CompoundTag $tile;
-	private ?InvMenuGraphicNetworkTranslator $network_translator;
-	private int $animation_duration;
+	readonly private BlockInvMenuGraphic $block_graphic;
+	readonly private Vector3 $position;
+	readonly private CompoundTag $tile;
+	readonly private ?InvMenuGraphicNetworkTranslator $network_translator;
+	readonly private int $animation_duration;
 
 	public function __construct(Block $block, Vector3 $position, CompoundTag $tile, ?InvMenuGraphicNetworkTranslator $network_translator = null, int $animation_duration = 0){
 		$this->block_graphic = new BlockInvMenuGraphic($block, $position);
