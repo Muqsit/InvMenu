@@ -62,6 +62,10 @@ class InvMenu implements InvMenuTypeIds{
 		$this->setInventory($custom_inventory);
 	}
 
+	public function __destruct(){
+		$this->setInventory(null);
+	}
+
 	/**
 	 * @deprecated Access {@see InvMenu::$type} directly
 	 * @return InvMenuType
