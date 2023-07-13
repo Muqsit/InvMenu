@@ -172,7 +172,7 @@ final class PlayerNetwork{
 	}
 
 	public function notify(int $timestamp) : void{
-		if($this->current !== null && $timestamp === $this->current->timestamp){
+		if($this->current !== null && $timestamp === $this->current->timestamp * 1000000){
 			$this->processCurrent(true);
 		}
 	}
