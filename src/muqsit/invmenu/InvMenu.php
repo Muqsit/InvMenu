@@ -115,6 +115,21 @@ class InvMenu implements InvMenuTypeIds{
 		return $this;
 	}
 
+	public function getInventory() : Inventory{
+		return $this->inventory;
+	}
+
+	public function setInventory(?Inventory $custom_inventory) : void{
+		if($this->synchronizer !== null){
+			$this->synchronizer->destroy();
+			$this->synchronizer = null;
+		}
+
+		if($custom_inventory !== null){
+			$this->synchronizer = new SharedInvMenuSynchronizer($this, $custom_inventory);
+		}
+	}
+
 	/**
 	 * @param Player $player
 	 * @param string|null $name
@@ -158,21 +173,6 @@ class InvMenu implements InvMenuTypeIds{
 			}
 			return false;
 		});
-	}
-
-	public function getInventory() : Inventory{
-		return $this->inventory;
-	}
-
-	public function setInventory(?Inventory $custom_inventory) : void{
-		if($this->synchronizer !== null){
-			$this->synchronizer->destroy();
-			$this->synchronizer = null;
-		}
-
-		if($custom_inventory !== null){
-			$this->synchronizer = new SharedInvMenuSynchronizer($this, $custom_inventory);
-		}
 	}
 
 	/**
