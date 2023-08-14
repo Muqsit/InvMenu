@@ -84,12 +84,26 @@ class InvMenu implements InvMenuTypeIds{
 	}
 
 	/**
+	 * @return (Closure(InvMenuTransaction) : InvMenuTransactionResult)|null
+	 */
+	public function getListener() : ?Closure{
+		return $this->listener;
+	}
+
+	/**
 	 * @param (Closure(InvMenuTransaction) : InvMenuTransactionResult)|null $listener
 	 * @return self
 	 */
 	public function setListener(?Closure $listener) : self{
 		$this->listener = $listener;
 		return $this;
+	}
+
+	/**
+	 * @return (Closure(Player, Inventory) : void)|null
+	 */
+	public function getInventoryCloseListener() : ?Closure{
+		return $this->inventory_close_listener;
 	}
 
 	/**
