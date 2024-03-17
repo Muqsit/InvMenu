@@ -6,11 +6,9 @@ namespace muqsit\invmenu\type\graphic;
 
 use muqsit\invmenu\type\graphic\network\InvMenuGraphicNetworkTranslator;
 use pocketmine\block\Block;
-use pocketmine\block\tile\Spawnable;
 use pocketmine\inventory\Inventory;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\convert\TypeConverter;
-use pocketmine\network\mcpe\protocol\BlockActorDataPacket;
 use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\UpdateBlockPacket;
 use pocketmine\player\Player;
@@ -38,14 +36,8 @@ final class BlockInvMenuGraphic implements PositionedInvMenuGraphic{
 
 	public function remove(Player $player) : void{
 		$network = $player->getNetworkSession();
-		$world = $player->getWorld();
-		$runtime_block_mapping = TypeConverter::getInstance();
-		$block = $world->getBlockAt($this->position->x, $this->position->y, $this->position->z);
-		$network->sendDataPacket(UpdateBlockPacket::create(BlockPosition::fromVector3($this->position), $runtime_block_mapping->getBlockTranslator()->internalIdToNetworkId($block->getStateId()), UpdateBlockPacket::FLAG_NETWORK, UpdateBlockPacket::DATA_LAYER_NORMAL), true);
-
-		$tile = $world->getTileAt($this->position->x, $this->position->y, $this->position->z);
-		if($tile instanceof Spawnable){
-			$network->sendDataPacket(BlockActorDataPacket::create(BlockPosition::fromVector3($this->position), $tile->getSerializedSpawnCompound()), true);
+		foreach($player->getWorld()->createBlockUpdatePackets([$this->position]) as $packet){
+			$network->sendDataPacket($packet);
 		}
 	}
 
