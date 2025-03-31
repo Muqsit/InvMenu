@@ -151,7 +151,7 @@ class InvMenu implements InvMenuTypeIds{
 			$network->dropPendingOfType(PlayerNetwork::DELAY_TYPE_OPERATION);
 		}
 
-		$network->waitUntil(PlayerNetwork::DELAY_TYPE_OPERATION, 0, function(bool $success) use($player, $session, $name, $callback) : bool{
+		$network->waitUntil(PlayerNetwork::DELAY_TYPE_OPERATION, 50 * 8, function(bool $success) use($player, $session, $name, $callback) : bool{
 			if(!$success){
 				if($callback !== null){
 					$callback(false);
