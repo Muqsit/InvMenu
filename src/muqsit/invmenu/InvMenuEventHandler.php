@@ -78,6 +78,7 @@ final class InvMenuEventHandler implements Listener{
 			$session->current = null;
 		}
 		$session->network->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static fn($success) => false);
+		$current?->menu->onClose($player);
 	}
 
 	/**
