@@ -6,12 +6,15 @@ namespace muqsit\invmenu;
 
 use muqsit\invmenu\session\network\PlayerNetwork;
 use muqsit\invmenu\session\PlayerManager;
+use muqsit\invmenu\session\PlayerWindowDispatcher;
 use pocketmine\event\inventory\InventoryCloseEvent;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
+use pocketmine\network\mcpe\protocol\ContainerClosePacket;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
+use pocketmine\network\mcpe\protocol\PacketViolationWarningPacket;
 
 final class InvMenuEventHandler implements Listener{
 	
@@ -30,6 +33,31 @@ final class InvMenuEventHandler implements Listener{
 			if($player !== null){
 				$this->player_manager->getNullable($player)?->network->notify($packet->timestamp);
 			}
+		}elseif($packet instanceof ContainerClosePacket){
+			if(!$packet->server && $packet->windowId === 255 && $packet->windowType === 247){
+				$player = $event->getOrigin()->getPlayer();
+				if($player !== null && $this->player_manager->getNullable($player)?->dispatcher !== null){
+					$event->cancel();
+				}
+			}
+		}elseif($packet instanceof PacketViolationWarningPacket){
+			if($packet->getPacketId() === PacketViolationWarningPacket::NETWORK_ID && $packet->getType() === -1 && $packet->getSeverity() === PacketViolationWarningPacket::SEVERITY_WARNING){
+				$player = $event->getOrigin()->getPlayer();
+				if($player !== null){
+					$dispatcher = $this->player_manager->getNullable($player)?->dispatcher;
+					if($dispatcher !== null){
+						if($dispatcher->state === PlayerWindowDispatcher::STATE_SENDING){
+							$dispatcher->setResult(true);
+							$event->cancel();
+						}elseif($dispatcher->state === PlayerWindowDispatcher::STATE_FINALIZING){
+							if(--$dispatcher->n_finalization_acks <= 0){
+								$dispatcher->finalize();
+							}
+							$event->cancel();
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -44,11 +72,12 @@ final class InvMenuEventHandler implements Listener{
 			return;
 		}
 
-		$current = $session->getCurrent();
+		$current = $session->current;
 		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
-			$current->menu->onClose($player);
+			$current?->graphic->remove($player);
+			$session->current = null;
 		}
-		$session->network->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success) : bool => false);
+		$session->network->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static fn($success) => false);
 	}
 
 	/**
@@ -60,7 +89,19 @@ final class InvMenuEventHandler implements Listener{
 		$player = $transaction->getSource();
 
 		$player_instance = $this->player_manager->get($player);
-		$current = $player_instance->getCurrent();
+
+		// cancel transaction if menu is still being sent
+		if($player_instance->dispatcher !== null && $player_instance->dispatcher->state !== PlayerWindowDispatcher::STATE_FINALIZING){
+			$inventory = $player_instance->dispatcher->info->menu->getInventory();
+			foreach($transaction->getActions() as $action){
+				if($action instanceof SlotChangeAction && $action->getInventory() === $inventory){
+					$event->cancel();
+					return;
+				}
+			}
+		}
+
+		$current = $player_instance->current;
 		if($current === null){
 			return;
 		}
