@@ -34,6 +34,9 @@ final class InvMenuEventHandler implements Listener{
 				$this->player_manager->getNullable($player)?->network->notify($packet->timestamp);
 			}
 		}elseif($packet instanceof ContainerClosePacket){
+			// these are not magic numbers. 255 (windowId) is supposed to be ContainerIds::NONE (-1) but it appears
+			// either pocketmine or mojang wrongly encodes/decodes the packet. the same applies to 247 (windowType)
+			// which actually is WindowTypes::NONE (-9).
 			if(!$packet->server && $packet->windowId === 255 && $packet->windowType === 247){
 				$player = $event->getOrigin()->getPlayer();
 				if($player !== null && $this->player_manager->getNullable($player)?->dispatcher !== null){
@@ -41,6 +44,10 @@ final class InvMenuEventHandler implements Listener{
 				}
 			}
 		}elseif($packet instanceof PacketViolationWarningPacket){
+			// we (ab)use a packet violation as an ACK the inventory was successfully sent to the player. we expect to
+			// receive the same number of violation packets as the number of excess ContainerOpenPackets that we sent.
+			// digesting these excess violation packets is not necessary, but in this way we can intercept violations
+			// from propagating further if existing plugins print these violations for debugging purposes.
 			if($packet->getPacketId() === PacketViolationWarningPacket::NETWORK_ID && $packet->getType() === -1 && $packet->getSeverity() === PacketViolationWarningPacket::SEVERITY_WARNING){
 				$player = $event->getOrigin()->getPlayer();
 				if($player !== null){
