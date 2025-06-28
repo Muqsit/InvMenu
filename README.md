@@ -3,10 +3,10 @@ Create and manage virtual inventories in PocketMine-MP.
 
 ## Installation and setup
 Download the compiled .phar file from [Poggit CI](https://poggit.pmmp.io/ci/Muqsit/InvMenu/~) and place it in your `virions/` folder.
-Read [Installation](https://github.com/Muqsit/InvMenu/wiki/Installation) for a more elaborate guide on how to setup InvMenu.
+Read [Installation](https://github.com/Muqsit/InvMenu/wiki/Installation) for a more elaborate guide on how to setup InvMenu library.
 
 > [!NOTE]
-> You **MUST** register `InvMenuHandler` before you can use InvMenu.
+> You must register `InvMenuHandler` before you can use InvMenu.
 > ```php
 > // in class MyPlugin extends PluginBase:
 > protected function onEnable() : void{
@@ -14,7 +14,6 @@ Read [Installation](https://github.com/Muqsit/InvMenu/wiki/Installation) for a m
 > 		InvMenuHandler::register($this);
 > 	}
 > }
-> ```
 
 ## Create a virtual inventory
 Quick start, use `InvMenu::create(InvMenu::TYPE_CHEST)->send($player);` to display a virtual chest inventory to a player.
