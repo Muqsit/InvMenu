@@ -29,16 +29,4 @@ final class PlayerSession{
 		$this->dispatcher?->finalize();
 		$this->dispatcher = null;
 	}
-
-	public function getCurrent() : ?InvMenuInfo{
-		return $this->current;
-	}
-
-	/**
-	 * @deprecated Access {@see PlayerSession::$network} directly
-	 * @return PlayerNetwork
-	 */
-	public function getNetwork() : PlayerNetwork{
-		return $this->network;
-	}
 }

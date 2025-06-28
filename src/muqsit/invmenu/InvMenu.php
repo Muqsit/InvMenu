@@ -64,14 +64,6 @@ class InvMenu implements InvMenuTypeIds{
 		$this->setInventory(null);
 	}
 
-	/**
-	 * @deprecated Access {@see InvMenu::$type} directly
-	 * @return InvMenuType
-	 */
-	public function getType() : InvMenuType{
-		return $this->type;
-	}
-
 	public function getName() : ?string{
 		return $this->name;
 	}

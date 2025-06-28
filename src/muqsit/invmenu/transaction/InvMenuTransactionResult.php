@@ -17,14 +17,6 @@ final class InvMenuTransactionResult{
 	){}
 
 	/**
-	 * @deprecated Access {@see InvMenuTransactionResult::$cancelled} directly
-	 * @return bool
-	 */
-	public function isCancelled() : bool{
-		return $this->cancelled;
-	}
-
-	/**
 	 * Notify when we have escaped from the event stack trace and the
 	 * client's network stack trace.
 	 * Useful for sending forms and other stuff that cant be sent right
@@ -36,13 +28,5 @@ final class InvMenuTransactionResult{
 	public function then(?Closure $callback) : self{
 		$this->post_transaction_callback = $callback;
 		return $this;
-	}
-
-	/**
-	 * @deprecated Access {@see InvMenuTransactionResult::$post_transaction_callback} directly
-	 * @return (Closure(Player) : void)|null
-	 */
-	public function getPostTransactionCallback() : ?Closure{
-		return $this->post_transaction_callback;
 	}
 }

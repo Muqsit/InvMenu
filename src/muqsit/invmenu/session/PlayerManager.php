@@ -53,12 +53,4 @@ final class PlayerManager{
 	public function getNullable(Player $player) : ?PlayerSession{
 		return $this->sessions[$player->getId()] ?? null;
 	}
-
-	/**
-	 * @deprecated Access {@see PlayerManager::$network_handler_registry} directly
-	 * @return PlayerNetworkHandlerRegistry
-	 */
-	public function getNetworkHandlerRegistry() : PlayerNetworkHandlerRegistry{
-		return $this->network_handler_registry;
-	}
 }
