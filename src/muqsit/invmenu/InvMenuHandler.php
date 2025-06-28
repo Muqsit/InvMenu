@@ -18,10 +18,7 @@ final class InvMenuHandler{
 	private static PlayerManager $player_manager;
 
 	public static function register(Plugin $plugin) : void{
-		if(self::isRegistered()){
-			throw new InvalidArgumentException("{$plugin->getName()} attempted to register " . self::class . " twice.");
-		}
-
+		!self::isRegistered() || throw new InvalidArgumentException("{$plugin->getName()} attempted to register " . self::class . " twice.");
 		self::$registrant = $plugin;
 		self::$type_registry = new InvMenuTypeRegistry();
 		self::$player_manager = new PlayerManager(self::getRegistrant());

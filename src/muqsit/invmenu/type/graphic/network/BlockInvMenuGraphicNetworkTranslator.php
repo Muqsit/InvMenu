@@ -23,10 +23,7 @@ final class BlockInvMenuGraphicNetworkTranslator implements InvMenuGraphicNetwor
 
 	public function translate(PlayerSession $session, InvMenuInfo $current, ContainerOpenPacket $packet) : void{
 		$graphic = $current->graphic;
-		if(!($graphic instanceof PositionedInvMenuGraphic)){
-			throw new InvalidArgumentException("Expected " . PositionedInvMenuGraphic::class . ", got " . get_class($graphic));
-		}
-
+		$graphic instanceof PositionedInvMenuGraphic || throw new InvalidArgumentException("Expected " . PositionedInvMenuGraphic::class . ", got " . $graphic::class);
 		$pos = $graphic->getPosition();
 		$packet->blockPosition = new BlockPosition((int) $pos->x, (int) $pos->y, (int) $pos->z);
 	}
