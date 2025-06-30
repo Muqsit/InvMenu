@@ -1,5 +1,5 @@
 # InvMenu
-Create and manage virtual inventories in PocketMine-MP.
+Create and manage virtual inventories in PocketMine-MP..
 
 ## Installation and setup
 Download the compiled .phar file from [Poggit CI](https://poggit.pmmp.io/ci/Muqsit/InvMenu/~) and place it in your `virions/` folder.
