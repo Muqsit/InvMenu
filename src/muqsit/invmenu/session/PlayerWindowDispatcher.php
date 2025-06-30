@@ -22,9 +22,9 @@ use function assert;
 
 final class PlayerWindowDispatcher{
 
-	public const int STATE_SENDING = 0;
-	public const int STATE_FINALIZING = 1;
-	public const int STATE_COMPLETED = 2;
+	public const STATE_SENDING = 0;
+	public const STATE_FINALIZING = 1;
+	public const STATE_COMPLETED = 2;
 
 	private ?TaskHandler $task_handler = null;
 	private ?Closure $container_open_callback = null;
