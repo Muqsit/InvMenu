@@ -126,6 +126,10 @@ final class PlayerWindowDispatcher{
 
 	public function setResult(bool $result) : void{
 		$this->result = $result;
+		if(!$result){
+			// this belongs here so we do not end up calling inventory close listener on failed dispatches
+			$this->session->current = null;
+		}
 		$this->task_handler?->cancel();
 		$this->task_handler = null;
 		if($this->session->player->isConnected()){
