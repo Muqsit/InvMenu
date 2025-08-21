@@ -21,12 +21,13 @@ final class PlayerSession{
 	 * @internal
 	 */
 	public function finalize() : void{
+		$this->network->finalize();
+		$this->dispatcher?->finalize(); // dispatcher finalized first, it has authority to nullify current
+		$this->dispatcher = null;
 		if($this->current !== null){
 			$this->current->graphic->remove($this->player);
 			$this->player->removeCurrentWindow();
+			$this->current = null;
 		}
-		$this->network->finalize();
-		$this->dispatcher?->finalize();
-		$this->dispatcher = null;
 	}
 }

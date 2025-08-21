@@ -81,10 +81,13 @@ final class InvMenuEventHandler implements Listener{
 
 		$current = $session->current;
 		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
-			$current?->graphic->remove($player);
+			$current->graphic->remove($player);
 			$session->current = null;
 		}
 		$session->network->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static fn($success) => false);
+		if($session->dispatcher !== null && $session->dispatcher->state === PlayerWindowDispatcher::STATE_SENDING && $session->dispatcher->info === $current){
+			return;
+		}
 		$current?->menu->onClose($player);
 	}
 
