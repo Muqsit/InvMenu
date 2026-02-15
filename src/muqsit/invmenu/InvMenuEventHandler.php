@@ -22,6 +22,22 @@ final class InvMenuEventHandler implements Listener{
 		readonly private PlayerManager $player_manager
 	){}
 
+    /**
+     * @param DataPacketDecodeEvent $event
+     * @priority NORMAL
+     * @handleCancelled
+     */
+    public function onDataPacketDecode(DataPacketDecodeEvent $event) : void{
+        $packet_id = $event->getPacketId();
+        if(
+            $packet_id === NetworkStackLatencyPacket::NETWORK_ID ||
+            $packet_id === ContainerClosePacket::NETWORK_ID ||
+            $packet_id === PacketViolationWarningPacket::NETWORK_ID
+        ){
+            $event->uncancel();
+        }
+    }
+
 	/**
 	 * @param DataPacketReceiveEvent $event
 	 * @priority NORMAL
