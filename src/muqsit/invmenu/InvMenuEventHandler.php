@@ -29,12 +29,13 @@ final class InvMenuEventHandler implements Listener{
      * @handleCancelled
      */
     public function onDataPacketDecode(DataPacketDecodeEvent $event) : void{
-        $packet_id = $event->getPacketId();
-        if(
-            $packet_id === NetworkStackLatencyPacket::NETWORK_ID ||
-            $packet_id === ContainerClosePacket::NETWORK_ID ||
-            $packet_id === PacketViolationWarningPacket::NETWORK_ID
-        ){
+        static $packets = [
+            NetworkStackLatencyPacket::NETWORK_ID => true,
+            ContainerClosePacket::NETWORK_ID => true,
+            PacketViolationWarningPacket::NETWORK_ID => true
+        ];
+
+        if (isset($packets[$event->getPacketId()])) {
             $event->uncancel();
         }
     }
